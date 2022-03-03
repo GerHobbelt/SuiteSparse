@@ -1,0 +1,3 @@
+- [ ] fix scaling issue
+- [ ] consider block permutation
+- [ ] improve path implementation (push_front)
