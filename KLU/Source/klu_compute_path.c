@@ -2,10 +2,16 @@
 /* === KLU_compute_path ===================================================== */
 /* ========================================================================== */
 
-/* Computes the factorization path under a given change vector
+/* 
+ * Computes the factorization path given change vector
+ * Any new refactorisation can be computed by iterating over entries in factorization path
+ * instead of all columns (see klu_partial.c)
  */
 #include "klu_internal.h"
 
+/* 
+ * "Wrapper" function. If pivot is already in path, return 1, else return 0 (i.e. pivot must be computed)
+ */
 int findVal(list* l, int pivot){
     int ret = search(l, pivot);
     if (ret == FOUND){
@@ -14,9 +20,14 @@ int findVal(list* l, int pivot){
     return 0;
 }
 
+/*
+ * Main function. Expects a factorized matrix and "changeVector", which contains columns of A that change
+ * e.g. changeVector = {3, 5}, if columns 3 and 5 contain varying entries. Needs to be permuted, since
+ * L*U = P*A*Q
+ */
 int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* Common, Int* changeVector, Int changeLen){
-    // ToDo: make block-wise
     // first, get LU decomposition
+    // sloppy implementation, as there might be a smarter way to do this
     int n = Symbolic->n;
     int lnz = Numeric->lnz;
     int unz = Numeric->unz;
@@ -58,7 +69,7 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     }
 
     // third, sort permuted vector
-    // in full partial factorisation, only find minimum value
+    // in "full partial refactorisation", only find minimum value
     // sloppy selectionsort implementation for first design
     int pivot = 0;
     int indx = 0;
@@ -80,7 +91,7 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
 
     // step two and three can / should be done externally
 
-    // fourth, compute factorization path. max length: n
+    // fourth, compute factorization path
     if(Numeric->path){
         free(Numeric->path);
     }
@@ -107,12 +118,14 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             // already computed pivot
             continue;
         }
-        // set first value of singleton path
 
+        // singleton path, which is put at front of factorization path
         list* singleton = (list*)malloc(sizeof(list));
         singleton->head = NULL;
         singleton->tail = NULL;
         singleton->length = 0;
+        
+        // set first value of singleton path
         push_back(singleton, pivot);
 
         // find block of pivot
@@ -131,10 +144,11 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         }
 
         // propagate until end
-        // in blocks, pivot<n_block[k]
+        // in blocks, pivot < n_block[k]
         while(pivot < k2){
             u_closest = n+1;
             l_closest = n+1;
+
             // find closest off-diagonal entry in L
             col = Lp[pivot];
             nextcol = Lp[pivot+1];
@@ -143,8 +157,9 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
                 // only one entry in column => diagonal entry
                 l_closest = n+1;
             } else {
-                // indices are not sorted!!!!
-                // TODO
+                // indices are not sorted!!!! TODO. Use klu_sort maybe?
+
+                // find closest off-diagonal entry in L, "look down" in pivot-th column
                 for(int entry=col+1; entry<nextcol; entry++){
                     if(l_closest > Li[entry]){
                         l_closest = Li[entry];
@@ -170,8 +185,10 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
                     for(int k=0; k<n+1; k++){
                         if(Up[k] <= j && j < Up[k+1]){
                             if(k > pivot){
+                                // found closest off-diagonal
                                 u_closest = k;
-                                goto minimum; // don't hate me
+                                // don't hate me
+                                goto minimum; 
                                 // alternatively: j=unz+1
                             }
                             break;
@@ -188,8 +205,6 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         push_front_list(singleton, Numeric->path);
         free(singleton);
     }
-    // necessary for some reason, we don't want it though
-    //sort_list(Numeric->path, QUICK);
     free(Lp);
     free(Li);
     free(Lx);

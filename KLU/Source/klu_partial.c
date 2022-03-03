@@ -340,7 +340,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for( z=0; z<pathLen && cur; z++ )
+                for( z = 0; z < pathLen && cur; z++ )
                 {
                     k = cur->value;
                     cur = cur->next;
@@ -405,6 +405,16 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                         }
                         if (Common->halt_if_singular)
                         {
+                            /* do not continue the factorization */
+                            return (FALSE) ;
+                        }
+                    }
+                    /* pivot vadility testing */ 
+                    else if( SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
+                    { 
+                        /* pivot is too small */
+                        Common->status = KLU_PIVOT_FAULT;
+                        if (Common->halt_if_pivot_fails){
                             /* do not continue the factorization */
                             return (FALSE) ;
                         }

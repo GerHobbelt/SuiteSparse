@@ -135,6 +135,7 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_OUT_OF_MEMORY (-2)
 #define KLU_INVALID (-3)
 #define KLU_TOO_LARGE (-4)          /* integer overflow has occured */
+#define KLU_PIVOT_FAULT (-5)        /* pivot became too small during (partial) refactorization */
 
 typedef struct klu_common_struct
 {
@@ -171,6 +172,14 @@ typedef struct klu_common_struct
         * TRUE: stop quickly.  klu_factor will free the partially-constructed
         *   Numeric object.  klu_refactor will not free it, but will leave the
         *   numerical values only partially defined.  This is the default. */
+
+    int halt_if_pivot_fails ; /* how to handle a failing pivot:
+        * FALSE: keep going. May return wrong numerical results, depending on
+        *   pivot tolerance
+        * TRUE: stop. does the same as "halt_if_singular".
+    */
+
+    double pivot_tol_fail ; /* pivot below this tolerance? => failure */
 
     /* ---------------------------------------------------------------------- */
     /* statistics */
@@ -218,6 +227,8 @@ typedef struct klu_l_common_struct /* 64-bit version (otherwise same as above)*/
         struct klu_l_common_struct *) ;
     void *user_data ;
     SuiteSparse_long halt_if_singular ;
+    SuiteSparse_long halt_if_pivot_fails ;
+    double pivot_tol_fail ;
     SuiteSparse_long status, nrealloc, structural_rank, numerical_rank,
         singular_col, noffdiag ;
     double flops, rcond, condest, rgrowth, work ;
