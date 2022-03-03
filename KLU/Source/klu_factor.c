@@ -70,6 +70,7 @@ static void factor2
     scale = Common->scale ;
     max_lnz_block = 1 ;
     max_unz_block = 1 ;
+    Numeric->path = (list*)malloc(sizeof(list));
 
     /* compute the inverse of P from symbolic analysis.  Will be updated to
      * become the inverse of the numerical factorization when the factorization

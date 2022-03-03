@@ -89,7 +89,7 @@ SUITESPARSE_VERSION = 5.10.1
     # optimization level
     #---------------------------------------------------------------------------
 
-    OPTIMIZATION ?= -O3
+    OPTIMIZATION ?= -O2
 
     #---------------------------------------------------------------------------
     # statement coverage for */Tcov

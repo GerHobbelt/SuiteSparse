@@ -1,28 +1,31 @@
 /* ========================================================================== */
-/* === KLU_refactor ========================================================= */
+/* === KLU_partial ========================================================== */
 /* ========================================================================== */
 
-/* Factor the matrix, after ordering and analyzing it with KLU_analyze, and
- * factoring it once with KLU_factor.  This routine cannot do any numerical
- * pivoting.  The pattern of the input matrix (Ap, Ai) must be identical to
- * the pattern given to KLU_factor.
+/* Factor the matrix, after ordering and analyzing it with KLU_analyze,
+ * factoring it once with KLU_factor, and computing factorization path.  
+ * This routine cannot do any numerical pivoting.  The pattern of the 
+ * input matrix (Ap, Ai) must be identical to the pattern given to 
+ * KLU_factor.
  */
 
 #include "klu_internal.h"
 
 
 /* ========================================================================== */
-/* === KLU_refactor ========================================================= */
+/* === KLU_partial ========================================================== */
 /* ========================================================================== */
 
-Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
+Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
 (
     /* inputs, not modified */
     Int Ap [ ],         /* size n+1, column pointers */
     Int Ai [ ],         /* size nz, row indices */
     double Ax [ ],
-    KLU_symbolic *Symbolic,
-
+    KLU_symbolic *Symbolic, /* now also contains factorization path */
+    /*Int PATH[],
+    Int PathLen,*/
+    //list* path,
     /* input/output */
     KLU_numeric *Numeric,
     KLU_common  *Common
@@ -37,6 +40,10 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale,
         nblocks, poff, i, j, up, ulen, llen, maxblock, nzoff ;
 
+    Int pathLen = Numeric->path->length;
+    node* cur = Numeric->path->head;
+    Int z = 0;
+    
     /* ---------------------------------------------------------------------- */
     /* check inputs */
     /* ---------------------------------------------------------------------- */
@@ -105,20 +112,19 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
     Common->nrealloc = 0 ;
     Udiag = Numeric->Udiag ;
     nzoff = Symbolic->nzoff ;
-
     /* ---------------------------------------------------------------------- */
     /* check the input matrix compute the row scale factors, Rs */
     /* ---------------------------------------------------------------------- */
 
     /* do no scale, or check the input matrix, if scale < 0 */
-    if (scale >= 0)
-    {
+    //if (scale >= 0)
+    //{
         /* check for out-of-range indices, but do not check for duplicates */
-        if (!KLU_scale (scale, n, Ap, Ai, Ax, Rs, NULL, Common))
-        {
-            return (FALSE) ;
-        }
-    }
+    //    if (!KLU_scale (scale, n, Ap, Ai, Ax, Rs, NULL, Common))
+    //    {
+    //        return (FALSE) ;
+    //    }
+    //}
 
     /* ---------------------------------------------------------------------- */
     /* clear workspace X */
@@ -126,7 +132,7 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
 
     for (k = 0 ; k < maxblock ; k++)
     {
-        /* X [k] = 0 */
+        /* X [k] k= 0 */
         CLEAR (X [k]) ;
     }
 
@@ -188,16 +194,16 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
                 /* ---------------------------------------------------------- */
-
                 Lip  = Numeric->Lip  + k1 ;
                 Llen = Numeric->Llen + k1 ;
                 Uip  = Numeric->Uip  + k1 ;
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for (k = 0 ; k < nk ; k++)
+                for (z = 0 ; z < pathLen && cur; z++)
                 {
-
+                    k = cur->value;
+                    cur = cur->next;
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -239,7 +245,6 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
                             MULT_SUB (X [Li [p]], Lx [p], ujk) ;
                         }
                     }
-                    /* Anmerkung: ukk ist das (partielle) Pivotelement */
                     /* get the diagonal entry of U */
                     ukk = X [k] ;
                     /* X [k] = 0 */
@@ -337,8 +342,11 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for (k = 0 ; k < nk ; k++)
+                //for (k = nk-1 ; k < nk ; k++)
+                for( z=0; z<pathLen && cur; z++ )
                 {
+                    k = cur->value;
+                    cur = cur->next;
 
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */

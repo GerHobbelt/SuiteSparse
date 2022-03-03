@@ -9,6 +9,14 @@ default: go
 
 include SuiteSparse_config/SuiteSparse_config.mk
 
+klu:
+	( cd SuiteSparse_config && $(MAKE) )
+	( cd AMD && $(MAKE) )
+	( cd BTF && $(MAKE) )
+	( cd COLAMD && $(MAKE) )
+	( cd KLU && $(MAKE) )
+
+
 # Compile the default rules for each package.  Compiled libraries for all
 # packages are placed in SuiteSparse/lib, except for Mongoose and GraphBLAS.
 # Those two packages use CMake, and their compiled libraries are placed in

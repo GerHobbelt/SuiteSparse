@@ -15,6 +15,7 @@ extern "C" {
 #include "amd.h"
 #include "colamd.h"
 #include "btf.h"
+#include "klu_list.h"
 
 /* -------------------------------------------------------------------------- */
 /* Symbolic object - contains the pre-ordering computed by klu_analyze */
@@ -103,7 +104,7 @@ typedef struct
     int *Offi ;         /* size nzoff, row indices */
     void *Offx ;        /* size nzoff, numerical values */
     int nzoff ;
-
+    list *path ;
 } klu_numeric ;
 
 typedef struct          /* 64-bit version (otherwise same as above) */
@@ -120,6 +121,7 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     SuiteSparse_long *Offp, *Offi ;
     void *Offx ;
     SuiteSparse_long nzoff ;
+    list *path ;
 
 } klu_l_numeric ;
 
@@ -422,6 +424,36 @@ SuiteSparse_long klu_l_refactor (SuiteSparse_long *, SuiteSparse_long *,
 SuiteSparse_long klu_zl_refactor (SuiteSparse_long *, SuiteSparse_long *,
     double *, klu_l_symbolic *, klu_l_numeric *, klu_l_common *) ;
 
+/* -------------------------------------------------------------------------- */
+/* klu_compute_path: computes factorization path for partial refactorization  */
+/* -------------------------------------------------------------------------- */
+
+int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
+(
+    klu_symbolic* Symbolic, 
+    klu_numeric* Numeric, 
+    klu_common* Common, 
+    int* changeVector, 
+    int changeLen
+) ; 
+            
+
+/* -------------------------------------------------------------------------- */
+/* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
+/* -------------------------------------------------------------------------- */
+
+int klu_partial            /* return TRUE if successful, FALSE otherwise */
+(
+    /* inputs, not modified */
+    int Ap [ ],         /* size n+1, column pointers */
+    int Ai [ ],         /* size nz, row indices */
+    double Ax [ ],      /* size nz, numerical values */
+    klu_symbolic *Symbolic,
+    //list* path,
+    /* input, and numerical values modified on output */
+    klu_numeric *Numeric,
+    klu_common *Common
+) ;
 
 /* -------------------------------------------------------------------------- */
 /* klu_free_symbolic: destroys the Symbolic object */

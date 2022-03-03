@@ -16,20 +16,7 @@ endif
 
 I = -I../../include
 
-all: library klu_simple kludemo kluldemo
-	- ./klu_simple
-	- ./kludemo < ../Matrix/1c.mtx
-	- ./kludemo < ../Matrix/arrowc.mtx
-	- ./kludemo < ../Matrix/arrow.mtx
-	- ./kludemo < ../Matrix/impcol_a.mtx
-	- ./kludemo < ../Matrix/w156.mtx
-	- ./kludemo < ../Matrix/ctina.mtx
-	- ./kluldemo < ../Matrix/1c.mtx
-	- ./kluldemo < ../Matrix/arrowc.mtx
-	- ./kluldemo < ../Matrix/arrow.mtx
-	- ./kluldemo < ../Matrix/impcol_a.mtx
-	- ./kluldemo < ../Matrix/w156.mtx
-	- ./kluldemo < ../Matrix/ctina.mtx
+all: library klu_simple kludemo kluldemo klu_simpler klu_path
 
 library:
 	( cd ../../SuiteSparse_config ; $(MAKE) )
@@ -61,3 +48,8 @@ klu_simple: klu_simple.c Makefile
 	$(CC) $(CF) $(I) klu_simple.c -o klu_simple $(CLIB)
 	- ./klu_simple
 
+klu_simpler: klu_simpler.c Makefile
+	$(CC) $(CF) $(I) klu_simpler.c -o klu_simpler $(CLIB)
+
+klu_path: klu_path.c Makefile
+	$(CC) $(CF) $(I) klu_path.c -o klu_path $(CLIB)

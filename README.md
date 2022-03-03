@@ -22,6 +22,19 @@ Additional algorithm designers: Esmond Ng and John Gilbert.
 Refer to each package for license, copyright, and author information.  All
 codes are authored or co-authored by Timothy A. Davis.
 
+
+-----------------------------------------------------------------------------
+KLU-Partial: KLU with factorization path based partial refactorisation
+-----------------------------------------------------------------------------
+
+March 3, 2022
+
+   Given an update on A, computes subset of columns that need to be refactored
+   for a new LU factorisation.
+
+Author:
+   Lennart Schumacher
+
 -----------------------------------------------------------------------------
 About the BLAS and LAPACK libraries
 -----------------------------------------------------------------------------
