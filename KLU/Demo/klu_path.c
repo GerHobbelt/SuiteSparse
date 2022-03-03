@@ -21,6 +21,7 @@ double Ax_new [ ] = {8.18413247, 0.31910091, 0.95960852, 7.9683539 , 3.27076739,
        4.03715243, 4.36857613, 0.54369597, 6.86482384, 6.46735381,
        4.76819917 } ;
 double b [ ] = {1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0} ;
+double c [ ] = {1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0} ;
 
 void showLU(klu_symbolic* symb, klu_numeric* num, klu_common* com){
     int n = symb->n;
@@ -128,16 +129,12 @@ int main (void)
     klu_common Common ;
     int i , RET;
     klu_defaults (&Common) ;
-    // TODO: respect scale
-    Common.scale = -1;
+
     Symbolic = klu_analyze (n, Ap, Ai, &Common) ;
     Numeric = klu_factor (Ap, Ai, Ax, Symbolic, &Common) ;
-    //int ret = klu_partial(Ap, Ai, Ax, Symbolic, Numeric, &Common) ;
-    
-    //showLU(Symbolic, Numeric, &Common);
 
     int changeLen = 2;
-    int* changeVector = (int*) calloc(sizeof(int), 2);
+    int* changeVector = (int*) calloc(sizeof(int), changeLen);
     changeVector[0] = 3;
     changeVector[1] = 8;
     RET = klu_compute_path(Symbolic, Numeric, &Common, changeVector, changeLen);
@@ -150,9 +147,24 @@ int main (void)
     RET = klu_partial(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
 
     klu_solve (Symbolic, Numeric, 10, 1, b, &Common) ;
+    printf("------------------\n");
+    printf("Partial solution:\n");
+    for (i = 0 ; i < n ; i++) printf ("xp [%d] = %g\n", i, b [i]) ;
+    printf("------------------\n");
+
+    RET = klu_refactor(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
+    klu_solve (Symbolic, Numeric, 10, 1, c, &Common) ;
+    printf("------------------\n");
+    printf("Refactor solution:\n");
+    for (i = 0 ; i < n ; i++) printf ("xr [%d] = %g\n", i, c [i]) ;
+    printf("------------------\n");
+
+    printf("------------------\n");
+    printf("Difference:\n");
+    for(i = 0; i < n ; i++) printf("xp[%d] - xr[%d] = %g\n", i, i, b[i]-c[i]);
+    printf("------------------\n");
     klu_free_symbolic (&Symbolic, &Common) ;
     klu_free_numeric (&Numeric, &Common) ;
-    for (i = 0 ; i < n ; i++) printf ("x [%d] = %g\n", i, b [i]) ;
     return (0) ;
 }
 

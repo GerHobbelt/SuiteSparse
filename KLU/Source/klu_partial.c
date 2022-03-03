@@ -23,9 +23,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     Int Ai [ ],         /* size nz, row indices */
     double Ax [ ],
     KLU_symbolic *Symbolic, /* now also contains factorization path */
-    /*Int PATH[],
-    Int PathLen,*/
-    //list* path,
+
     /* input/output */
     KLU_numeric *Numeric,
     KLU_common  *Common
@@ -117,14 +115,14 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     /* ---------------------------------------------------------------------- */
 
     /* do no scale, or check the input matrix, if scale < 0 */
-    //if (scale >= 0)
-    //{
+    if (scale >= 0)
+    {
         /* check for out-of-range indices, but do not check for duplicates */
-    //    if (!KLU_scale (scale, n, Ap, Ai, Ax, Rs, NULL, Common))
-    //    {
-    //        return (FALSE) ;
-    //    }
-    //}
+        if (!KLU_scale (scale, n, Ap, Ai, Ax, Rs, NULL, Common))
+        {
+            return (FALSE) ;
+        }
+    }
 
     /* ---------------------------------------------------------------------- */
     /* clear workspace X */
@@ -342,7 +340,6 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                //for (k = nk-1 ; k < nk ; k++)
                 for( z=0; z<pathLen && cur; z++ )
                 {
                     k = cur->value;
