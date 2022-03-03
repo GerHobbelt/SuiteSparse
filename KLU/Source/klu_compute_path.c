@@ -78,15 +78,10 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         }
     }
 
+    // step two and three can / should be done externally
+
     // fourth, compute factorization path. max length: n
-    //int* factPath = calloc(n, sizeof(int));
-    // initialize factorization path as -1
-    /*for(int i=0; i<n; i++){
-        factPath[i] = -1;
-    }*/
-    //Numeric->path = (list*)malloc(sizeof(list));
     if(Numeric->path){
-        //killlist(Numeric->path);
         free(Numeric->path);
     }
     Numeric->path = (list*)malloc(sizeof(list));
@@ -96,9 +91,12 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
 
     pivot = 0;
     int ret;
-    int ctr = 0;
     int col, nextcol;
     int u_closest, l_closest;
+
+    // blocks
+    Int k2, k1, nk;
+
     for(int i=0; i<changeLen; i++){
         // get next changed column
         pivot = changeVector_permuted[i];
@@ -110,8 +108,6 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             continue;
         }
         // set first value of singleton path
-        //factPath[ctr] = pivot;
-        //ctr++;
 
         list* singleton = (list*)malloc(sizeof(list));
         singleton->head = NULL;
@@ -119,9 +115,24 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         singleton->length = 0;
         push_back(singleton, pivot);
 
+        // find block of pivot
+        for(int k=0; k<nb+1; k++){
+            if(R[k] <= pivot && pivot < R[k+1]){
+                k1 = R[k];
+                k2 = R[k+1];
+                nk = k2-k1;
+                break;
+            }
+        }
+
+        if(nk == 1){
+            // singleton case, do nothing. pivot already added
+            continue;
+        }
+
         // propagate until end
         // in blocks, pivot<n_block[k]
-        while(pivot<n-1){
+        while(pivot < k2){
             u_closest = n+1;
             l_closest = n+1;
             // find closest off-diagonal entry in L
@@ -173,13 +184,12 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             if(findVal(Numeric->path, pivot)==1||pivot==n+1)
                 break;
             push_back(singleton, pivot);
-            ctr++;
         }
-        concat(Numeric->path, singleton);
+        push_front_list(singleton, Numeric->path);
         free(singleton);
     }
     // necessary for some reason, we don't want it though
-    sort_list(Numeric->path, QUICK);
+    //sort_list(Numeric->path, QUICK);
     free(Lp);
     free(Li);
     free(Lx);

@@ -262,14 +262,18 @@ void push_front_list(list* f, list* b){ /* pushes f in front of b */
     if(back && front){
         back->next = front;
         front->prev = back;
-        f->head = b->head;
-        b->tail = f->tail;
+        b->head = f->head;
+        f->tail = b->tail;
         f->length += b->length;
         b->length = f->length;
     } else if(back){
-        b = f;
+        b->head = f->head;
+        b->tail = f->tail;
+        b->length = f->length;
     } else if(front){
-        f = b;
+        f->head = b->head;
+        f->tail = b->tail;
+        f->length = b->length;
     } else {
         ;
     }
