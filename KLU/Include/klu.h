@@ -136,6 +136,7 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_INVALID (-3)
 #define KLU_TOO_LARGE (-4)          /* integer overflow has occured */
 #define KLU_PIVOT_FAULT (-5)        /* pivot became too small during (partial) refactorization */
+#define KLU_PATH_INVALID (-6)       /* path is NULL. klu_compute_path wasn't called properly. */
 
 typedef struct klu_common_struct
 {
@@ -460,7 +461,25 @@ int klu_partial            /* return TRUE if successful, FALSE otherwise */
     int Ai [ ],         /* size nz, row indices */
     double Ax [ ],      /* size nz, numerical values */
     klu_symbolic *Symbolic,
-    //list* path,
+
+    /* input, and numerical values modified on output */
+    klu_numeric *Numeric,
+    klu_common *Common
+) ;
+
+/* -------------------------------------------------------------------------- */
+/* klu_full_partial: partially refactorizes matrix with same ordering as klu_factor */
+/* -------------------------------------------------------------------------- */
+
+int klu_full_partial            /* return TRUE if successful, FALSE otherwise */
+(
+    /* inputs, not modified */
+    int Ap [ ],         /* size n+1, column pointers */
+    int Ai [ ],         /* size nz, row indices */
+    double Ax [ ],      /* size nz, numerical values */
+    klu_symbolic *Symbolic,
+    int k_start,
+
     /* input, and numerical values modified on output */
     klu_numeric *Numeric,
     klu_common *Common

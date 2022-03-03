@@ -121,6 +121,7 @@
 #define KLU_factor klu_factor
 #define KLU_refactor klu_refactor
 #define KLU_partial klu_partial
+#define KLU_full_partial klu_full_partial
 #define KLU_compute_path klu_compute_path
 #define KLU_kernel_factor klu_kernel_factor 
 #define KLU_lsolve klu_lsolve

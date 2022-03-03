@@ -1,9 +1,9 @@
 /* ========================================================================== */
-/* === KLU_partial ========================================================== */
+/* === KLU_full_partial ========================================================== */
 /* ========================================================================== */
 
 /* Factor the matrix, after ordering and analyzing it with KLU_analyze,
- * factoring it once with KLU_factor, and computing factorization path.  
+ * factoring it once with KLU_factor.  
  * This routine cannot do any numerical pivoting.  The pattern of the 
  * input matrix (Ap, Ai) must be identical to the pattern given to 
  * KLU_factor.
@@ -16,14 +16,14 @@
 /* === KLU_partial ========================================================== */
 /* ========================================================================== */
 
-Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
+Int KLU_full_partial       /* returns TRUE if successful, FALSE otherwise */
 (
     /* inputs, not modified */
     Int Ap [ ],         /* size n+1, column pointers */
     Int Ai [ ],         /* size nz, row indices */
     double Ax [ ],
     KLU_symbolic *Symbolic, /* now also contains factorization path */
-
+    Int k_start,        /* first changing column */
     /* input/output */
     KLU_numeric *Numeric,
     KLU_common  *Common
@@ -37,10 +37,6 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     Unit *LU ;
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale,
         nblocks, poff, i, j, up, ulen, llen, maxblock, nzoff ;
-
-    Int pathLen = Numeric->path->length;
-    node* cur = Numeric->path->head;
-    Int z = 0;
     
     /* ---------------------------------------------------------------------- */
     /* check inputs */
@@ -57,13 +53,6 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
         /* invalid Numeric object */
         Common->status = KLU_INVALID ;
         return (FALSE) ;
-    }
-
-    if (cur == NULL || Numeric->path == NULL)
-    {
-        /* no path computed */
-        Common->status = KLU_PATH_INVALID ;
-        return (FALSE);
     }
 
     Common->numerical_rank = EMPTY ;
@@ -205,11 +194,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for (z = 0 ; z < pathLen && cur; z++)
+                for (k = k_start - k1; k < nk ; k++)
                 {
-                    /* TODO: check */
-                    k = cur->value - k1;
-                    cur = cur->next;
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -348,12 +334,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for( z = 0; z < pathLen && cur; z++ )
+                for (k = k_start - k1 ; k < nk ; k++)
                 {
-                    /* TODO: check */
-                    k = cur->value - k1;
-                    cur = cur->next;
-
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */

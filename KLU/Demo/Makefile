@@ -16,7 +16,7 @@ endif
 
 I = -I../../include
 
-all: library klu_simple kludemo kluldemo klu_simpler klu_path
+all: library klu_simple kludemo kluldemo klu_simpler klu_path klu_full
 
 library:
 	( cd ../../SuiteSparse_config ; $(MAKE) )
@@ -53,3 +53,6 @@ klu_simpler: klu_simpler.c Makefile
 
 klu_path: klu_path.c Makefile
 	$(CC) $(CF) $(I) klu_path.c -o klu_path $(CLIB)
+
+klu_full: klu_full.c Makefile 
+	$(CC) $(CF) $(I) klu_full.c -o klu_full $(CLIB)
