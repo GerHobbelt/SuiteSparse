@@ -28,9 +28,9 @@ KLU-Partial: KLU with factorization path based partial refactorisation
 -----------------------------------------------------------------------------
 
 March 3, 2022
-
-   Given an update on A, computes subset of columns that need to be refactored
-   for a new LU factorisation.
+    
+    Given an update on A, computes subset of columns that need to be refactored
+    for a new LU factorisation.
 
 Author:
    Lennart Schumacher
