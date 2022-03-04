@@ -129,7 +129,7 @@ Int KLU_full_partial       /* returns TRUE if successful, FALSE otherwise */
         /* X [k] k= 0 */
         CLEAR (X [k]) ;
     }
-
+    /* TODO: remember for each block where to start! */
     poff = 0 ;
 
     /* ---------------------------------------------------------------------- */

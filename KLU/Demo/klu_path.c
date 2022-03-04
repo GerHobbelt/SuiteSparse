@@ -33,7 +33,7 @@ void showLU(klu_symbolic* symb, klu_numeric* num, klu_common* com){
     int *P, *Q, *R;
     double* Rs;
     int nb = symb->nblocks;
-
+    int i;
     Lp = calloc(n+1, sizeof(int));
     Up = calloc(n+1, sizeof(int));
     Fp = calloc(n+1, sizeof(int));
@@ -53,57 +53,57 @@ void showLU(klu_symbolic* symb, klu_numeric* num, klu_common* com){
 
     printf("--------------\nU:");
     printf(" unz: %d\n", unz);
-    for(int i=0; i<unz; i++)
+    for(i=0; i<unz; i++)
         printf("%lf,\t", Ux[i]);
     printf("\n");
-    for(int i=0; i<unz; i++)
+    for(i=0; i<unz; i++)
         printf("%d,\t", Ui[i]);
     printf("\n");
-    for(int i=0; i<n+1; i++)
+    for(i=0; i<n+1; i++)
         printf("%d,\t", Up[i]);
     printf("\n");
 
     printf("--------------\nL:");
     printf(" lnz: %d\n", lnz);
-    for(int i=0; i<lnz; i++)
+    for(i=0; i<lnz; i++)
         printf("%lf,\t", Lx[i]);
     printf("\n");
-    for(int i=0; i<lnz; i++)
+    for(i=0; i<lnz; i++)
         printf("%d,\t", Li[i]);
     printf("\n");
-    for(int i=0; i<n+1; i++)
+    for(i=0; i<n+1; i++)
         printf("%d,\t", Lp[i]);
     printf("\n");
 
     printf("--------------\nF:");
     printf(" nzoff: %d\n", nzoff);
-    for(int i=0; i<nzoff; i++)
+    for(i=0; i<nzoff; i++)
         printf("%lf,\t", Fx[i]);
     printf("\n");
-    for(int i=0; i<nzoff; i++)
+    for(i=0; i<nzoff; i++)
         printf("%d,\t", Fi[i]);
     printf("\n");
-    for(int i=0; i<n+1; i++)
+    for(i=0; i<n+1; i++)
         printf("%d,\t", Fp[i]);
     printf("\n");
 
     
     printf("--------------\nRs:\n");
-    for(int i=0; i<n; i++)
+    for(i=0; i<n; i++)
         printf("%lf,\t", Rs[i]);
     printf("\n");
     printf("--------------\nP:\n");
-    for(int i=0; i<n; i++)
+    for(i=0; i<n; i++)
         printf("%d,\t", P[i]);
     printf("\n");
     printf("--------------\nQ:\n");
-    for(int i=0; i<n; i++)
+    for(i=0; i<n; i++)
         printf("%d,\t", Q[i]);
     printf("\n");
 
     printf("--------------\nR:");
     printf(" nblocks: %d\n", symb->nblocks);
-    for(int i=0; i<symb->nblocks+1; i++)
+    for(i=0; i<symb->nblocks+1; i++)
         printf("%d\t", R[i]);
     printf("\n");
 
