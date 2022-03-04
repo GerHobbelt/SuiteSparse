@@ -26,8 +26,6 @@ int findVal(list* l, int pivot){
  * L*U = P*A*Q
  */
 int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* Common, Int* changeVector, Int changeLen){
-    // first, get LU decomposition
-    // sloppy implementation, as there might be a smarter way to do this
     /* Declarations */
     /* LU data */
     int n = Symbolic->n;
@@ -40,6 +38,8 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     int *P, *Q, *R;
     double* Rs;
 
+    int RET;
+
     /* indices and temporary variables */
     int i, k, j, entry;
     int pivot;
@@ -49,8 +49,8 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     // blocks
     Int k2, k1, nk;
     // TODO: save sizeof(...) statically and not call for each alloc
-    int* Qi = calloc(n, sizeof(int));
-    int* changeVector_permuted = calloc(changeLen, sizeof(Int));
+    Int* Qi = calloc(n, sizeof(Int));
+    Int* changeVector_permuted = calloc(changeLen, sizeof(Int));
 
     if(Numeric->path){
         free(Numeric->path);
@@ -75,50 +75,64 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     Rs = calloc(n, sizeof(double));
     R = calloc(nb+1, sizeof(int));
     
-    Int RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-    if(RET != (TRUE))
+    // first, get LU decomposition
+    // sloppy implementation, as there might be a smarter way to do this
+    RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+    if (RET != (TRUE))
+    {
         return (FALSE);
-
-    // first and a halfly, invert permutation vector
-    for(i=0; i<n; i++){
-        Qi[Q[i]] = i;
     }
 
-    // second, apply permutation on changeVector
-    for(i=0; i<changeLen; i++){
-        changeVector_permuted[i] = Qi[changeVector[i]];
+    // second, invert permutation vector
+    for (i = 0 ; i < n ; i++)
+    {
+        Qi [Q [i]] = i;
     }
 
-    // third, sort permuted vector
+    // third, apply permutation on changeVector
+    for (i = 0 ; i < changeLen ; i++)
+    {
+        changeVector_permuted [i] = Qi [changeVector [i]];
+    }
+
+    // fourth, sort permuted vector
     // in "full partial refactorisation", only find minimum value
     // sloppy selectionsort implementation for first design
-    for(i=0; i<changeLen; i++){
+    for (i = 0 ; i < changeLen ; i++)
+    {
         k = i;
-        pivot = changeVector_permuted[i];
-        for(j=i+1; j<changeLen; j++){
-            if(changeVector_permuted[j]<pivot){
-                pivot = changeVector_permuted[j];
+        pivot = changeVector_permuted [i];
+        for (j = i + 1 ; j < changeLen ; j++)
+        {
+            if (changeVector_permuted [j] < pivot)
+            {
+                pivot = changeVector_permuted [j];
                 k = j;
             }
         }
-        if(k != i){ // found smaller
+        if (k != i)
+        { 
+            // found smaller
             // switch positions
-            int tmp = changeVector_permuted[i];
-            changeVector_permuted[i] = pivot;
-            changeVector_permuted[k] = tmp;
+            int tmp = changeVector_permuted [i];
+            changeVector_permuted [i] = pivot;
+            changeVector_permuted [k] = tmp;
         }
     }
 
-    // step two and three can / should be done externally
+    // step three and four can / should be done externally
 
-    // fourth, compute factorization path
-    for(i=0; i<changeLen; i++){
+    // fifth, compute factorization path
+    for (i = 0 ; i < changeLen ; i++)
+    {
         // get next changed column
-        pivot = changeVector_permuted[i];
+        pivot = changeVector_permuted [i];
         
         // check if it was already computed
-        if(findVal(Numeric->path, pivot) == 1){
+        if (findVal(Numeric->path, pivot) == 1)
+        {
             // already computed pivot
+            // do nothing, go to next pivot
             continue;
         }
 
@@ -132,23 +146,30 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         push_back(singleton, pivot);
 
         // find block of pivot
-        for(k=0; k<nb+1; k++){
-            if(R[k] <= pivot && pivot < R[k+1]){
-                k1 = R[k];
-                k2 = R[k+1];
-                nk = k2-k1;
+        for (k = 0 ; k < nb+1 ; k++)
+        {
+            if (R [k] <= pivot && pivot < R [k+1])
+            {
+                k1 = R [k];
+                k2 = R [k+1];
+                nk = k2 - k1;
                 break;
             }
         }
 
-        if(nk == 1){
-            // singleton case, do nothing. pivot already added
+        if (nk == 1)
+        {
+            // Maybe redundant?
+            // singleton case, put pivot in front of path
+            push_front_list(singleton, Numeric->path);
+            free(singleton);
             continue;
         }
 
         // propagate until end
         // in blocks, pivot < n_block[k]
-        while(pivot < k2){
+        while (pivot < k2)
+        {
             u_closest = n+1;
             l_closest = n+1;
 
@@ -156,16 +177,21 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             col = Lp[pivot];
             nextcol = Lp[pivot+1];
 
-            if(nextcol-col == 1){
+            if (nextcol - col == 1)
+            {
                 // only one entry in column => diagonal entry
                 l_closest = n+1;
-            } else {
+            } 
+            else 
+            {
                 // indices are not sorted!!!! TODO. Use klu_sort maybe?
 
                 // find closest off-diagonal entry in L, "look down" in pivot-th column
-                for(entry=col+1; entry<nextcol; entry++){
-                    if(l_closest > Li[entry]){
-                        l_closest = Li[entry];
+                for (entry = col + 1 ; entry < nextcol ; entry++)
+                {
+                    if (l_closest > Li [entry])
+                    {
+                        l_closest = Li [entry];
                     }
                 }
             }
@@ -182,12 +208,17 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
                Transpose U
                do the same as for L
              */
-            for(j = 0; j<unz; j++){
-                if(Ui[j] == pivot){
+            for (j = 0 ; j < unz ; j++)
+            {
+                if(Ui [j] == pivot)
+                {
                     // check if Ui[j] is right to pivot
-                    for(k=0; k<n+1; k++){
-                        if(Up[k] <= j && j < Up[k+1]){
-                            if(k > pivot){
+                    for (k = 0 ; k < n+1 ; k++)
+                    {
+                        if (Up [k] <= j && j < Up [k+1])
+                        {
+                            if (k > pivot)
+                            {
                                 // found closest off-diagonal
                                 u_closest = k;
                                 // don't hate me
@@ -201,8 +232,11 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             }
         minimum:
             pivot = MIN(l_closest, u_closest);
-            if(findVal(Numeric->path, pivot)==1||pivot==n+1)
+            // check if pivot is either already in path or n+1 (no more off-diag values)
+            if (findVal(Numeric->path, pivot) == 1 || pivot == n+1)
+            {
                 break;
+            }
             push_back(singleton, pivot);
         }
         push_front_list(singleton, Numeric->path);
