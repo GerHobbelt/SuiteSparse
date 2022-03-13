@@ -41,6 +41,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     Int pathLen = Numeric->path->length;
     node* cur = Numeric->path->head;
     Int z = 0;
+    Int doRefact = 0;
     
     /* ---------------------------------------------------------------------- */
     /* check inputs */
@@ -195,6 +196,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
+                //cur = Numeric->path->head;
 
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
@@ -205,11 +207,26 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for (z = 0 ; z < pathLen && cur; z++)
+                //for (z = 0 ; z < pathLen && cur ; z++)
+                for (k = 0 ; k < nk ; k++)
                 {
-                    /* TODO: check */
-                    k = cur->value - k1;
-                    cur = cur->next;
+                    doRefact =  1 ? (search(Numeric->path, k+k1) == FOUND) : 0;
+                    if(!doRefact)
+                    {
+                        oldcol = Q[k+k1];
+                        pend = Ap [oldcol+1] ;
+                        for (p = Ap [oldcol] ; p < pend ; p++)
+                        {
+                            newrow = Pinv [Ai [p]] - k1 ;
+                            if (newrow < 0 && poff < nzoff)
+                            {
+                                Offx [poff] = Az [p] ;
+                                poff++ ;
+                            }
+                        }
+                        continue;
+                    }
+                    
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -231,6 +248,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                             X [newrow] = Az [p] ;
                         }
                     }
+
 
                     /* ------------------------------------------------------ */
                     /* compute kth column of U, and update kth column of A */
@@ -271,9 +289,21 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                             return (FALSE) ;
                         }
                     }
+                    /* pivot vadility testing */ 
+                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
+                    { 
+                        /* pivot is too small */
+                        Common->status = KLU_PIVOT_FAULT;
+                        if (Common->halt_if_pivot_fails)
+                        {
+                            /* do not continue the factorization */
+                            return (FALSE) ;
+                        }
+                    }
                     Udiag [k+k1] = ukk ;
                     /* gather and divide by pivot to get kth column of L */
                     GET_POINTER (LU, Lip, Llen, Li, Lx, k, llen) ;
+                    
                     for (p = 0 ; p < llen ; p++)
                     {
                         i = Li [p] ;
@@ -337,7 +367,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
-
+                cur = Numeric->path->head;
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
                 /* ---------------------------------------------------------- */
@@ -348,12 +378,28 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for( z = 0; z < pathLen && cur; z++ )
+                for (k = 0 ; k < nk ; k++)
                 {
-                    /* TODO: check */
-                    k = cur->value - k1;
-                    cur = cur->next;
-
+                    doRefact = 1 ? (search(Numeric->path, k+k1) == FOUND) : 0;
+                    if(!doRefact)
+                    {
+                        oldcol = Q[k+k1];
+                        pend = Ap [oldcol+1] ;
+                        for (p = Ap [oldcol] ; p < pend ; p++)
+                        {
+                            oldrow = Ai [p] ;
+                            newrow = Pinv [oldrow] - k1 ;
+                            if (newrow < 0 && poff < nzoff)
+                            {
+                                /* entry in off-diagonal part */
+                                /* Offx [poff] = Az [p] / Rs [oldrow] */
+                                SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
+                                poff++ ;
+                            }
+                        }
+                        continue;
+                    }
+                    
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -384,18 +430,30 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                     /* ------------------------------------------------------ */
 
                     GET_POINTER (LU, Uip, Ulen, Ui, Ux, k, ulen) ;
-                    for (up = 0 ; up < ulen ; up++)
+                    if(search(Numeric->path, k+k1) == FOUND)
                     {
-                        j = Ui [up] ;
-                        ujk = X [j] ;
-                        /* X [j] = 0 */
-                        CLEAR (X [j]) ;
-                        Ux [up] = ujk ;
-                        GET_POINTER (LU, Lip, Llen, Li, Lx, j, llen) ;
-                        for (p = 0 ; p < llen ; p++)
+                        for (up = 0 ; up < ulen ; up++)
                         {
-                            /* X [Li [p]] -= Lx [p] * ujk */
-                            MULT_SUB (X [Li [p]], Lx [p], ujk) ;
+                            j = Ui [up] ;
+                            ujk = X [j] ;
+                            /* X [j] = 0 */
+                            CLEAR (X [j]) ;
+                            Ux [up] = ujk ;
+                            GET_POINTER (LU, Lip, Llen, Li, Lx, j, llen) ;
+                            for (p = 0 ; p < llen ; p++)
+                            {
+                                /* X [Li [p]] -= Lx [p] * ujk */
+                                MULT_SUB (X [Li [p]], Lx [p], ujk) ;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (up = 0 ; up < ulen ; up++)
+                        {
+                            j = Ui[up];
+                            Ux[up] = X[j];
+                            CLEAR(X[j]);
                         }
                     }
                     /* get the diagonal entry of U */
@@ -419,11 +477,12 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                         }
                     }
                     /* pivot vadility testing */ 
-                    else if( SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
+                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
                     { 
                         /* pivot is too small */
                         Common->status = KLU_PIVOT_FAULT;
-                        if (Common->halt_if_pivot_fails){
+                        if (Common->halt_if_pivot_fails)
+                        {
                             /* do not continue the factorization */
                             return (FALSE) ;
                         }

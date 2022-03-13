@@ -9,7 +9,7 @@ default: go
 
 include SuiteSparse_config/SuiteSparse_config.mk
 
-klu:
+klu: metis
 	( cd SuiteSparse_config && $(MAKE) )
 	( cd AMD && $(MAKE) )
 	( cd BTF && $(MAKE) )

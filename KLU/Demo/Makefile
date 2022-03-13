@@ -32,7 +32,7 @@ library:
 purge: distclean
 
 distclean: clean
-	- $(RM) kludemo kluldemo klu_simple
+	- $(RM) kludemo kluldemo klu_simple klu_full klu_path klu_simpler
 	- $(RM) -r $(PURGE)
 
 clean:
