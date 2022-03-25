@@ -91,6 +91,7 @@ SUITESPARSE_VERSION = 5.10.1
 
     OPTIMIZATION ?= -O2
 
+
     #---------------------------------------------------------------------------
     # statement coverage for */Tcov
     #---------------------------------------------------------------------------
@@ -102,8 +103,8 @@ SUITESPARSE_VERSION = 5.10.1
         # which overrides the following settings:
         # MKLROOT =
         AUTOCC = no
-        CC = gcc
-        CXX = g++
+        CC = clang 
+        CXX = clang++
         # BLAS = -lrefblas -lgfortran -lstdc++
         # LAPACK = -llapack
         CFLAGS += --coverage

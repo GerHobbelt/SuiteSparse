@@ -9,17 +9,6 @@
  */
 #include "klu_internal.h"
 
-/* 
- * "Wrapper" function. If pivot is already in path, return 1, else return 0 (i.e. pivot must be computed)
- */
-int findVal(list* l, int pivot){
-    int ret = search(l, pivot);
-    if (ret == FOUND){
-        return 1;
-    }
-    return 0;
-}
-
 void saveLU(double* Lx, int* Li, int* Lp, double* Ux, int* Ui, int* Up, double* Fx, int* Fi, int* Fp, int lnz, int unz, int n, int nzoff)
 {
     FILE* l, *u, *g;
@@ -111,13 +100,17 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     Int* Qi = calloc(n, sizeof(Int));
     Int* changeVector_permuted = calloc(changeLen, sizeof(Int));
 
-    if(Numeric->path){
-        free(Numeric->path);
+    Numeric->path = KLU_malloc(n, sizeof(int), Common);
+    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
+
+    for(i = 0 ; i < n ; i++)
+    {
+        Numeric->path[i] = 0;
     }
-    Numeric->path = (list*)malloc(sizeof(list));
-    Numeric->path->head = NULL;
-    Numeric->path->tail = NULL;
-    Numeric->path->length = 0;
+    for(i = 0 ; i < nb ; i++)
+    {
+        Numeric->bpath[i] = 0;
+    }
 
     // TODO: solve smarter, no more klu_extracts.
     Lp = calloc(n+1, sizeof(int));
@@ -190,7 +183,7 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         pivot = changeVector_permuted [i];
         
         // check if it was already computed
-        if (findVal(Numeric->path, pivot) == 1)
+        if (Numeric->path[pivot] == 1)
         {
             // already computed pivot
             // do nothing, go to next pivot
@@ -198,13 +191,14 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         }
 
         // singleton path, which is put at front of factorization path
-        list* singleton = (list*)malloc(sizeof(list));
-        singleton->head = NULL;
-        singleton->tail = NULL;
-        singleton->length = 0;
+        // list* singleton = (list*)malloc(sizeof(list));
+        // singleton->head = NULL;
+        // singleton->tail = NULL;
+        // singleton->length = 0;
         
         // set first value of singleton path
-        push_back(singleton, pivot);
+        // push_back(singleton, pivot);
+        Numeric->path[pivot] = 1;
 
         // find block of pivot
         for (k = 0 ; k < nb+1 ; k++)
@@ -212,6 +206,8 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             if (R [k] <= pivot && pivot < R [k+1])
             {
                 k1 = R [k];
+                /* set varying block */
+                Numeric->bpath[k] = 1;
                 k2 = R [k+1];
                 nk = k2 - k1;
                 break;
@@ -222,8 +218,8 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         {
             // Maybe redundant?
             // singleton case, put pivot in front of path
-            push_front_list(singleton, Numeric->path);
-            free(singleton);
+            // push_front_list(singleton, Numeric->path);
+            // free(singleton);
             continue;
         }
 
@@ -302,14 +298,15 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         minimum:
             pivot = MIN(l_closest, u_closest);
             // check if pivot is either already in path or n+1 (no more off-diag values)
-            if (findVal(Numeric->path, pivot) == 1 || pivot == k2)//n+1)
+            if (Numeric->path[pivot] == 1 || pivot == k2)//n+1)
             {
                 break;
             }
-            push_back(singleton, pivot);
+            //push_back(singleton, pivot);
+            Numeric->path[pivot] = 1;
         }
-        push_front_list(singleton, Numeric->path);
-        free(singleton);
+        // push_front_list(singleton, Numeric->path);
+        // free(singleton);
     }
     //sort_list(Numeric->path, QUICK);
     free(Lp);

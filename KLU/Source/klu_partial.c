@@ -38,8 +38,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale,
         nblocks, poff, i, j, up, ulen, llen, maxblock, nzoff ;
 
-    Int pathLen = Numeric->path->length;
-    node* cur = Numeric->path->head;
+    //Int pathLen = Numeric->path->length;
+    //node* cur = Numeric->path->head;
     Int z = 0;
     Int doRefact = 0;
     
@@ -60,7 +60,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
         return (FALSE) ;
     }
 
-    if (cur == NULL || Numeric->path == NULL)
+    if (Numeric->path == NULL)
     {
         /* no path computed */
         Common->status = KLU_PATH_INVALID ;
@@ -142,125 +142,129 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
         CLEAR (X [k]) ;
     }
 
+    /* ---------------------------------------------------------------------- */
+    /* assemble off-diagonal blocks */
+    /* ---------------------------------------------------------------------- */
+    
     poff = 0 ;
 
-    if (scale <= 0)
-    {
-        for (block = 0 ; block < nblocks ; block ++)
-        {
-            k1 = R [block] ;
-            k2 = R [block+1] ;
-            nk = k2 - k1 ;
-            if (nk == 1)
-            {
-                oldcol = Q [k1] ;
-                pend = Ap [oldcol+1] ;
-                CLEAR (s) ;
-                for (p = Ap [oldcol] ; p < pend ; p++)
-                {
-                    newrow = Pinv [Ai [p]] - k1 ;
-                    if (newrow < 0 && poff < nzoff)
-                    {
-                        /* entry in off-diagonal block */
-                        Offx [poff] = Az [p] ;
-                        poff++ ;
-                    }
-                }
-                Udiag [k1] = s ;
-            }
-            else
-            {
-                for (k = 0 ; k < nk ; k++)
-                {
-                    oldcol = Q [k+k1] ;
-                    pend = Ap [oldcol+1] ;
-                    for (p = Ap [oldcol] ; p < pend ; p++)
-                    {
-                        newrow = Pinv [Ai [p]] - k1 ;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal block */
-                            Offx [poff] = Az [p] ;
-                            poff++ ;
-                        }
-                    }
-                }
-            }
-        }
-    } 
-    else
-    {
+    // if (scale <= 0)
+    // {
+    //     for (block = 0 ; block < nblocks ; block ++)
+    //     {
+    //         k1 = R [block] ;
+    //         k2 = R [block+1] ;
+    //         nk = k2 - k1 ;
+    //         if (nk == 1)
+    //         {
+    //             oldcol = Q [k1] ;
+    //             pend = Ap [oldcol+1] ;
+    //             CLEAR (s) ;
+    //             for (p = Ap [oldcol] ; p < pend ; p++)
+    //             {
+    //                 newrow = Pinv [Ai [p]] - k1 ;
+    //                 if (newrow < 0 && poff < nzoff)
+    //                 {
+    //                     /* entry in off-diagonal block */
+    //                     Offx [poff] = Az [p] ;
+    //                     poff++ ;
+    //                 }
+    //             }
+    //             Udiag [k1] = s ;
+    //         }
+    //         else
+    //         {
+    //             for (k = 0 ; k < nk ; k++)
+    //             {
+    //                 oldcol = Q [k+k1] ;
+    //                 pend = Ap [oldcol+1] ;
+    //                 for (p = Ap [oldcol] ; p < pend ; p++)
+    //                 {
+    //                     newrow = Pinv [Ai [p]] - k1 ;
+    //                     if (newrow < 0 && poff < nzoff)
+    //                     {
+    //                         /* entry in off-diagonal block */
+    //                         Offx [poff] = Az [p] ;
+    //                         poff++ ;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // } 
+    // else
+    // {
 
-        /* ------------------------------------------------------------------ */
-        /* scaling */
-        /* ------------------------------------------------------------------ */
+    //     /* ------------------------------------------------------------------ */
+    //     /* scaling */
+    //     /* ------------------------------------------------------------------ */
 
-        for (block = 0 ; block < nblocks ; block++)
-        {
+    //     for (block = 0 ; block < nblocks ; block++)
+    //     {
 
-            /* -------------------------------------------------------------- */
-            /* the block is from rows/columns k1 to k2-1 */
-            /* -------------------------------------------------------------- */
+    //         /* -------------------------------------------------------------- */
+    //         /* the block is from rows/columns k1 to k2-1 */
+    //         /* -------------------------------------------------------------- */
 
-            k1 = R [block] ;
-            k2 = R [block+1] ;
-            nk = k2 - k1 ;
+    //         k1 = R [block] ;
+    //         k2 = R [block+1] ;
+    //         nk = k2 - k1 ;
 
-            if (nk == 1)
-            {
+    //         if (nk == 1)
+    //         {
 
-                /* ---------------------------------------------------------- */
-                /* singleton case */
-                /* ---------------------------------------------------------- */
+    //             /* ---------------------------------------------------------- */
+    //             /* singleton case */
+    //             /* ---------------------------------------------------------- */
 
-                oldcol = Q [k1] ;
-                pend = Ap [oldcol+1] ;
-                CLEAR (s) ;
-                for (p = Ap [oldcol] ; p < pend ; p++)
-                {
-                    oldrow = Ai [p] ;
-                    newrow = Pinv [oldrow] - k1 ;
-                    if (newrow < 0 && poff < nzoff)
-                    {
-                        /* entry in off-diagonal block */
-                        /* Offx [poff] = Az [p] / Rs [oldrow] */
-                        SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]) ;
-                        poff++ ;
-                    }
-                }
-            }
-            else
-            {
-                Lip  = Numeric->Lip  + k1 ;
-                Llen = Numeric->Llen + k1 ;
-                Uip  = Numeric->Uip  + k1 ;
-                Ulen = Numeric->Ulen + k1 ;
-                LU = LUbx [block] ;
+    //             oldcol = Q [k1] ;
+    //             pend = Ap [oldcol+1] ;
+    //             CLEAR (s) ;
+    //             for (p = Ap [oldcol] ; p < pend ; p++)
+    //             {
+    //                 oldrow = Ai [p] ;
+    //                 newrow = Pinv [oldrow] - k1 ;
+    //                 if (newrow < 0 && poff < nzoff)
+    //                 {
+    //                     /* entry in off-diagonal block */
+    //                     /* Offx [poff] = Az [p] / Rs [oldrow] */
+    //                     SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]) ;
+    //                     poff++ ;
+    //                 }
+    //             }
+    //         }
+    //         else
+    //         {
+    //             Lip  = Numeric->Lip  + k1 ;
+    //             Llen = Numeric->Llen + k1 ;
+    //             Uip  = Numeric->Uip  + k1 ;
+    //             Ulen = Numeric->Ulen + k1 ;
+    //             LU = LUbx [block] ;
 
-                for (k = 0 ; k < nk ; k++)
-                {
-                    /* ------------------------------------------------------ */
-                    /* scatter kth column of the block into workspace X */
-                    /* ------------------------------------------------------ */
+    //             for (k = 0 ; k < nk ; k++)
+    //             {
+    //                 /* ------------------------------------------------------ */
+    //                 /* scatter kth column of the block into workspace X */
+    //                 /* ------------------------------------------------------ */
 
-                    oldcol = Q [k+k1] ;
-                    pend = Ap [oldcol+1] ;
-                    for (p = Ap [oldcol] ; p < pend ; p++)
-                    {
-                        oldrow = Ai [p] ;
-                        newrow = Pinv [oldrow] - k1 ;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal part */
-                            /* Offx [poff] = Az [p] / Rs [oldrow] */
-                            SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
-                            poff++ ;
-                        }
-                    }
-                }
-            }
-        }   
-    }
+    //                 oldcol = Q [k+k1] ;
+    //                 pend = Ap [oldcol+1] ;
+    //                 for (p = Ap [oldcol] ; p < pend ; p++)
+    //                 {
+    //                     oldrow = Ai [p] ;
+    //                     newrow = Pinv [oldrow] - k1 ;
+    //                     if (newrow < 0 && poff < nzoff)
+    //                     {
+    //                         /* entry in off-diagonal part */
+    //                         /* Offx [poff] = Az [p] / Rs [oldrow] */
+    //                         SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
+    //                         poff++ ;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }   
+    // }
 
     /* ---------------------------------------------------------------------- */
     /* factor each block */
@@ -297,12 +301,13 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 for (p = Ap [oldcol] ; p < pend ; p++)
                 {
                     newrow = Pinv [Ai [p]] - k1 ;
-                    // if (newrow < 0 && poff < nzoff)
-                    // {
-                    //     /* entry in off-diagonal block */
-                    //     Offx [poff] = Az [p] ;
-                    //     poff++ ;
-                    // }
+                    if (newrow < 0 && poff < nzoff)
+                    {
+                        /* entry in off-diagonal block */
+                        if(Numeric->bpath[block] == 1)
+                            Offx [poff] = Az [p] ;  
+                        poff++ ;
+                    }
                     if (newrow >= 0)
                     {
                         /* singleton */
@@ -314,7 +319,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
-                cur = Numeric->path->head;
+                //cur = Numeric->path->head;
 
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
@@ -325,30 +330,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                for (z = 0 ; z < pathLen && cur ; z++)
-                //for (k = 0 ; k < nk ; k++)
+                for (k = 0 ; k < nk ; k++)
                 {
-                    k = cur->value;
-                    cur = cur->next;
-                    if (k < k1 || k >= k2)
-                        continue;
-                    k = k - k1 ;
-                    //doRefact =  1 ? (search(Numeric->path, k+k1) == FOUND) : 0;
-/*                     if(!doRefact)
-                    {
-                        oldcol = Q[k+k1];
-                        pend = Ap [oldcol+1] ;
-                        for (p = Ap [oldcol] ; p < pend ; p++)
-                        {
-                            newrow = Pinv [Ai [p]] - k1 ;
-                            if (newrow < 0 && poff < nzoff)
-                            {
-                                Offx [poff] = Az [p] ;
-                                poff++ ;
-                            }
-                        }
-                        continue;
-                    } */
                     
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
@@ -359,19 +342,23 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                     for (p = Ap [oldcol] ; p < pend ; p++)
                     {
                         newrow = Pinv [Ai [p]] - k1 ;
-                        // if (newrow < 0 && poff < nzoff)
-                        // {
-                        //     /* entry in off-diagonal block */
-                        //     Offx [poff] = Az [p] ;
-                        //     poff++ ;
-                        // }
+                        if (newrow < 0 && poff < nzoff)
+                        {
+                            /* entry in off-diagonal block */
+                            if(Numeric->bpath[block] == 1)
+                                Offx [poff] = Az [p] ;
+                            poff++ ;
+                        }
                         if (newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
-                            X [newrow] = Az [p] ;
+                            if(Numeric->path[k1+k] == 1 && Numeric->bpath[block] == 1)
+                                X [newrow] = Az [p] ;
                         }
                     }
 
+                    if(Numeric->path[k1+k] != 1 || Numeric->bpath[block] != 1)
+                        continue;
 
                     /* ------------------------------------------------------ */
                     /* compute kth column of U, and update kth column of A */
@@ -471,18 +458,20 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 {
                     oldrow = Ai [p] ;
                     newrow = Pinv [oldrow] - k1 ;
-                    // if (newrow < 0 && poff < nzoff)
-                    // {
-                    //     /* entry in off-diagonal block */
-                    //     /* Offx [poff] = Az [p] / Rs [oldrow] */
-                    //     SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]) ;
-                    //     poff++ ;
-                    // }
+                    if (newrow < 0 && poff < nzoff)
+                    {
+                        /* entry in off-diagonal block */
+                        /* Offx [poff] = Az [p] / Rs [oldrow] */
+                        if(Numeric->bpath[block] == 1)
+                            SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]) ;
+                        poff++ ;
+                    }
                     if(newrow >= 0)
                     {
                         /* singleton */
                         /* s = Az [p] / Rs [oldrow] */
-                        SCALE_DIV_ASSIGN (s, Az [p], Rs [oldrow]) ;
+                        if(Numeric->bpath[block] == 1)
+                            SCALE_DIV_ASSIGN (s, Az [p], Rs [oldrow]) ;
                     }
                 }
                 Udiag [k1] = s ;
@@ -490,7 +479,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
-                cur = Numeric->path->head;
+                // cur = Numeric->path->head;
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
                 /* ---------------------------------------------------------- */
@@ -501,33 +490,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                 Ulen = Numeric->Ulen + k1 ;
                 LU = LUbx [block] ;
 
-                //for (k = 0 ; k < nk ; k++)
-                for (z = 0 ; z < pathLen && cur ; z ++)
+                for (k = 0 ; k < nk ; k++)
                 {
-//                   doRefact = 1 ? (search(Numeric->path, k+k1) == FOUND) : 0;
-                    // if(!doRefact)
-                    // {
-                    //     oldcol = Q[k+k1];
-                    //     pend = Ap [oldcol+1] ;
-                    //     for (p = Ap [oldcol] ; p < pend ; p++)
-                    //     {
-                    //         oldrow = Ai [p] ;
-                    //         newrow = Pinv [oldrow] - k1 ;
-                    //         if (newrow < 0 && poff < nzoff)
-                    //         {
-                    //             /* entry in off-diagonal part */
-                    //             /* Offx [poff] = Az [p] / Rs [oldrow] */
-                    //             SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
-                    //             poff++ ;
-                    //         }
-                    //     }
-                    //     continue;
-                    // }
-                    k = cur->value;
-                    if( k - k1 < 0 || k >= k2)
-                        continue;
-                    k = k - k1;
-                    cur = cur->next;
                     
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
@@ -539,20 +503,25 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                     {
                         oldrow = Ai [p] ;
                         newrow = Pinv [oldrow] - k1 ;
-                        // if (newrow < 0 && poff < nzoff)
-                        // {
-                        //     /* entry in off-diagonal part */
-                        //     /* Offx [poff] = Az [p] / Rs [oldrow] */
-                        //     SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
-                        //     poff++ ;
-                        // }
+                        if (newrow < 0 && poff < nzoff)
+                        {
+                            /* entry in off-diagonal part */
+                            /* Offx [poff] = Az [p] / Rs [oldrow] */
+                            if(Numeric->bpath[block] == 1)
+                                SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
+                            poff++ ;
+                        }
                         if( newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
                             /* X [newrow] = Az [p] / Rs [oldrow] */
-                            SCALE_DIV_ASSIGN (X [newrow], Az [p], Rs [oldrow]) ;
+                            if(Numeric->bpath[block] == 1 && Numeric->path[k+k1] == 1)
+                                SCALE_DIV_ASSIGN (X [newrow], Az [p], Rs [oldrow]) ;
                         }
                     }
+
+                    if(Numeric->bpath[block] != 1 || Numeric->path[k+k1] != 1)
+                        continue;
 
                     /* ------------------------------------------------------ */
                     /* compute kth column of U, and update kth column of A */

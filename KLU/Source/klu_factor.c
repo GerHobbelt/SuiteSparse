@@ -8,6 +8,41 @@
 
 #include "klu_internal.h"
 
+static void saveM(Entry* Ax, Int* Ai, Int* Ap, int nnz, int n)
+{
+    FILE* a = fopen("A.txt", "w");
+    int i;
+    for(i=0;i<nnz;i++)
+        fprintf(a, "%lf, ", Ax[i]);
+    fprintf(a, "\n");
+    for(i=0;i<nnz;i++)
+        fprintf(a, "%d, ", Ai[i]);
+    fprintf(a, "\n");
+    for(i=0;i<n+1;i++)
+        fprintf(a, "%d, ", Ap[i]);
+    fclose(a);
+}
+
+static void savePerm(Int* P, Int* Q, int n)
+{
+    FILE* p = fopen("P.txt", "w");
+    FILE* q = fopen("Q.txt", "w");
+    int i;
+    int* Qi = (int*)calloc(n, sizeof(int));
+    int* Pi = (int*)calloc(n, sizeof(int));
+    for (i=0; i<n; i++)
+    {
+        Qi[Q[i]] = i;
+        Pi[P[i]] = i;
+    }
+    for(i=0; i<n; i++)
+        fprintf(p, "%d, ", Pi[i]);
+    for(i=0; i<n; i++)
+        fprintf(q, "%d, ", Qi[i]);
+    fclose(p);
+    fclose(q);
+}
+
 /* ========================================================================== */
 /* === KLU_factor2 ========================================================== */
 /* ========================================================================== */
@@ -34,6 +69,8 @@ static void factor2
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, lnz, unz, p, newrow,
         nblocks, poff, nzoff, lnz_block, unz_block, scale, max_lnz_block,
         max_unz_block ;
+
+    //saveM(Ax, Ai, Ap, Symbolic->nz, Symbolic->n);
 
     /* ---------------------------------------------------------------------- */
     /* initializations */
@@ -70,7 +107,8 @@ static void factor2
     scale = Common->scale ;
     max_lnz_block = 1 ;
     max_unz_block = 1 ;
-    Numeric->path = (list*)malloc(sizeof(list));
+    
+    //savePerm(P, Q, n);
 
     /* compute the inverse of P from symbolic analysis.  Will be updated to
      * become the inverse of the numerical factorization when the factorization

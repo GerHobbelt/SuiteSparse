@@ -64,10 +64,9 @@ Int KLU_free_numeric
 
     KLU_free (Numeric->Work, Numeric->worksize, 1, Common) ;
 
-    if(Numeric->path!=NULL){
-        //killlist(Numeric->path);
-        KLU_free (Numeric->path, 1, sizeof (list), Common) ;
-    }
+    KLU_free (Numeric->path, n, sizeof (int), Common) ;
+    
+    KLU_free (Numeric->bpath, Numeric->nblocks, sizeof (int), Common);
 
     KLU_free (Numeric, 1, sizeof (KLU_numeric), Common) ;
 

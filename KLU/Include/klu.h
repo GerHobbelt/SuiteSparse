@@ -15,7 +15,7 @@ extern "C" {
 #include "amd.h"
 #include "colamd.h"
 #include "btf.h"
-#include "klu_list.h"
+//#include "klu_list.h"
 
 /* -------------------------------------------------------------------------- */
 /* Symbolic object - contains the pre-ordering computed by klu_analyze */
@@ -104,7 +104,8 @@ typedef struct
     int *Offi ;         /* size nzoff, row indices */
     void *Offx ;        /* size nzoff, numerical values */
     int nzoff ;
-    list *path ;
+    int *path ;  /* factorization path contains columns with varying entries */
+    int *bpath ; /* block path to indicate which blocks contain varying entries */
 } klu_numeric ;
 
 typedef struct          /* 64-bit version (otherwise same as above) */
@@ -121,7 +122,8 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     SuiteSparse_long *Offp, *Offi ;
     void *Offx ;
     SuiteSparse_long nzoff ;
-    list *path ;
+    int *path ;
+    int *bpath ;
 
 } klu_l_numeric ;
 
