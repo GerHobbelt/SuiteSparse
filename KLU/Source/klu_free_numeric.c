@@ -64,10 +64,16 @@ Int KLU_free_numeric
 
     KLU_free (Numeric->Work, Numeric->worksize, 1, Common) ;
 
-    KLU_free (Numeric->path, n, sizeof (int), Common) ;
-    
-    KLU_free (Numeric->bpath, Numeric->nblocks, sizeof (int), Common);
-
+    /* Numeric->path or Numeric->bpath only allocated if klu_compute_path
+     * is called, i.e. partial refactorization is used */
+    if(Numeric->path)
+    {
+        KLU_free (Numeric->path, n, sizeof (int), Common) ;
+    }
+    if(Numeric->bpath)
+    {
+        KLU_free (Numeric->bpath, Numeric->nblocks, sizeof (int), Common);
+    }
     KLU_free (Numeric, 1, sizeof (KLU_numeric), Common) ;
 
     *NumericHandle = NULL ;
