@@ -3,9 +3,9 @@
 /* ========================================================================== */
 
 /* Factor the matrix, after ordering and analyzing it with KLU_analyze,
- * factoring it once with KLU_factor, and computing factorization path.  
- * This routine cannot do any numerical pivoting.  The pattern of the 
- * input matrix (Ap, Ai) must be identical to the pattern given to 
+ * factoring it once with KLU_factor, and computing factorization path.
+ * This routine cannot do any numerical pivoting.  The pattern of the
+ * input matrix (Ap, Ai) must be identical to the pattern given to
  * KLU_factor.
  */
 
@@ -42,7 +42,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     //node* cur = Numeric->path->head;
     Int z = 0;
     Int doRefact = 0;
-    
+
     /* ---------------------------------------------------------------------- */
     /* check inputs */
     /* ---------------------------------------------------------------------- */
@@ -138,14 +138,14 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
 
     for (k = 0 ; k < maxblock ; k++)
     {
-        /* X [k] k= 0 */
+        /* X [k] = 0 */
         CLEAR (X [k]) ;
     }
 
     /* ---------------------------------------------------------------------- */
     /* assemble off-diagonal blocks */
     /* ---------------------------------------------------------------------- */
-    
+
     poff = 0 ;
 
     // if (scale <= 0)
@@ -191,7 +191,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     //             }
     //         }
     //     }
-    // } 
+    // }
     // else
     // {
 
@@ -263,7 +263,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
     //                 }
     //             }
     //         }
-    //     }   
+    //     }
     // }
 
     /* ---------------------------------------------------------------------- */
@@ -305,10 +305,11 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                     {
                         /* entry in off-diagonal block */
                         if(Numeric->bpath[block] == 1)
-                            Offx [poff] = Az [p] ;  
+                            Offx [poff] = Az [p] ;
                         poff++ ;
                     }
-                    if (newrow >= 0)
+                    //if (newrow >= 0)
+                    else
                     {
                         /* singleton */
                         s = Az [p] ;
@@ -332,7 +333,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
 
                 for (k = 0 ; k < nk ; k++)
                 {
-                    
+
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -349,7 +350,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                                 Offx [poff] = Az [p] ;
                             poff++ ;
                         }
-                        if (newrow >= 0)
+                        //if (newrow >= 0)
+                        else
                         {
                             /* (newrow,k) is an entry in the block */
                             if(Numeric->path[k1+k] == 1 && Numeric->bpath[block] == 1)
@@ -399,9 +401,9 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                             return (FALSE) ;
                         }
                     }
-                    /* pivot vadility testing */ 
-                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
-                    { 
+                    /* pivot vadility testing */
+                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail)
+                    {
                         /* pivot is too small */
                         Common->status = KLU_PIVOT_FAULT;
                         if (Common->halt_if_pivot_fails)
@@ -413,7 +415,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                     Udiag [k+k1] = ukk ;
                     /* gather and divide by pivot to get kth column of L */
                     GET_POINTER (LU, Lip, Llen, Li, Lx, k, llen) ;
-                    
+
                     for (p = 0 ; p < llen ; p++)
                     {
                         i = Li [p] ;
@@ -466,7 +468,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                             SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]) ;
                         poff++ ;
                     }
-                    if(newrow >= 0)
+                    //if(newrow >= 0)
+                    else
                     {
                         /* singleton */
                         /* s = Az [p] / Rs [oldrow] */
@@ -479,7 +482,6 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
-                // cur = Numeric->path->head;
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
                 /* ---------------------------------------------------------- */
@@ -492,7 +494,7 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
 
                 for (k = 0 ; k < nk ; k++)
                 {
-                    
+
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
                     /* ------------------------------------------------------ */
@@ -511,7 +513,8 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                                 SCALE_DIV_ASSIGN (Offx [poff], Az [p], Rs [oldrow]);
                             poff++ ;
                         }
-                        if( newrow >= 0)
+                        //if( newrow >= 0)
+                        else
                         {
                             /* (newrow,k) is an entry in the block */
                             /* X [newrow] = Az [p] / Rs [oldrow] */
@@ -562,9 +565,9 @@ Int KLU_partial       /* returns TRUE if successful, FALSE otherwise */
                             return (FALSE) ;
                         }
                     }
-                    /* pivot vadility testing */ 
-                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail) 
-                    { 
+                    /* pivot vadility testing */
+                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail)
+                    {
                         /* pivot is too small */
                         Common->status = KLU_PIVOT_FAULT;
                         if (Common->halt_if_pivot_fails)

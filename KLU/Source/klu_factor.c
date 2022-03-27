@@ -525,6 +525,10 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
 
     Numeric->Pinv = KLU_malloc (n, sizeof (Int), Common) ;
 
+    /* only allocate if klu_compute_path is called */
+    Numeric->path = NULL;
+    Numeric->bpath = NULL;
+
     /* allocate permanent workspace for factorization and solve.  Note that the
      * solver will use an Xwork of size 4n, whereas the factorization codes use
      * an Xwork of size n and integer space (Iwork) of size 6n. KLU_condest
