@@ -161,27 +161,27 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
     // fourth, sort permuted vector
     // in "full partial refactorisation", only find minimum value
     // sloppy selectionsort implementation for first design
-    for (i = 0 ; i < changeLen ; i++)
-    {
-        k = i;
-        pivot = changeVector_permuted [i];
-        for (j = i + 1 ; j < changeLen ; j++)
-        {
-            if (changeVector_permuted [j] < pivot)
-            {
-                pivot = changeVector_permuted [j];
-                k = j;
-            }
-        }
-        if (k != i)
-        {
-            // found smaller
-            // switch positions
-            int tmp = changeVector_permuted [i];
-            changeVector_permuted [i] = pivot;
-            changeVector_permuted [k] = tmp;
-        }
-    }
+    // for (i = 0 ; i < changeLen ; i++)
+    // {
+    //     k = i;
+    //     pivot = changeVector_permuted [i];
+    //     for (j = i + 1 ; j < changeLen ; j++)
+    //     {
+    //         if (changeVector_permuted [j] < pivot)
+    //         {
+    //             pivot = changeVector_permuted [j];
+    //             k = j;
+    //         }
+    //     }
+    //     if (k != i)
+    //     {
+    //         // found smaller
+    //         // switch positions
+    //         int tmp = changeVector_permuted [i];
+    //         changeVector_permuted [i] = pivot;
+    //         changeVector_permuted [k] = tmp;
+    //     }
+    // }
 
     // step three and four can / should be done externally
 
@@ -199,26 +199,20 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             continue;
         }
 
-        // singleton path, which is put at front of factorization path
-        // list* singleton = (list*)malloc(sizeof(list));
-        // singleton->head = NULL;
-        // singleton->tail = NULL;
-        // singleton->length = 0;
-
         // set first value of singleton path
-        // push_back(singleton, pivot);
         Numeric->path[pivot] = 1;
 
         // find block of pivot
-        for (k = 0 ; k < nb+1 ; k++)
+        for (k = 0 ; k < nb ; k++)
         {
-            if (R [k] <= pivot && pivot < R [k+1])
+          k1 = R [k];
+          k2 = R [k+1];
+            if (k1 <= pivot && pivot < k2)
             {
-                k1 = R [k];
+                nk = k2 - k1;
+
                 /* set varying block */
                 Numeric->bpath[k] = 1;
-                k2 = R [k+1];
-                nk = k2 - k1;
                 break;
             }
         }
@@ -236,8 +230,6 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
         // in blocks, pivot < n_block[k]
         while (pivot < k2)
         {
-            //u_closest = n+1;
-            //l_closest = n+1;
             u_closest = k2;
             l_closest = k2;
 
@@ -248,7 +240,6 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             if (nextcol - col == 1)
             {
                 // only one entry in column => diagonal entry
-                //l_closest = n+1;
                 l_closest = k2;
             }
             else
@@ -311,13 +302,9 @@ int KLU_compute_path(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* C
             {
                 break;
             }
-            //push_back(singleton, pivot);
             Numeric->path[pivot] = 1;
         }
-        // push_front_list(singleton, Numeric->path);
-        // free(singleton);
     }
-    //sort_list(Numeric->path, QUICK);
     free(Lp);
     free(Li);
     free(Lx);
