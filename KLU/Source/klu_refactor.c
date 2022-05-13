@@ -11,6 +11,119 @@
 #include "klu_internal.h"
 
 
+// Int dumpLU(KLU_symbolic* Symbolic, KLU_numeric* Numeric, KLU_common* Common, int ctr)
+// {
+//     char strL[32];
+//     char strU[32];
+//     char strF[32];
+//     char counterstring[32];
+//     sprintf(counterstring, "%d", ctr);
+//     strcpy(strL, "KLU_L");
+//     strcpy(strU, "KLU_U");
+//     strcpy(strF, "KLU_F");
+//     strcat(strL, counterstring);
+//     strcat(strU, counterstring);
+//     strcat(strF, counterstring);
+//     strcat(strL, ".csc");
+//     strcat(strU, ".csc");
+//     strcat(strF, ".csc");
+
+//     FILE *l, *u, *g;
+//     g = fopen(strF, "w");
+//     l = fopen(strL, "w");
+//     u = fopen(strU, "w");
+
+//     int n = Symbolic->n;
+//     int lnz = Numeric->lnz;
+//     int unz = Numeric->unz;
+//     int nzoff = Numeric->nzoff;
+//     int nb = Symbolic->nblocks;
+
+//     int* Lp = calloc(n + 1, sizeof(int));
+//     int* Up = calloc(n + 1, sizeof(int));
+//     int* Fp = calloc(n + 1, sizeof(int));
+//     double* Lx = calloc(lnz, sizeof(double));
+//     double* Ux = calloc(unz, sizeof(double));
+//     double* Fx = calloc(nzoff, sizeof(double));
+//     int* Li = calloc(lnz, sizeof(int));
+//     int* Ui = calloc(unz, sizeof(int));
+//     int* Fi = calloc(nzoff, sizeof(int));
+//     int* P = calloc(n, sizeof(int));
+//     int* Q = calloc(n, sizeof(int));
+//     double* Rs = calloc(n, sizeof(double));
+//     int* R = calloc(nb + 1, sizeof(int));
+
+//     // first, get LU decomposition
+//     // sloppy implementation, as there might be a smarter way to do this
+//     int RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+//     int i;
+
+//     for (i = 0; i < nzoff - 1; i++)
+//     {
+//         fprintf(g, "%lf, ", Fx[i]);
+//     }
+//     fprintf(g, "%lf\n", Fx[nzoff-1]);
+//     for (i = 0; i < nzoff-1; i++)
+//     {
+//         fprintf(g, "%d, ", Fi[i]);
+//     }
+//     fprintf(g, "%d\n", Fi[nzoff-1]);
+//     for (i = 0; i < n ; i++)
+//     {
+//         fprintf(g, "%d, ", Fp[i]);
+//     }
+//     fprintf(g, "%d\n", Fp[n]);
+
+//     for (i = 0; i < lnz-1; i++)
+//     {
+//         fprintf(l, "%lf, ", Lx[i]);
+//     }
+//     fprintf(l, "%lf\n", Lx[lnz-1]);
+//     for (i = 0; i < lnz-1; i++)
+//     {
+//         fprintf(l, "%d, ", Li[i]);
+//     }
+//     fprintf(l, "%d\n", Li[lnz-1]);
+//     for (i = 0; i < n; i++)
+//     {
+//         fprintf(l, "%d, ", Lp[i]);
+//     }
+//     fprintf(l, "%d\n", Lp[n]);
+
+//     for (i = 0; i < unz-1; i++)
+//     {
+//         fprintf(u, "%lf, ", Ux[i]);
+//     }
+//     fprintf(u, "%lf\n", Ux[unz-1]);
+//     for (i = 0; i < unz-1; i++)
+//     {
+//         fprintf(u, "%d, ", Ui[i]);
+//     }
+//     fprintf(u, "%d\n", Ui[unz-1]);
+//     for (i = 0; i < n; i++)
+//     {
+//         fprintf(u, "%d, ", Up[i]);
+//     }
+//     fprintf(u, "%d\n", Up[n]);
+
+//     fclose(g);
+//     fclose(l);
+//     fclose(u);
+//     free(Lp);
+//     free(Li);
+//     free(Lx);
+//     free(Up);
+//     free(Ui);
+//     free(Ux);
+//     free(Fi);
+//     free(Fp);
+//     free(Fx);
+//     free(P);
+//     free(Q);
+//     free(R);
+//     free(Rs);
+// }
+
 /* ========================================================================== */
 /* === KLU_refactor ========================================================= */
 /* ========================================================================== */
@@ -432,6 +545,17 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         {
             Rs [k] = REAL (X [k]) ;
         }
+    }
+
+    static int counter = 0;
+    if(counter != 0 && counter != 9999)
+    {
+        counter++;
+    }
+    else
+    {
+      dumpLU(Symbolic, Numeric, Common, counter);
+      counter++;
     }
 
 #ifndef NDEBUG
