@@ -547,17 +547,6 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         }
     }
 
-    static int counter = 0;
-    if(counter != 0 && counter != 9999)
-    {
-        counter++;
-    }
-    else
-    {
-      dumpLU(Symbolic, Numeric, Common, counter);
-      counter++;
-    }
-
 #ifndef NDEBUG
     ASSERT (Numeric->Offp [n] == poff) ;
     ASSERT (Symbolic->nzoff == poff) ;

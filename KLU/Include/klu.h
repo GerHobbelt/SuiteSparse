@@ -184,6 +184,8 @@ typedef struct klu_common_struct
 
     double pivot_tol_fail ; /* pivot below this tolerance? => failure */
 
+    int dump; /* dump LU factorized matrix, and factorization path */
+
     /* ---------------------------------------------------------------------- */
     /* statistics */
     /* ---------------------------------------------------------------------- */
@@ -232,6 +234,7 @@ typedef struct klu_l_common_struct /* 64-bit version (otherwise same as above)*/
     SuiteSparse_long halt_if_singular ;
     SuiteSparse_long halt_if_pivot_fails ;
     double pivot_tol_fail ;
+    SuiteSparse_long dump ;
     SuiteSparse_long status, nrealloc, structural_rank, numerical_rank,
         singular_col, noffdiag ;
     double flops, rcond, condest, rgrowth, work ;

@@ -53,5 +53,7 @@ Int KLU_defaults
     Common->halt_if_pivot_fails = TRUE ;   /* quick halt if pivot is too small */
     Common->pivot_tol_fail = 1e-8;
 
+    Common->dump = FALSE;
+
     return (TRUE) ;
 }

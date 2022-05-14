@@ -10,10 +10,58 @@
 #include "klu_internal.h"
 #include <string.h>
 
-void saveLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *Fx, int *Fi, int *Fp, int lnz, int unz,
-            int n, int nzoff)
+void dumpPerm(int* Q, int* P, int n, int counter)
 {
-    static int counter = 0;
+    int i;
+    char strQ[32];
+    char strQi[32];
+    char strP[32];
+    char strPi[32];
+    char counterstring[32];
+    sprintf(counterstring, "%d", counter);
+
+    strcpy(strQ, "KLU_Q");
+    strcpy(strP, "KLU_P");
+    strcat(strQ, counterstring);
+    strcat(strP, counterstring);
+    strcat(strQ, ".txt");
+    strcat(strP, ".txt");
+    // strcat(strQi, counterstring);
+    // strcat(strPi, counterstring);
+    // strcpy(strQi, "KLU_Qi");
+    // strcpy(strPi, "KLU_Pi");
+    // strcat(strQi, ".txt");
+    // strcat(strPi, ".txt");
+
+    /* dump permutations into file */
+    FILE* fQ = fopen(strQ, "w");
+    FILE* fP = fopen(strP, "w");
+    // FILE* fQi = fopen(strQi, "w");
+    // FILE* fPi = fopen(strPi, "w");
+
+    /* dump Q */
+    for (i = 0 ; i < n-1; i++)
+    {
+        fprintf(fQ, "%d, ", Q[i]);
+    }
+    fprintf(fQ, "%d\n", Q[n-1]);
+
+    /* dump P */
+    for (i = 0 ; i < n-1; i++)
+    {
+        fprintf(fP, "%d, ", P[i]);
+    }
+    fprintf(fP, "%d\n", P[n-1]);
+
+    fclose(fQ);
+    fclose(fP);
+    // fclose(fQi);
+    // fclose(fPi);
+}
+
+void dumpLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *Fx, int *Fi, int *Fp, int lnz, int unz,
+            int n, int nzoff, int counter)
+{
     char strL[32];
     char strU[32];
     char strF[32];
@@ -28,21 +76,14 @@ void saveLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     strcat(strL, ".csc");
     strcat(strU, ".csc");
     strcat(strF, ".csc");
-    counter++;
+
     FILE *l, *u, *g;
     g = fopen(strF, "w");
     l = fopen(strL, "w");
     u = fopen(strU, "w");
     int i;
-    for ( i = 0 ; i < nzoff ; i++)
-    {
-        printf("%d, ", Fi[i]);
-    }
-    for ( i = 0 ; i < n + 1 ; i++)
-    {
-        printf("%d, ", Fp[i]);
-    }
 
+    /* Print off-diagonal blocks in csr format */
     for (i = 0; i < nzoff - 1; i++)
     {
         fprintf(g, "%lf, ", Fx[i]);
@@ -59,6 +100,7 @@ void saveLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     }
     fprintf(g, "%d\n", Fp[n]);
 
+    /* Print L-matrix in csr format */
     for (i = 0; i < lnz-1; i++)
     {
         fprintf(l, "%lf, ", Lx[i]);
@@ -75,6 +117,7 @@ void saveLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     }
     fprintf(l, "%d\n", Lp[n]);
 
+    /* Print U-matrix in csr format */
     for (i = 0; i < unz-1; i++)
     {
         fprintf(u, "%lf, ", Ux[i]);
@@ -94,6 +137,66 @@ void saveLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     fclose(l);
     fclose(u);
     fclose(g);
+}
+
+void dumpPath(int* path, int* bpath, int n, int nb, int counter)
+{
+        int i;
+        char counterstring[32];
+        sprintf(counterstring, "%d", counter);
+        char strbpath[32];
+        char strpath[32];
+        strcpy(strbpath, "KLU_bpath");
+        strcpy(strpath, "KLU_path");
+        strcat(strbpath, counterstring);
+        strcat(strpath, counterstring);
+        strcat(strbpath, ".txt");
+        strcat(strpath, ".txt");
+        FILE* fbpath = fopen(strbpath, "w");
+        FILE* fpath = fopen(strpath, "w");
+
+        /* dump path into file */
+        for (i = 0; i < nb - 1; i++)
+        {
+            fprintf(fbpath, "%d, ", bpath[i]);
+        }
+        fprintf(fbpath, "%d\n", bpath[nb-1]);
+
+        for (i = 0; i < n - 1; i++)
+        {
+            fprintf(fpath, "%d, ", path[i]);
+        }
+        fprintf(fpath, "%d\n", path[n-1]);
+
+        fclose(fpath);
+        fclose(fbpath);
+}
+
+void dumpAll(double *Lx, 
+            int *Li, 
+            int *Lp,
+            double *Ux, 
+            int *Ui, 
+            int *Up, 
+            double *Fx, 
+            int *Fi, 
+            int *Fp, 
+            int *P,
+            int *Q,
+            int *path,
+            int *bpath,
+            int lnz,
+            int unz,
+            int n,
+            int nzoff,
+            int nb
+        )
+{
+    static int counter = 0;
+    dumpPerm(Q, P, n, counter);
+    dumpLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+    dumpPath(path, bpath, n, nb, counter);
+    counter++;
 }
 
 /*
@@ -431,13 +534,13 @@ int KLU_compute_path(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *C
             }
         }
     }
-    printf("Number of blocks: %d\n", nb);
-    printf("Path: ");
-    for (int i = 0; i < n - 1; i++)
-    {
-        printf("%d, ", Numeric->path[i]);
-    }
-    printf("%d\n", Numeric->path[n-1]);
+    // printf("Number of blocks: %d\n", nb);
+    // printf("Path: ");
+    // for (int i = 0; i < n - 1; i++)
+    // {
+    //     printf("%d, ", Numeric->path[i]);
+    // }
+    // printf("%d\n", Numeric->path[n-1]);
     free(Lp);
     free(Li);
     free(Lx);
@@ -539,12 +642,12 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
         return (FALSE);
     }
 
-    printf("Change-Vec: ");
-    for(i=0 ; i < changeLen ; i++)
-    {
-        printf("%d, ", changeVector[i]);
-    }
-    printf("\n");
+    // printf("Change-Vec: ");
+    // for(i=0 ; i < changeLen ; i++)
+    // {
+    //     printf("%d, ", changeVector[i]);
+    // }
+    // printf("\n");
 
 
     // second, invert permutation vector
@@ -553,39 +656,39 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     {
         Qi[Q[i]] = i;
     }
-    Int *Pi = calloc(n, sizeof(Int));
-    for (i = 0; i < n; i++)
-    {
-        Pi[P[i]] = i;
-    }
+    // Int *Pi = calloc(n, sizeof(Int));
+    // for (i = 0; i < n; i++)
+    // {
+    //     Pi[P[i]] = i;
+    // }
 
-    printf("Pi: ");
-    for (i = 0; i < n-1 ; i++)
-    {
-        printf("%d, ", Pi[i]);
-    }
-    printf("%d\n", Pi[n-1]);
-    free(Pi);
-    printf("Qi: ");
-    for (i = 0; i < n-1 ; i++)
-    {
-        printf("%d, ", Qi[i]);
-    }
-    printf("%d\n", Qi[n-1]);
+    // printf("Pi: ");
+    // for (i = 0; i < n-1 ; i++)
+    // {
+    //     printf("%d, ", Pi[i]);
+    // }
+    // printf("%d\n", Pi[n-1]);
+    // free(Pi);
+    // printf("Qi: ");
+    // for (i = 0; i < n-1 ; i++)
+    // {
+    //     printf("%d, ", Qi[i]);
+    // }
+    // printf("%d\n", Qi[n-1]);
 
 
-    printf("P: ");
-    for (i = 0; i < n-1 ; i++)
-    {
-        printf("%d, ", P[i]);
-    }
-    printf("%d\n", P[n-1]);
-    printf("Q: ");
-    for (i = 0; i < n-1 ; i++)
-    {
-        printf("%d, ", Q[i]);
-    }
-    printf("%d\n", Q[n-1]);
+    // printf("P: ");
+    // for (i = 0; i < n-1 ; i++)
+    // {
+    //     printf("%d, ", P[i]);
+    // }
+    // printf("%d\n", P[n-1]);
+    // printf("Q: ");
+    // for (i = 0; i < n-1 ; i++)
+    // {
+    //     printf("%d, ", Q[i]);
+    // }
+    // printf("%d\n", Q[n-1]);
 
 
 
@@ -594,12 +697,42 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     {
         changeVector_permuted[i] = Qi[changeVector[i]];
     }
-    printf("Permuted Vec: ");
-    for(i=0 ; i < changeLen ; i++)
+    int* cV = (int*) calloc(n, sizeof(int));
+    for ( i = 0 ; i < changeLen ; i++)
     {
-        printf("%d, ", changeVector_permuted[i]);
+        cV[changeVector_permuted[i]] = 1;
     }
-    printf("\n");
+    for ( i = 0; i< changeLen ; i++)
+    {
+        changeVector_permuted[i] = 0;
+    } 
+    changeLen = 0;
+    for ( i = 0 ; i < n ; i++)
+    {
+        if(cV[i] == 1)
+        {
+            changeLen++;
+        }
+    }
+    int ctr = 0;
+    changeVector_permuted = (int*) realloc(changeVector_permuted, sizeof(int)*changeLen);
+    for ( i = 0 ; i < n ; i++)
+    {
+        if(cV[i] == 1)
+        {
+            changeVector_permuted[ctr] = i;
+            ctr++;
+        }
+    }
+    free(cV);
+
+
+    // printf("Permuted Vec: ");
+    // for(i=0 ; i < changeLen ; i++)
+    // {
+    //     printf("%d, ", changeVector_permuted[i]);
+    // }
+    // printf("\n");
 
     // step three can / should be done externally
 
@@ -610,6 +743,7 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
         /* no blocks */
         for (i = 0; i < changeLen; i++)
         {
+            flag = 1;
             pivot = changeVector_permuted[i];
             if (Numeric->path[pivot] == 1)
             {
@@ -754,39 +888,11 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
         }
     }
 
-    // for ( i = 0 ; i < n ; i ++)
-    // {
-    //     Numeric->path[i] = 1;
-    // }
-    // for ( i = 0 ; i < nb ; i++)
-    // {
-    //     Numeric->bpath[i] = 1;
-    // }
-
-    // static int counter = 0;
-    // if (counter==1)
-    // {
-    //   for( i = 0 ; i < 6; i ++)
-    //   {
-    //     Numeric->path[i] = 1;
-    //     Numeric->bpath[i] = 1;
-    //   }
-    // }
-    // counter++;
-
-    printf("Block path: ");
-    for (int i = 0; i < nb - 1; i++)
+    if(Common->dump == 1)
     {
-        printf("%d, ", Numeric->bpath[i]);
+        dumpAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->bpath, lnz, unz, n, nzoff, nb);
     }
-    printf("%d\n", Numeric->bpath[nb-1]);
 
-    printf("Path: ");
-    for (int i = 0; i < n - 1; i++)
-    {
-        printf("%d, ", Numeric->path[i]);
-    }
-    printf("%d\n", Numeric->path[n-1]);
     free(workpath);
     free(Lp);
     free(Li);
