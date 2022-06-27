@@ -86,7 +86,7 @@ void dumpLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     /* Print off-diagonal blocks in csr format */
     for (i = 0; i < nzoff - 1; i++)
     {
-        fprintf(g, "%lf, ", Fx[i]);
+        fprintf(g, "%.17lf, ", Fx[i]);
     }
     fprintf(g, "%lf\n", Fx[nzoff-1]);
     for (i = 0; i < nzoff-1; i++)
@@ -105,7 +105,7 @@ void dumpLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     {
         fprintf(l, "%lf, ", Lx[i]);
     }
-    fprintf(l, "%lf\n", Lx[lnz-1]);
+    fprintf(l, "%.17lf\n", Lx[lnz-1]);
     for (i = 0; i < lnz-1; i++)
     {
         fprintf(l, "%d, ", Li[i]);
@@ -120,7 +120,7 @@ void dumpLU(double *Lx, int *Li, int *Lp, double *Ux, int *Ui, int *Up, double *
     /* Print U-matrix in csr format */
     for (i = 0; i < unz-1; i++)
     {
-        fprintf(u, "%lf, ", Ux[i]);
+        fprintf(u, "%.17lf, ", Ux[i]);
     }
     fprintf(u, "%lf\n", Ux[unz-1]);
     for (i = 0; i < unz-1; i++)
@@ -591,6 +591,10 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     // blocks
     Int k2, k1, nk;
 
+    #ifdef FPATH
+        int pivot_l, pivot_u;
+    #endif
+
     // TODO: save sizeof(...) statically and not call for each alloc
     Int *Qi = calloc(n, sizeof(Int));
     Int *changeVector_permuted = calloc(changeLen, sizeof(Int));
@@ -636,19 +640,12 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     // first, get LU decomposition
     // sloppy implementation, as there might be a smarter way to do this
     RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-    //saveLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff);
+
+    /* check if extraction of LU matrix broke */
     if (RET != (TRUE))
     {
         return (FALSE);
     }
-
-    // printf("Change-Vec: ");
-    // for(i=0 ; i < changeLen ; i++)
-    // {
-    //     printf("%d, ", changeVector[i]);
-    // }
-    // printf("\n");
-
 
     // second, invert permutation vector
     // Q gives "oldcol", we need "newcol"
@@ -656,41 +653,6 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     {
         Qi[Q[i]] = i;
     }
-    // Int *Pi = calloc(n, sizeof(Int));
-    // for (i = 0; i < n; i++)
-    // {
-    //     Pi[P[i]] = i;
-    // }
-
-    // printf("Pi: ");
-    // for (i = 0; i < n-1 ; i++)
-    // {
-    //     printf("%d, ", Pi[i]);
-    // }
-    // printf("%d\n", Pi[n-1]);
-    // free(Pi);
-    // printf("Qi: ");
-    // for (i = 0; i < n-1 ; i++)
-    // {
-    //     printf("%d, ", Qi[i]);
-    // }
-    // printf("%d\n", Qi[n-1]);
-
-
-    // printf("P: ");
-    // for (i = 0; i < n-1 ; i++)
-    // {
-    //     printf("%d, ", P[i]);
-    // }
-    // printf("%d\n", P[n-1]);
-    // printf("Q: ");
-    // for (i = 0; i < n-1 ; i++)
-    // {
-    //     printf("%d, ", Q[i]);
-    // }
-    // printf("%d\n", Q[n-1]);
-
-
 
     // third, apply permutation on changeVector
     for (i = 0; i < changeLen; i++)
@@ -726,17 +688,7 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
     }
     free(cV);
 
-
-    // printf("Permuted Vec: ");
-    // for(i=0 ; i < changeLen ; i++)
-    // {
-    //     printf("%d, ", changeVector_permuted[i]);
-    // }
-    // printf("\n");
-
-    // step three can / should be done externally
-
-    // fourth, compute factorization path
+    /* fourth, compute factorization path */
     if (Common->btf == FALSE)
     {
         Numeric->bpath[0] = 1;
@@ -747,45 +699,104 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
             pivot = changeVector_permuted[i];
             if (Numeric->path[pivot] == 1)
             {
-                // already computed pivot?
+                /* already computed pivot? */
                 continue;
             }
             Numeric->path[pivot] = 1;
-            while (pivot < n && flag)
-            {
-                flag = 0;
-                nextcol = Up[pivot + 1];
-
-                // scan Ui for values in row "pivot"
-                for (j = nextcol; j < unz; j++)
+            
+            #ifndef FPATH
+                /* GP-based version */
+                while (pivot < n && flag)
                 {
-                    if (Ui[j] == pivot)
+                    flag = 0;
+                    nextcol = Up[pivot + 1];
+
+                    /* scan Ui for values in row "pivot" */
+                    for (j = nextcol; j < unz; j++)
                     {
-                        // column j is affected
-                        // find column in which j is
-                        for (k = 0; k < n; k++)
+                        if (Ui[j] == pivot)
                         {
-                            if (j >= Up[k] && j < Up[k + 1])
+                            /* column j is affected
+                             * find column in which j is
+                            */                             
+                            for (k = 0; k < n; k++)
                             {
-                                col = k;
-                                break;
+                                if (j >= Up[k] && j < Up[k + 1])
+                                {
+                                    col = k;
+                                    break;
+                                }
+                            }
+                            /* col is always well-defined */
+                            Numeric->path[col] = 1;
+                            workpath[col] = 1;
+                        }
+                    }
+                    for (j = pivot + 1; j < n; j++)
+                    {
+                        if (workpath[j] == 1)
+                        {
+                            workpath[j] = 0;
+                            pivot = j;
+                            flag = 1;
+                            break;
+                        }
+                    }
+                }
+            #else
+                /* off-diagonal-looking */
+                pivot_l = n;
+                pivot_u = n;
+                while (pivot < n)
+                {
+                    nextcol = Lp[pivot+1];
+                    /* scan Lp for next entry
+                     * if this check fails, current column only has one entry
+                    */
+                    if(nextcol - Lp[pivot] > 1)
+                    {
+                        pivot_l = Li[Lp[pivot]+1];
+                        /* check if found pivot is next off-diagonal entry
+                         * then you can skip the next loop for U */
+                        if(pivot_l - pivot == 1)
+                        {
+                            goto minimum_nobtf;
+                        } 
+                        for(j = Lp[pivot]+2; j<nextcol; j++)
+                        {
+                            if(Li[j]<pivot_l)
+                            {
+                                pivot_l = Li[j];
                             }
                         }
-                        Numeric->path[col] = 1;
-                        workpath[col] = 1;
                     }
-                }
-                for (j = pivot + 1; j < n; j++)
-                {
-                    if (workpath[j] == 1)
+
+                    nextcol = Up[pivot + 1];
+                    /* scan Ui for values in row "pivot" */
+                    for (j = nextcol; j < unz; j++)
                     {
-                        workpath[j] = 0;
-                        pivot = j;
-                        flag = 1;
-                        break;
+                        if (Ui[j] == pivot)
+                        {
+                            /* column j is affected
+                             * find column in which j is
+                             */
+                            for (k = 0; k < n; k++)
+                            {
+                                if (j >= Up[k] && j < Up[k + 1])
+                                {
+                                    pivot_u = k;
+                                    goto minimum_nobtf;
+                                }
+                            }
+                        }
                     }
+                    minimum_nobtf:
+                    pivot = MIN(pivot_u, pivot_l);
+                    pivot_l = n;
+                    pivot_u = n;
+                    Numeric->path[pivot] = 1;
                 }
-            }
+            #endif
         }
     }
     else
@@ -828,6 +839,8 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
                 continue;
             }
 
+            
+            #ifndef FPATH
             /* propagate until end
              * in blocks, pivot < n_block[k]
              *
@@ -841,7 +854,7 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
             {
                 flag = 0;
                 nextcol = Up[pivot + 1];
-                // find closest off-diagonal entry in U
+                // find closest off-diagonal entries in U
                 /* u saved in csc:
                    Ux = [x, x, x, x, x] entries saved column-wise
                    Ui = [0, 2, 1, 4, 3] row position of those entries in columns
@@ -885,6 +898,77 @@ int KLU_compute_path2(KLU_symbolic *Symbolic, KLU_numeric *Numeric, KLU_common *
                     }
                 }
             }
+            #else
+            /* propagate until end
+             * in blocks, pivot < n_block[k]
+             *
+             * k2 is the first column of the NEXT block
+             *
+             * if pivot == k2 - 1, it is the last column of the
+             * current block. then, "nextcol" would be k2, which is already
+             * in the next block. Thus, only do loop if pivot < k2 - 1
+             */
+            while (pivot < k2 - 1)
+            {
+                pivot_l = k2;
+                pivot_u = k2;
+
+                nextcol = Lp[pivot+1];
+                if(nextcol - Lp[pivot] > 1)
+                {
+                    pivot_l = Li[Lp[pivot]+1];
+                    if(pivot_l - pivot == 1)
+                    {
+                        goto minimum_dobtf;
+                    }
+                    for(j = Lp[pivot]+2; j<nextcol; j++)
+                    {
+                        if(Li[j]<pivot_l)
+                        {
+                            pivot_l = Li[j];
+                        }
+                    }
+                }
+
+                nextcol = Up[pivot + 1];
+                /* find closest off-diagonal entries in U */
+                /* u saved in csc:
+                   Ux = [x, x, x, x, x] entries saved column-wise
+                   Ui = [0, 2, 1, 4, 3] row position of those entries in columns
+                   Up = [0, 1, 2, 3, 4, 5] column pointers
+                   to find closest off-diagonal of row k:
+                   find all Ui[j] == pivot
+                   find Up[k] <= j < Up[k+1], k > pivot
+                   ALTERNATIVELY
+                   Transpose U
+                   do the same as for L
+                 */
+
+                /* This loop finds all nnz in row "pivot",
+                 * meaning their respective columns depend on pivot column
+                 */
+                for (j = nextcol; j < unz; j++)
+                {
+                    if (Ui[j] == pivot)
+                    {
+                        // find column in which j is
+                        for (k = k1; k < k2; k++)
+                        {
+                            if (j >= Up[k] && j < Up[k + 1])
+                            {
+                                pivot_u = k;
+                                goto minimum_dobtf;
+                            }
+                        }
+                    }
+                }
+                minimum_dobtf:
+                pivot = MIN(pivot_l, pivot_u);
+                Numeric->path[pivot] = 1;
+                pivot_u = k2;
+                pivot_l = k2;
+            }
+            #endif
         }
     }
 
