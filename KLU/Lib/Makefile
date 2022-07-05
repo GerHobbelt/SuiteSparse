@@ -34,7 +34,7 @@ all: library
 
 KLU_D = klu_d.o klu_d_kernel.o klu_d_dump.o \
     klu_d_factor.o klu_d_free_numeric.o klu_d_solve.o \
-    klu_d_scale.o klu_d_refactor.o klu_d_partial.o klu_d_compute_path.o \
+    klu_d_scale.o klu_d_refactor.o klu_d_partial.o klu_d_compute_path.o klu_d_print.o\
     klu_d_full_partial.o klu_d_tsolve.o klu_d_diagnostics.o klu_d_sort.o klu_d_extract.o
 
 KLU_Z = klu_z.o klu_z_kernel.o klu_z_dump.o \
@@ -131,6 +131,9 @@ klu_d_full_partial.o: ../Source/klu_full_partial.c
 	$(C) -c $(I) $< -o $@
 
 klu_d_compute_path.o: ../Source/klu_compute_path.c
+	$(C) -c $(I) $< -o $@
+
+klu_d_print.o: ../Source/klu_print.c
 	$(C) -c $(I) $< -o $@
 
 #klu_z_partial.o: ../Source/klu_partial.c
