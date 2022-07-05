@@ -41,8 +41,6 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale, nblocks, poff, i, j, up, ulen, llen, maxblock,
         nzoff;
 
-    // Int pathLen = Numeric->path->length;
-    // node* cur = Numeric->path->head;
     Int z = 0;
     Int doRefact = 0;
 
@@ -629,8 +627,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
         }
     }
 #endif
+#ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && counter == 9999)
+    if(Common->dump == 1 && counter == 0)
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;
@@ -657,8 +656,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
         // first, get LU decomposition
         // sloppy implementation, as there might be a smarter way to do this
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-        dumpAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->bpath, lnz, unz, n, nzoff, nb);
+        dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->bpath, lnz, unz, n, nzoff, nb);
     }
     counter++;
+#endif
     return (TRUE);
 }

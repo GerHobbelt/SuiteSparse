@@ -450,24 +450,10 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
     klu_symbolic* Symbolic, 
     klu_numeric* Numeric, 
     klu_common* Common, 
-    int* changeVector, 
-    int changeLen
-) ; 
-
-/* -------------------------------------------------------------------------- */
-/* klu_compute_path: computes factorization path for partial refactorization  */
-/* -------------------------------------------------------------------------- */
-
-int klu_compute_path2       /* return TRUE if successful, FALSE otherwise */
-(
-    klu_symbolic* Symbolic, 
-    klu_numeric* Numeric, 
-    klu_common* Common, 
-    int* changeVector, 
+    int changeVector [ ], 
     int changeLen
 ) ; 
             
-
 /* -------------------------------------------------------------------------- */
 /* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */

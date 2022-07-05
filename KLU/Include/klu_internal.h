@@ -234,6 +234,56 @@ Int KLU_valid_LU
     Unit LU [ ]
 );
 
+Int KLU_extract_quick(
+    /* inputs: */
+    KLU_numeric *Numeric,
+    KLU_symbolic *Symbolic,
+
+    /* outputs: */
+    Int Ui [ ],
+    Int Up [ ],
+    Int Q [ ],
+    Int R [ ]
+) ;
+
+void dumpKAll(
+    Entry Lx [ ], 
+    Int Li [ ], 
+    Int Lp [ ],
+    Entry Ux [ ], 
+    Int Ui [ ], 
+    Int Up [ ], 
+    Entry Fx [ ], 
+    Int Fi [ ], 
+    Int Fp [ ], 
+    Int P [ ],
+    Int Q [ ],
+    Int path [ ],
+    Int bpath [ ],
+    Int lnz,
+    Int unz,
+    Int n,
+    Int nzoff,
+    Int nb
+) ;
+
+void dumpKLU(
+    Entry Lx [ ], 
+    Int Li [ ], 
+    Int Lp [ ],
+    Entry Ux [ ], 
+    Int Ui [ ], 
+    Int Up [ ], 
+    Entry Fx [ ], 
+    Int Fi [ ], 
+    Int Fp [ ], 
+    Int lnz,
+    Int unz,
+    Int n,
+    Int nzoff,
+    Int counter
+) ;
+
 size_t KLU_add_size_t (size_t a, size_t b, Int *ok) ;
 
 size_t KLU_mult_size_t (size_t a, size_t k, Int *ok) ;
