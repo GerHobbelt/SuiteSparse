@@ -121,8 +121,9 @@
 #define KLU_factor klu_factor
 #define KLU_refactor klu_refactor
 #define KLU_partial klu_partial
-#define KLU_full_partial klu_full_partial
+#define KLU_fpartial klu_fpartial
 #define KLU_compute_path klu_compute_path
+#define KLU_determine_start klu_determine_start
 //#define dumpAll dumpAll
 #define KLU_extract_quick klu_extract_quick
 #define KLU_kernel_factor klu_kernel_factor 
@@ -148,6 +149,7 @@
 #ifdef DLONG
 
 #define KLU_analyze klu_l_analyze
+#define KLU_analyze_partial klu_l_analyze_partial
 #define KLU_analyze_given klu_l_analyze_given
 #define KLU_alloc_symbolic klu_l_alloc_symbolic
 #define KLU_free_symbolic klu_l_free_symbolic
@@ -166,12 +168,14 @@
 #define BTF_strongcomp btf_l_strongcomp
 
 #define AMD_order amd_l_order
+#define AMD_order_partial amd_l_order_partial
 #define COLAMD colamd_l
 #define COLAMD_recommended colamd_l_recommended
 
 #else
 
 #define KLU_analyze klu_analyze
+#define KLU_analyze_partial klu_analyze_partial
 #define KLU_analyze_given klu_analyze_given
 #define KLU_alloc_symbolic klu_alloc_symbolic
 #define KLU_free_symbolic klu_free_symbolic
@@ -190,6 +194,7 @@
 #define BTF_strongcomp btf_strongcomp
 
 #define AMD_order amd_order
+#define AMD_order_partial amd_order_partial
 #define COLAMD colamd
 #define COLAMD_recommended colamd_recommended
 

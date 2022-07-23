@@ -48,7 +48,7 @@ void printKMTX(FILE* f, double* values, int* indices, int* pointers, int n, int 
     fprintf(f, "%d %d %d\n", n, n, nz);
     for(i = 0; i < n ; i++)
     {
-        for(j = pointers[i] ; j < pointers[i]+1 ; j++)
+        for(j = pointers[i] ; j < pointers[i+1] ; j++)
         {
             fprintf(f, "%d %d %.*e\n", indices[j]+1, i+1, PRECISION, values[j]);
         }
@@ -147,5 +147,28 @@ void dumpKAll(double *Lx,
     dumpKPerm(Q, P, n, counter);
     dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
     dumpKPath(path, bpath, n, nb, counter);
+    counter++;
+}
+
+void dumpKA(double* Ax,
+            int* Ai,
+            int* Ap,
+            int n
+        )
+{
+    static int counter = 0;
+    char str[32];
+    char counterstring[32];
+    sprintf(counterstring, "%d", counter);
+    strcpy(str, "KLU_A");
+    strcat(str, counterstring);
+    strcat(str, ".mtx");
+
+    FILE *a;
+    a = fopen(str, "w");
+
+    printKMTX(a, Ax, Ai, Ap, n, Ap[n-1]+1);
+
+    fclose(a);
     counter++;
 }

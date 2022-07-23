@@ -106,6 +106,7 @@ typedef struct
     int nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
     int *bpath ; /* block path to indicate which blocks contain varying entries */
+    int *start; /* first varying column in LU */
 } klu_numeric ;
 
 typedef struct          /* 64-bit version (otherwise same as above) */
@@ -124,6 +125,7 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     SuiteSparse_long nzoff ;
     int *path ;
     int *bpath ;
+    int *start; /* first varying column in LU */
 
 } klu_l_numeric ;
 
@@ -139,6 +141,11 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_TOO_LARGE (-4)          /* integer overflow has occured */
 #define KLU_PIVOT_FAULT (-5)        /* pivot became too small during (partial) refactorization */
 #define KLU_PATH_INVALID (-6)       /* path is NULL. klu_compute_path wasn't called properly. */
+
+#define KLU_AMD_FP (0)
+#define KLU_AMD_NV_FP (1)
+#define KLU_AMD_BRA_RR (2)
+#define KLU_AMD_RR (3)
 
 typedef struct klu_common_struct
 {
@@ -453,6 +460,19 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
     int changeVector [ ], 
     int changeLen
 ) ; 
+
+/* -------------------------------------------------------------------------- */
+/* klu_determine_start: determines first varying column for partial refactorization  */
+/* -------------------------------------------------------------------------- */
+
+int klu_determine_start       /* return TRUE if successful, FALSE otherwise */
+(
+    klu_symbolic* Symbolic, 
+    klu_numeric* Numeric, 
+    klu_common* Common, 
+    int changeVector [ ], 
+    int changeLen
+) ; 
             
 /* -------------------------------------------------------------------------- */
 /* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
@@ -469,20 +489,19 @@ int klu_partial            /* return TRUE if successful, FALSE otherwise */
     /* input, and numerical values modified on output */
     klu_numeric *Numeric,
     klu_common *Common
-) ;
+) ;       
 
 /* -------------------------------------------------------------------------- */
-/* klu_full_partial: partially refactorizes matrix with same ordering as klu_factor */
+/* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */
 
-int klu_full_partial            /* return TRUE if successful, FALSE otherwise */
+int klu_fpartial            /* return TRUE if successful, FALSE otherwise */
 (
     /* inputs, not modified */
     int Ap [ ],         /* size n+1, column pointers */
     int Ai [ ],         /* size nz, row indices */
     double Ax [ ],      /* size nz, numerical values */
     klu_symbolic *Symbolic,
-    int k_start,
 
     /* input, and numerical values modified on output */
     klu_numeric *Numeric,

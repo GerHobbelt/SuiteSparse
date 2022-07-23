@@ -267,6 +267,13 @@ void dumpKAll(
     Int nb
 ) ;
 
+void dumpKA(
+    Entry Ax [ ], 
+    Int Ai [ ],
+    Int Ap [ ],
+    Int n
+) ;
+
 void dumpKLU(
     Entry Lx [ ], 
     Int Li [ ], 

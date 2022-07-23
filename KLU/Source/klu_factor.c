@@ -528,6 +528,7 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
     /* only allocate if klu_compute_path is called */
     Numeric->path = NULL;
     Numeric->bpath = NULL;
+    Numeric->start = NULL;
 
     /* allocate permanent workspace for factorization and solve.  Note that the
      * solver will use an Xwork of size 4n, whereas the factorization codes use
@@ -582,5 +583,36 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
         Common->numerical_rank = n ;
         Common->singular_col = n ;
     }
+#ifdef KLU_PRINT
+    static int counter = 0;
+    if(Common->dump == 1 && counter == 0)
+    {
+        int n = Symbolic->n;
+        int lnz = Numeric->lnz;
+        int unz = Numeric->unz;
+        int nzoff = Numeric->nzoff;
+        int nb = Symbolic->nblocks;
+        int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
+        double *Lx, *Ux, *Fx, *Rs;
+        int *P, *Q, *R;
+        Lp = calloc(n + 1, sizeof(int));
+        Up = calloc(n + 1, sizeof(int));
+        Fp = calloc(n + 1, sizeof(int));
+        Lx = calloc(lnz, sizeof(double));
+        Ux = calloc(unz, sizeof(double));
+        Fx = calloc(nzoff, sizeof(double));
+        Li = calloc(lnz, sizeof(int));
+        Ui = calloc(unz, sizeof(int));
+        Fi = calloc(nzoff, sizeof(int));
+        P = calloc(n, sizeof(int));
+        Q = calloc(n, sizeof(int));
+        Rs = calloc(n, sizeof(double));
+        R = calloc(nb + 1, sizeof(int));
+
+        klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+        dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+    }
+    counter++;
+#endif
     return (Numeric) ;
 }

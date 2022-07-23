@@ -221,9 +221,11 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
             {
                 if (Numeric->bpath[block] != 1)
                 {
-                    // unlikely
-                    // encountered a block > 1 that has no refact. effort
-                    // only raise counter
+                    /* 
+                      unlikely
+                      encountered a block > 1 that has no refact. effort, i.e. no varying entries
+                      only raise counter 
+                    */
                     for (k = 0; k < nk; k++)
                     {
                         oldcol = Q[k + k1];
@@ -255,9 +257,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                     {
                         if (Numeric->path[k + k1] != 1)
                         {
-                            // block contains varying entries, but column k of
-                            // block has no refactorization effort only raise
-                            // counter
+                            /* block contains varying entries, but column k of
+                             * block has no refactorization effort only raise
+                             * counter */
                             oldcol = Q[k + k1];
                             pend = Ap[oldcol + 1];
                             for (p = Ap[oldcol]; p < pend; p++)
@@ -437,9 +439,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                 /* ---------------------------------------------------------- */
                 if (Numeric->bpath[block] != 1)
                 {
-                    // unlikely
-                    // encountered a block > 1 that has no refact. effort
-                    // only raise counter
+                    /* unlikely
+                     * encountered a block > 1 that has no refact. effort
+                     * only raise counter */
                     for (k = 0; k < nk; k++)
                     {
                         oldcol = Q[k + k1];
@@ -470,9 +472,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 
                         if (Numeric->path[k + k1] != 1)
                         {
-                            // block contains varying entries, but column k of
-                            // block has no refactorization effort only raise
-                            // counter
+                            /* block contains varying entries, but column k of
+                             * block has no refactorization effort only raise
+                             * counter */
                             oldcol = Q[k + k1];
                             pend = Ap[oldcol + 1];
                             for (p = Ap[oldcol]; p < pend; p++)
@@ -629,7 +631,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 #endif
 #ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && counter == 0)
+    if(Common->dump == 1 && (counter == 0 || counter == 1000))
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;
@@ -657,6 +659,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
         // sloppy implementation, as there might be a smarter way to do this
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->bpath, lnz, unz, n, nzoff, nb);
+        dumpKA(Ax, Ai, Ap, n);
     }
     counter++;
 #endif

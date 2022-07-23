@@ -134,10 +134,10 @@ int KLU_compute_path(
     int u_closest, l_closest;
     int flag = 1;
 
-    // blocks
+    /* blocks */
     Int k2, k1, nk;
 
-    // TODO: save sizeof(...) statically and not call for each alloc
+    /* TODO: save sizeof(...) statically and not call for each alloc */
     Int *Qi = calloc(n, sizeof(Int));
     Int *changeVector_permuted = calloc(changeLen, sizeof(Int));
 
@@ -187,8 +187,9 @@ int KLU_compute_path(
     Rs = calloc(n, sizeof(double));
     R = calloc(nb + 1, sizeof(int));
 
-    // first, get LU decomposition
-    // sloppy implementation, as there might be a smarter way to do this
+    /* first, get LU decomposition
+     * sloppy implementation, as there might be a smarter way to do this
+     */
     RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
 
     /* check if extraction of LU matrix broke */
@@ -197,14 +198,15 @@ int KLU_compute_path(
         return (FALSE);
     }
 
-    // second, invert permutation vector
-    // Q gives "oldcol", we need "newcol"
+    /* second, invert permutation vector
+     * Q gives "oldcol", we need "newcol"
+     */
     for (i = 0; i < n; i++)
     {
         Qi[Q[i]] = i;
     }
 
-    // third, apply permutation on changeVector
+    /* third, apply permutation on changeVector */
     for (i = 0; i < changeLen; i++)
     {
         changeVector_permuted[i] = Qi[changeVector[i]];
@@ -299,21 +301,22 @@ int KLU_compute_path(
         for (i = 0; i < changeLen; i++)
         {
             flag = 1;
-            // get next changing column
+            /* get next changing column */
             pivot = changeVector_permuted[i];
 
-            // check if it was already computed
+            /* check if it was already computed */
             if (Numeric->path[pivot] == 1)
             {
-                // already computed pivot
-                // do nothing, go to next pivot
+                /* already computed pivot
+                 * do nothing, go to next pivot
+                 */
                 continue;
             }
 
-            // set first value of singleton path
+            /* set first value of singleton path */
             Numeric->path[pivot] = 1;
 
-            // find block of pivot
+            /* find block of pivot */
             for (k = 0; k < nb; k++)
             {
                 k1 = R[k];
@@ -330,7 +333,7 @@ int KLU_compute_path(
 
             if (nk == 1)
             {
-                // 1x1-block, its pivot already in path
+                /* 1x1-block, its pivot already in path */
                 continue;
             }
 
@@ -347,7 +350,7 @@ int KLU_compute_path(
             {
                 flag = 0;
                 nextcol = Up[pivot + 1];
-                // find closest off-diagonal entries in U
+                /* find closest off-diagonal entries in U */
                 /* u saved in csc:
                    Ux = [x, x, x, x, x] entries saved column-wise
                    Ui = [0, 2, 1, 4, 3] row position of those entries in columns
@@ -394,6 +397,220 @@ int KLU_compute_path(
         }
     }
     free(workpath);
+    free(Lp);
+    free(Li);
+    free(Lx);
+    free(Up);
+    free(Ui);
+    free(Ux);
+    free(Fi);
+    free(Fp);
+    free(Fx);
+    free(P);
+    free(Q);
+    free(Qi);
+    free(R);
+    free(Rs);
+    free(changeVector_permuted);
+    return (TRUE);
+}
+
+/*
+ * This function determines the first varying column for 
+ * partial refactorization by refactorization restart (PR-RR)
+ */
+int KLU_determine_start(
+        KLU_symbolic *Symbolic, 
+        KLU_numeric *Numeric, 
+        KLU_common *Common, 
+        Int *changeVector,
+        Int changeLen
+    )
+{
+    int n = Symbolic->n;
+    int lnz = Numeric->lnz;
+    int unz = Numeric->unz;
+    int nzoff = Numeric->nzoff;
+    int nb = Symbolic->nblocks;
+    int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
+    double *Lx, *Ux, *Fx;
+    int *P, *Q, *R;
+    double *Rs;
+    int RET;
+
+    /* indices and temporary variables */
+    int i, k, j, ent, block;
+    int pivot;
+    int col, nextcol;
+    int u_closest, l_closest;
+    int flag = 1;
+
+    /* blocks */
+    Int k2, k1, nk;
+
+    /* TODO: save sizeof(...) statically and not call for each alloc */
+    Int *Qi = calloc(n, sizeof(Int));
+    Int *changeVector_permuted = calloc(changeLen, sizeof(Int));
+
+    if (Numeric->path)
+    {
+        KLU_free(Numeric->path, n, sizeof(int), Common);
+    }
+    if (Numeric->bpath)
+    {
+        KLU_free(Numeric->bpath, Numeric->nblocks, sizeof(int), Common);
+    }
+    if (Numeric->start)
+    {
+        KLU_free(Numeric->start, Numeric->nblocks, sizeof(int), Common);
+    }
+
+    Numeric->path = KLU_malloc(n, sizeof(int), Common);
+    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
+    Numeric->start = KLU_malloc(nb, sizeof(int), Common);
+
+    for (i = 0; i < n; i++)
+    {
+        Numeric->path[i] = 0;
+    }
+    for (i = 0; i < nb; i++)
+    {
+        Numeric->bpath[i] = 0;
+        Numeric->start[i] = n;
+    }
+
+    Lp = calloc(n + 1, sizeof(int));
+    Up = calloc(n + 1, sizeof(int));
+    Fp = calloc(n + 1, sizeof(int));
+    Lx = calloc(lnz, sizeof(double));
+    Ux = calloc(unz, sizeof(double));
+    Fx = calloc(nzoff, sizeof(double));
+    Li = calloc(lnz, sizeof(int));
+    Ui = calloc(unz, sizeof(int));
+    Fi = calloc(nzoff, sizeof(int));
+    P = calloc(n, sizeof(int));
+    Q = calloc(n, sizeof(int));
+    Rs = calloc(n, sizeof(double));
+    R = calloc(nb + 1, sizeof(int));
+
+    /* first, get LU decomposition
+     * sloppy implementation, as there might be a smarter way to do this
+     */
+    RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+
+    /* check if extraction of LU matrix broke */
+    if (RET != (TRUE))
+    {
+        return (FALSE);
+    }
+
+    /* second, invert permutation vector
+     * Q gives "oldcol", we need "newcol"
+     */
+    for (i = 0; i < n; i++)
+    {
+        Qi[Q[i]] = i;
+    }
+
+    /* third, apply permutation on changeVector */
+    for (i = 0; i < changeLen; i++)
+    {
+        changeVector_permuted[i] = Qi[changeVector[i]];
+    }
+    int* cV = (int*) calloc(n, sizeof(int));
+    for ( i = 0 ; i < changeLen ; i++)
+    {
+        cV[changeVector_permuted[i]] = 1;
+    }
+    for ( i = 0; i< changeLen ; i++)
+    {
+        changeVector_permuted[i] = 0;
+    } 
+    changeLen = 0;
+    for ( i = 0 ; i < n ; i++)
+    {
+        if(cV[i] == 1)
+        {
+            changeLen++;
+        }
+    }
+    int ctr = 0;
+    changeVector_permuted = (int*) realloc(changeVector_permuted, sizeof(int)*changeLen);
+    for ( i = 0 ; i < n ; i++)
+    {
+        if(cV[i] == 1)
+        {
+            changeVector_permuted[ctr] = i;
+            ctr++;
+        }
+    }
+    free(cV);
+
+    if (Common->btf == FALSE)
+    {
+        /* no btf case
+         * => identify first varying entry in entire matrix */
+        Numeric->bpath[0] = 1;
+
+        /* find minimum in changeVector_permuted */
+        pivot = changeVector_permuted[0];
+        for(i = 1; i < n ; i++)
+        {
+            if(pivot > changeVector_permuted[i])
+            {
+                pivot = changeVector_permuted[i];
+            }
+        }
+
+        /* set first varying column internally */
+        Numeric->start[0] = pivot;
+    }
+    else
+    {
+        /* btf case
+         * 
+         * iterate over changeVector_permuted
+         * for each variable column
+         * find its block
+         *      put block in block-path
+         *      if block larger than 1
+         *          start[block] = min(start[block], column), if start[block] != 0
+         */
+
+         for(i = 0; i < changeLen ; i++)
+         {
+            /* grab variable column number i */
+            pivot = changeVector_permuted[i];
+
+            /* find block */
+            for (k = 0; k < nb; k++)
+            {
+                k1 = R[k];
+                k2 = R[k + 1];
+                if (k1 <= pivot && pivot < k2)
+                {
+                    nk = k2 - k1;
+
+                    /* set varying block */
+                    Numeric->bpath[k] = 1;
+                    break;
+                }
+            }
+
+            if (nk == 1)
+            {
+                /* 1x1-block, nothing left to do */
+                continue;
+            }
+
+            /* nk x nk block. check if pivot column is smaller (before) current minimum */
+            if(Numeric->start[k] > pivot)
+            {
+                Numeric->start[k] = pivot;
+            }
+         }
+    }
+
     free(Lp);
     free(Li);
     free(Lx);
