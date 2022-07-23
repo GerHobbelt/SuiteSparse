@@ -204,3 +204,131 @@ GLOBAL void AMD_postorder
 	}
     }
 }
+
+GLOBAL void AMD_postorder_partial
+(
+    /* inputs, not modified on output: */
+    Int nn,		/* nodes are in the range 0..nn-1 */
+    Int Parent [ ],	/* Parent [j] is the parent of j, or EMPTY if root */
+    Int Nv [ ],		/* Nv [j] > 0 number of pivots represented by node j,
+			 * or zero if j is not a node. */
+    Int Fsize [ ],	/* Fsize [j]: size of node j */
+
+    /* output, not defined on input: */
+    Int Order [ ],	/* output post-order */
+
+    /* workspaces of size nn: */
+    Int Child [ ],
+    Int Sibling [ ],
+    Int Stack [ ],
+	Int offset,
+	Int Varying [ ]
+)
+{
+    Int i, j, k, parent, frsize, f, fprev, maxfrsize, bigfprev, bigf, fnext ;
+
+    for (j = 0 ; j < nn ; j++)
+    {
+	Child [j] = EMPTY ;
+	Sibling [j] = EMPTY ;
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* place the children in link lists - bigger elements tend to be last */
+    /* --------------------------------------------------------------------- */
+
+    for (j = nn-1 ; j >= 0 ; j--)
+    {
+	if (Nv [j] > 0)
+	{
+	    /* this is an element */
+	    parent = Parent [j] ;
+	    if (parent != EMPTY)
+	    {
+		/* place the element in link list of the children its parent */
+		/* bigger elements will tend to be at the end of the list */
+		Sibling [j] = Child [parent] ;
+		Child [parent] = j ;
+	    }
+	}
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* place the largest child last in the list of children for each node */
+    /* --------------------------------------------------------------------- */
+
+    for (i = 0 ; i < nn ; i++)
+    {
+	if (Nv [i] > 0 && Child [i] != EMPTY)
+	{
+
+	    /* find the biggest element in the child list */
+	    fprev = EMPTY ;
+	    maxfrsize = EMPTY ;
+	    bigfprev = EMPTY ;
+	    bigf = EMPTY ;
+	    for (f = Child [i] ; f != EMPTY ; f = Sibling [f])
+	    {
+		ASSERT (f >= 0 && f < nn) ;
+		frsize = Fsize [f] ;
+		if (frsize >= maxfrsize)
+		{
+		    /* this is the biggest seen so far */
+		    maxfrsize = frsize ;
+		    bigfprev = fprev ;
+		    bigf = f ;
+		}
+		fprev = f ;
+	    }
+	    ASSERT (bigf != EMPTY) ;
+
+	    fnext = Sibling [bigf] ;
+
+	    AMD_DEBUG1 (("bigf "ID" maxfrsize "ID" bigfprev "ID" fnext "ID
+		" fprev " ID"\n", bigf, maxfrsize, bigfprev, fnext, fprev)) ;
+
+	    if (fnext != EMPTY)
+	    {
+		/* if fnext is EMPTY then bigf is already at the end of list */
+
+		if (bigfprev == EMPTY)
+		{
+		    /* delete bigf from the element of the list */
+		    Child [i] = fnext ;
+		}
+		else
+		{
+		    /* delete bigf from the middle of the list */
+		    Sibling [bigfprev] = fnext ;
+		}
+
+		/* put bigf at the end of the list */
+		Sibling [bigf] = EMPTY ;
+		ASSERT (Child [i] != EMPTY) ;
+		ASSERT (fprev != bigf) ;
+		ASSERT (fprev != EMPTY) ;
+		Sibling [fprev] = bigf ;
+	    }
+	}
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* postorder the assembly tree */
+    /* --------------------------------------------------------------------- */
+
+    for (i = 0 ; i < nn ; i++)
+    {
+	Order [i] = EMPTY ;
+    }
+
+    k = 0 ;
+
+    for (i = 0 ; i < nn ; i++)
+    {
+	if (Parent [i] == EMPTY && Nv [i] > 0)
+	{
+	    AMD_DEBUG1 (("Root of assembly tree "ID"\n", i)) ;
+	    k = AMD_post_tree (i, k, Child, Sibling, Order, Stack) ;
+	}
+    }
+}

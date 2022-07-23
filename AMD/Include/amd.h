@@ -66,6 +66,34 @@ SuiteSparse_long amd_l_order    /* see above for description of arguments */
     double Info [ ]
 ) ;
 
+int amd_order_partial          /* returns AMD_OK, AMD_OK_BUT_JUMBLED,
+                                * AMD_INVALID, or AMD_OUT_OF_MEMORY */
+(
+    int n,                     /* A is n-by-n.  n must be >= 0. */
+    const int Ap [ ],          /* column pointers for A, of size n+1 */
+    const int Ai [ ],          /* row indices of A, of size nz = Ap [n] */
+    int P [ ],                 /* output permutation, of size n */
+    double Control [ ],        /* input Control settings, of size AMD_CONTROL */
+    double Info [ ],            /* output Info statistics, of size AMD_INFO */
+    int offset,
+    int varying [ ],             /* indicating varying columns */
+    int mode                    /* indicates partial ordering mode */
+) ;
+
+SuiteSparse_long amd_l_order_partial          /* returns AMD_OK, AMD_OK_BUT_JUMBLED,
+                                * AMD_INVALID, or AMD_OUT_OF_MEMORY */
+(
+    SuiteSparse_long n,                     /* A is n-by-n.  n must be >= 0. */
+    const SuiteSparse_long Ap [ ],          /* column pointers for A, of size n+1 */
+    const SuiteSparse_long Ai [ ],          /* row indices of A, of size nz = Ap [n] */
+    SuiteSparse_long P [ ],                 /* output permutation, of size n */
+    double Control [ ],        /* input Control settings, of size AMD_CONTROL */
+    double Info [ ],            /* output Info statistics, of size AMD_INFO */
+    SuiteSparse_long offset,
+    SuiteSparse_long varying [ ],             /* indicating varying columns */
+    SuiteSparse_long mode                    /* indicates partial ordering mode */
+) ;
+
 /* Input arguments (not modified):
  *
  *       n: the matrix A is n-by-n.
@@ -273,6 +301,90 @@ void amd_l2
     double Info [ ]
 ) ;
 
+void amd_bra
+(
+    int n,
+    int Pe [ ],
+    int Iw [ ],
+    int Len [ ],
+    int iwlen,
+    int pfree,
+    int Nv [ ],
+    int Next [ ], 
+    int Last [ ],
+    int Head [ ],
+    int Elen [ ],
+    int Degree [ ],
+    int W [ ],
+    double Control [ ],
+    double Info [ ],
+    int offset,
+    int varying [ ]
+) ;
+
+void amd_l_bra
+(
+    SuiteSparse_long n,
+    SuiteSparse_long Pe [ ],
+    SuiteSparse_long Iw [ ],
+    SuiteSparse_long Len [ ],
+    SuiteSparse_long iwlen,
+    SuiteSparse_long pfree,
+    SuiteSparse_long Nv [ ],
+    SuiteSparse_long Next [ ], 
+    SuiteSparse_long Last [ ],
+    SuiteSparse_long Head [ ],
+    SuiteSparse_long Elen [ ],
+    SuiteSparse_long Degree [ ],
+    SuiteSparse_long W [ ],
+    double Control [ ],
+    double Info [ ],
+    SuiteSparse_long offset,
+    SuiteSparse_long varying [ ]
+) ;
+
+void amd_nv
+(
+    int n,
+    int Pe [ ],
+    int Iw [ ],
+    int Len [ ],
+    int iwlen,
+    int pfree,
+    int Nv [ ],
+    int Next [ ], 
+    int Last [ ],
+    int Head [ ],
+    int Elen [ ],
+    int Degree [ ],
+    int W [ ],
+    double Control [ ],
+    double Info [ ],
+    int offset,
+    int varying [ ]
+) ;
+
+void amd_l_nv
+(
+    SuiteSparse_long n,
+    SuiteSparse_long Pe [ ],
+    SuiteSparse_long Iw [ ],
+    SuiteSparse_long Len [ ],
+    SuiteSparse_long iwlen,
+    SuiteSparse_long pfree,
+    SuiteSparse_long Nv [ ],
+    SuiteSparse_long Next [ ], 
+    SuiteSparse_long Last [ ],
+    SuiteSparse_long Head [ ],
+    SuiteSparse_long Elen [ ],
+    SuiteSparse_long Degree [ ],
+    SuiteSparse_long W [ ],
+    double Control [ ],
+    double Info [ ],
+    SuiteSparse_long offset,
+    SuiteSparse_long varying [ ]
+) ;
+
 /* ------------------------------------------------------------------------- */
 /* amd_valid */
 /* ------------------------------------------------------------------------- */
@@ -324,6 +436,9 @@ void amd_l_control  (double Control [ ]) ;
 /* amd_info: prints the statistics */
 void amd_info       (double Info [ ]) ;
 void amd_l_info     (double Info [ ]) ;
+
+#define NV (1)
+#define BRA (2)
 
 #define AMD_CONTROL 5          /* size of Control array */
 #define AMD_INFO 20            /* size of Info array */
@@ -386,10 +501,10 @@ void amd_l_info     (double Info [ ]) ;
  * Versions 1.1 and earlier of AMD do not include a #define'd version number.
  */
 
-#define AMD_DATE "May 4, 2016"
+#define AMD_DATE "July 23, 2022"
 #define AMD_VERSION_CODE(main,sub) ((main) * 1000 + (sub))
 #define AMD_MAIN_VERSION 2
-#define AMD_SUB_VERSION 4
+#define AMD_SUB_VERSION 5
 #define AMD_SUBSUB_VERSION 6
 #define AMD_VERSION AMD_VERSION_CODE(AMD_MAIN_VERSION,AMD_SUB_VERSION)
 

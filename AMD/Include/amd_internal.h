@@ -160,14 +160,18 @@
 #define Int_MAX SuiteSparse_long_max
 
 #define AMD_order amd_l_order
+#define AMD_order_partial amd_l_order_partial
 #define AMD_defaults amd_l_defaults
 #define AMD_control amd_l_control
 #define AMD_info amd_l_info
 #define AMD_1 amd_l1
 #define AMD_2 amd_l2
+#define AMD_BRA amd_l_nv
+#define AMD_NV amd_l_bra
 #define AMD_valid amd_l_valid
 #define AMD_aat amd_l_aat
 #define AMD_postorder amd_l_postorder
+#define AMD_postorder_partial amd_l_postorder_partial
 #define AMD_post_tree amd_l_post_tree
 #define AMD_dump amd_l_dump
 #define AMD_debug amd_l_debug
@@ -181,14 +185,19 @@
 #define Int_MAX INT_MAX
 
 #define AMD_order amd_order
+#define AMD_order_partial amd_order_partial
 #define AMD_defaults amd_defaults
 #define AMD_control amd_control
 #define AMD_info amd_info
 #define AMD_1 amd_1
+#define AMD_1_partial amd_1_partial
 #define AMD_2 amd_2
+#define AMD_BRA amd_nv
+#define AMD_NV amd_bra
 #define AMD_valid amd_valid
 #define AMD_aat amd_aat
 #define AMD_postorder amd_postorder
+#define AMD_postorder_partial amd_postorder_partial
 #define AMD_post_tree amd_post_tree
 #define AMD_dump amd_dump
 #define AMD_debug amd_debug
@@ -225,6 +234,23 @@ GLOBAL void AMD_1
     double Info [ ]
 ) ;
 
+GLOBAL void AMD_1_partial
+(
+    Int n,
+    const Int Ap [ ],
+    const Int Ai [ ],
+    Int P [ ],
+    Int Pinv [ ],
+    Int Len [ ],
+    Int slen,
+    Int S [ ],
+    double Control [ ],
+    double Info [ ],
+    Int k1,
+    Int varying [ ],
+    Int mode
+) ;
+
 GLOBAL void AMD_postorder
 (
     Int nn,
@@ -235,6 +261,20 @@ GLOBAL void AMD_postorder
     Int Child [ ],
     Int Sibling [ ],
     Int Stack [ ]
+) ;
+
+GLOBAL void AMD_postorder_partial
+(
+    Int nn,
+    Int Parent [ ],
+    Int Npiv [ ],
+    Int Fsize [ ],
+    Int Order [ ],
+    Int Child [ ],
+    Int Sibling [ ],
+    Int Stack [ ],
+    Int offset,
+    Int Varying [ ]
 ) ;
 
 GLOBAL Int AMD_post_tree
