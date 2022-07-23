@@ -279,6 +279,27 @@ klu_symbolic *klu_analyze
 klu_l_symbolic *klu_l_analyze (SuiteSparse_long, SuiteSparse_long *,
     SuiteSparse_long *, klu_l_common *Common) ;
 
+/* -------------------------------------------------------------------------- */
+/* klu_analyze:  orders and analyzes a matrix */
+/* -------------------------------------------------------------------------- */
+
+/* Order the matrix with BTF (or not), then order each block with AMD, COLAMD,
+ * a natural ordering, or with a user-provided ordering function */
+
+klu_symbolic *klu_analyze_partial
+(
+    /* inputs, not modified */
+    int n,              /* A is n-by-n */
+    int Ap [ ],         /* size n+1, column pointers */
+    int Ai [ ],         /* size nz, row indices */
+    int Varying [ ],
+    int mode,
+    klu_common *Common
+) ;
+
+klu_l_symbolic *klu_l_analyze_partial (SuiteSparse_long, SuiteSparse_long *,
+    SuiteSparse_long *, SuiteSparse_long *, SuiteSparse_long, klu_l_common *Common) ;
+
 
 /* -------------------------------------------------------------------------- */
 /* klu_analyze_given: analyzes a matrix using given P and Q */

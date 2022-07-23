@@ -279,7 +279,17 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
 {
     double amd_Info [AMD_INFO], lnz, lnz1, flops, flops1 ;
     Int k1, k2, nk, k, block, oldcol, pend, newcol, result, pc, p, newrow,
-        maxnz, nzoff, ok, err = KLU_INVALID ;
+        maxnz, nzoff, ok, err = KLU_INVALID, i ;
+
+    Int Varying2[n];
+
+    for(i = 0; i < n ; i++)
+    {
+        if(Varying[i] == 1)
+        {
+            Varying2[Qbtf[i]] = 1;
+        }
+    }
 
     /* ---------------------------------------------------------------------- */
     /* initializations */
@@ -385,7 +395,7 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
 
             if(mode == BRA || mode == NV)
             {
-                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying, mode);
+                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying2, mode);
             }
             else
             {

@@ -167,7 +167,7 @@ void dumpKA(double* Ax,
     FILE *a;
     a = fopen(str, "w");
 
-    printKMTX(a, Ax, Ai, Ap, n, Ap[n-1]+1);
+    printKMTX(a, Ax, Ai, Ap, n, Ap[n]);
 
     fclose(a);
     counter++;
