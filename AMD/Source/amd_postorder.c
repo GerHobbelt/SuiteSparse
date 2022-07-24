@@ -225,7 +225,7 @@ GLOBAL void AMD_postorder_partial
 	Int Varying [ ]
 )
 {
-    Int i, j, k, parent, frsize, f, fprev, maxfrsize, bigfprev, bigf, fnext ;
+    Int i, j, k, parent, frsize, f, fprev, maxfrsize, bigfprev, bigf, fnext, oldf, BIGF, maxfr, bigfp ;
 
     for (j = 0 ; j < nn ; j++)
     {
@@ -309,6 +309,58 @@ GLOBAL void AMD_postorder_partial
 		ASSERT (fprev != EMPTY) ;
 		Sibling [fprev] = bigf ;
 	    }
+
+		/* this part is added */
+		BIGF = bigf;
+	    fprev = EMPTY ;
+	    maxfrsize = EMPTY ;
+	    bigfprev = EMPTY ;
+	    bigf = EMPTY ;
+		for (f = Child[i]; f != EMPTY; f = Sibling[f])
+		{
+			if (Varying[offset+f] == 1)
+			{
+				/* f is varying */
+				maxfr = frsize;
+				bigfp = fprev;
+				bigf = f;
+				fnext = Sibling[f];
+				/* find last child 
+				 * else: fprev is already last */
+				oldf = fprev;
+				fprev = Sibling[f];
+				while(fprev != EMPTY && Sibling[fprev] != EMPTY && Sibling[fprev] != BIGF)
+				{
+				fprev = Sibling[fprev];
+				}
+				/* fprev should be last in list now (potentially equal to bigf) */
+				if (fnext != EMPTY && fprev != BIGF)
+				{
+					/* if fnext is -1 then f is already at the end of list */
+		
+					if (bigfp == EMPTY)
+					{
+						/* delete bigf from the element of the list */
+						Child[i] = fnext;
+					}
+					else
+					{
+						/* delete bigf from the middle of the list */
+						Sibling[bigfp] = fnext;
+					}
+		
+					/* put bigf at the end of the list */
+					Sibling[bigf] = BIGF;
+					Sibling[fprev] = bigf;
+					f = fprev;
+				}
+				fprev = oldf;
+			}
+			else
+			{
+				fprev = f;
+			}
+		}
 	}
     }
 

@@ -1185,7 +1185,7 @@ GLOBAL void AMD_2
 	     * Elen [i] == 1 && p3 == pn test, below. */
 	    ASSERT (IMPLIES (aggressive, (deg==0) == (Elen[i]==1 && p3==pn))) ;
 
-	    if (Elen [i] == 1 && p3 == pn)
+	    if (Elen [i] == 1 && p3 == pn /* && Varying[offset+i] != 1 */)
 	    {
 
 		/* --------------------------------------------------------- */
@@ -1393,7 +1393,7 @@ GLOBAL void AMD_2
 			    ASSERT (Iw [p] >= 0 && Iw [p] < n) ;
 			    if (W [Iw [p]] != wflg) ok = 0 ;
 			}
-			if (ok)
+			if (ok /* && Varying[offset+j] != 1*/)
 			{
 			    /* --------------------------------------------- */
 			    /* found it!  j can be absorbed into i */
@@ -1868,7 +1868,7 @@ GLOBAL void AMD_BRA
     double Control [ ],	/* array of size AMD_CONTROL */
     double Info [ ],	/* array of size AMD_INFO */
     Int offset,
-	Int varying [ ]
+	Int Varying [ ]
 )
 {
 
@@ -1993,7 +1993,7 @@ GLOBAL void AMD_BRA
 	    Pe [i] = EMPTY ;
 
 	}
-	else if (varying[offset+i] == 1)
+	else if (Varying[offset+i] == 1)
 	{
 
 	    /* -------------------------------------------------------------
@@ -3204,14 +3204,14 @@ GLOBAL void AMD_NV
     double Control [ ],	/* array of size AMD_CONTROL */
     double Info [ ],	/* array of size AMD_INFO */
     Int offset,
-	Int varying [ ]
+	Int Varying [ ]
 )
 {
 
     Int deg, degme, dext, lemax, e, elenme, eln, i, ilast, inext, j,
 	jlast, jnext, k, knt1, knt2, knt3, lenj, ln, me, mindeg, nel, nleft,
 	nvi, nvj, nvpiv, slenme, wbig, we, wflg, wnvi, ok, ndense, ncmpa,
-	dense, aggressive ;
+	dense, aggressive, menext ;
 
     unsigned Int hash ;	    /* unsigned, so that hash % n is well defined.*/
 
@@ -3375,7 +3375,55 @@ GLOBAL void AMD_NV
 	for (deg = mindeg ; deg < n ; deg++)
 	{
 	    me = Head [deg] ;
-	    if (me != EMPTY) break ;
+	    if (me != EMPTY)
+		{
+			if(Varying[offset+me] == 1)
+			{
+				/* me is a varying node. check if there are non-varying ones with the same degree */
+				i = Next[me];
+				while(i != EMPTY)
+				{
+					if(Varying[offset+i] != 1)
+					{
+						/* found non-varying! */
+						/* switch me and i */
+						menext = Next[me];
+						if(menext == i)
+						{
+							/* me and i are neighbors in data structure (not necessarily in graph) */
+							inext = Next[i];
+							if (inext != EMPTY)
+							{
+								Last[inext] = me;
+							}
+							Last[i] = Last[me];
+							Next[me] = inext;
+							Last[me] = i;
+							Next[i] = me;
+						}
+						else
+						{
+							inext = Next[i];
+							if(inext != EMPTY)
+							{
+								Last[inext] = me;
+							}
+							ilast = Last[i];
+							Last[i] = Last[me];
+							Next[ilast] = me;
+							Last[menext] = i;
+							Next[i] = menext;
+							Last[me] = ilast;
+							Next[me] = inext;
+						}
+						me = i;
+						break;
+					}
+					i = Next[i];
+				}
+			}
+			break ;
+		}
 	}
 	mindeg = deg ;
 	ASSERT (me >= 0 && me < n) ;
@@ -4401,7 +4449,7 @@ GLOBAL void AMD_NV
     AMD_postorder_partial (n, Pe, Nv, Elen,
 	W,			/* output order */
 	Head, Next, Last, /* workspace */
-	offset, varying
+	offset, Varying
 	) ;	
 
 /* ========================================================================= */
