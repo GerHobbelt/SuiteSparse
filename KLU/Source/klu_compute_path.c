@@ -9,109 +9,132 @@
  */
 #include "klu_internal.h"
 
-int KLU_extract_quick(
-    /* inputs: */
-    KLU_numeric *Numeric,
-    KLU_symbolic *Symbolic,
+// int KLU_extract_quick(
+//     /* inputs: */
+//     KLU_numeric *Numeric,
+//     KLU_symbolic *Symbolic,
 
-    /* outputs: */
-    Int *Ui,
-    Int *Up,
-    Int *Q,
-    Int *R
-)
-{
-    /* placeholder */
-    Entry *Lx2, *Ux2, *Ukk ;
-    Unit* LU;
-    Int *Lip, *Llen, *Uip, *Ulen, *Li2, *Ui2 ;
-    Int nz, k1, k2, block, nk, kk, len, p, n, nblocks, k;
-    n = Symbolic->n ;
-    nblocks = Symbolic->nblocks ;
+//     /* outputs: */
+//     Int *Ui,
+//     Int *Up,
+//     Int *Q,
+//     Int *R
+// )
+// {
+//     /* placeholder */
+//     Entry *Lx2, *Ux2, *Ukk ;
+//     Unit* LU;
+//     Int *Lip, *Llen, *Uip, *Ulen, *Li2, *Ui2 ;
+//     Int nz, k1, k2, block, nk, kk, len, p, n, nblocks, k;
+//     n = Symbolic->n ;
+//     nblocks = Symbolic->nblocks ;
 
-    /* ---------------------------------------------------------------------- */
-    /* extract block boundaries */
-    /* ---------------------------------------------------------------------- */
+//     /* ---------------------------------------------------------------------- */
+//     /* extract block boundaries */
+//     /* ---------------------------------------------------------------------- */
 
-    if (R != NULL)
-    {
-        for (block = 0 ; block <= nblocks ; block++)
-        {
-            R [block] = Symbolic->R [block] ;
-        }
-    }
+//     if (R != NULL)
+//     {
+//         for (block = 0 ; block <= nblocks ; block++)
+//         {
+//             R [block] = Symbolic->R [block] ;
+//         }
+//     }
 
-    /* ---------------------------------------------------------------------- */
-    /* extract column permutation */
-    /* ---------------------------------------------------------------------- */
+//     /* ---------------------------------------------------------------------- */
+//     /* extract column permutation */
+//     /* ---------------------------------------------------------------------- */
 
-    if (Q != NULL)
-    {
-        for (k = 0 ; k < n ; k++)
-        {
-            Q [k] = Symbolic->Q [k] ;
-        }
-    }
+//     if (Q != NULL)
+//     {
+//         for (k = 0 ; k < n ; k++)
+//         {
+//             Q [k] = Symbolic->Q [k] ;
+//         }
+//     }
 
-    /* ---------------------------------------------------------------------- */
-    /* extract each block of U */
-    /* ---------------------------------------------------------------------- */
+//     /* ---------------------------------------------------------------------- */
+//     /* extract each block of U */
+//     /* ---------------------------------------------------------------------- */
 
-    if (Up != NULL && Ui != NULL)
-    {
-        nz = 0 ;
-        for (block = 0 ; block < nblocks ; block++)
-        {
-            k1 = Symbolic->R [block] ;
-            k2 = Symbolic->R [block+1] ;
-            nk = k2 - k1 ;
-            if (nk == 1)
-            {
-                /* singleton block */
-                Up [k1] = nz ;
-                Ui [nz] = k1 ;
-                nz++ ;
-            }
-            else
-            {
-                /* non-singleton block */
-                LU = Numeric->LUbx [block] ;
-                Uip = Numeric->Uip + k1 ;
-                Ulen = Numeric->Ulen + k1 ;
-                for (kk = 0 ; kk < nk ; kk++)
-                {
-                    Up [k1+kk] = nz ;
-                    GET_POINTER (LU, Uip, Ulen, Ui2, Ux2, kk, len) ;
-                    for (p = 0 ; p < len ; p++)
-                    {
-                        Ui [nz] = k1 + Ui2 [p] ;
-                        nz++ ;
-                    }
-                    /* add the diagonal entry */
-                    Ui [nz] = k1 + kk ;
-                    nz++ ;
-                }
-            }
-        }
-        Up [n] = nz ;
-        ASSERT (nz == Numeric->unz) ;
-    }
-    return (TRUE);
-}
+//     if (Up != NULL && Ui != NULL)
+//     {
+//         nz = 0 ;
+//         for (block = 0 ; block < nblocks ; block++)
+//         {
+//             k1 = Symbolic->R [block] ;
+//             k2 = Symbolic->R [block+1] ;
+//             nk = k2 - k1 ;
+//             if (nk == 1)
+//             {
+//                 /* singleton block */
+//                 Up [k1] = nz ;
+//                 Ui [nz] = k1 ;
+//                 nz++ ;
+//             }
+//             else
+//             {
+//                 /* non-singleton block */
+//                 LU = Numeric->LUbx [block] ;
+//                 Uip = Numeric->Uip + k1 ;
+//                 Ulen = Numeric->Ulen + k1 ;
+//                 for (kk = 0 ; kk < nk ; kk++)
+//                 {
+//                     Up [k1+kk] = nz ;
+//                     GET_POINTER (LU, Uip, Ulen, Ui2, Ux2, kk, len) ;
+//                     for (p = 0 ; p < len ; p++)
+//                     {
+//                         Ui [nz] = k1 + Ui2 [p] ;
+//                         nz++ ;
+//                     }
+//                     /* add the diagonal entry */
+//                     Ui [nz] = k1 + kk ;
+//                     nz++ ;
+//                 }
+//             }
+//         }
+//         Up [n] = nz ;
+//         ASSERT (nz == Numeric->unz) ;
+//     }
+//     return (TRUE);
+// }
 
 /*
- * Secondary function. Expects a factorized matrix and "changeVector", which contains columns of A that change
- * e.g. changeVector = {3, 5}, if columns 3 and 5 contain varying entries. Needs to be permuted, since
- * L*U = P*A*Q
+ * Computes Factorization Path.
  */
 int KLU_compute_path(
                     KLU_symbolic *Symbolic, 
                     KLU_numeric *Numeric, 
                     KLU_common *Common, 
-                    Int *changeVector,
-                    Int changeLen
+                    Int Ap [ ],
+                    Int Ai [ ],
+                    Int *variable_columns,
+                    Int *variable_rows,
+                    Int n_variable_entries
                     )
 {
+
+    /* This method computes the factorization path.
+     * "output": 
+     *          - variable_offdiag_orig_entry: position of entries in Ax, which end up in off-diagonal block F
+     *          - variable_offdiag_perm_entry: position of entries in F, which are varying in Ax
+     *          - bpath: array of length nblocks+1. bpath[k]...bpath[k+1]-1 indicate the variable columns in block k
+     *          - path: path[bpath[k]]...path[bpath[k+1]-1] contain the variable columns in block k
+     *      
+     */
+
+    if(variable_columns == NULL)
+    {
+        return FALSE;
+    }
+    if(variable_rows == NULL)
+    {
+        return FALSE;
+    }
+    if(n_variable_entries <= 0)
+    {
+        return TRUE;
+    }
     /* This function is very long, because you have to implement BTF and no BTF-case... */
     /* Declarations */
     /* LU data */
@@ -121,58 +144,70 @@ int KLU_compute_path(
     int unz = Numeric->unz;
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
+    int *Pinv = Numeric->Pinv;
     int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
     int *P, *Q, *R;
     double *Rs;
     int RET;
+    int oldcol, pend, p, newrow;
+    int poff = 0, ctr = 0, variable_offdiag_length = 0;
+
+    Int n_variable_entries_new = n_variable_entries;
+
+    Int* variable_offdiag_orig_entry = (Int*)calloc(nzoff, sizeof(Int));
+    Int *variable_offdiag_perm_entry = (Int*)calloc(nzoff, sizeof(Int));
 
     /* indices and temporary variables */
-    int i, k, j, ent;
+    int i, k, j, ent, block;
     int pivot;
     int col, nextcol;
-    int u_closest, l_closest;
     int flag = 1;
 
     /* blocks */
     Int k2, k1, nk;
 
-    /* TODO: save sizeof(...) statically and not call for each alloc */
     Int *Qi = calloc(n, sizeof(Int));
-    Int *changeVector_permuted = calloc(changeLen, sizeof(Int));
+    Int *variable_columns_in_LU = calloc(n_variable_entries, sizeof(Int));
+    Int *variable_rows_in_LU = calloc(n_variable_entries, sizeof(Int));
 
     if (Numeric->path)
     {
         KLU_free(Numeric->path, n, sizeof(int), Common);
     }
-    if (Numeric->bpath)
+    if (Numeric->block_path)
     {
-        KLU_free(Numeric->bpath, Numeric->nblocks, sizeof(int), Common);
+        KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
+    }
+    if (Numeric->variable_block)
+    {
+        KLU_free(Numeric->variable_block, Numeric->n_variable_blocks, sizeof(int), Common);
+    }
+    if (Numeric->variable_offdiag_orig_entry)
+    {
+        KLU_free(Numeric->variable_offdiag_orig_entry, Numeric->variable_offdiag_length, sizeof(int), Common);
+    }
+    if (Numeric->variable_offdiag_perm_entry)
+    {
+        KLU_free(Numeric->variable_offdiag_perm_entry, Numeric->variable_offdiag_length, sizeof(int), Common);
     }
 
-    Numeric->path = KLU_malloc(n, sizeof(int), Common);
-    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
-    int *workpath = (int *)calloc(n, sizeof(int));
-
-    for (i = 0; i < n; i++)
+    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
+    int workpath[n];
+    Int path[n];
+    Int nvblocks[nb];
+    
+    for (i  = 0 ; i < n ; i++)
     {
-        Numeric->path[i] = 0;
+        path[i] = 0;
     }
+
     for (i = 0; i < nb; i++)
     {
-        Numeric->bpath[i] = 0;
+        nvblocks[i] = 0;
+        Numeric->block_path[i] = 0;
     }
 
-
-    // Up = calloc(n + 1, sizeof(int));
-    // Ui = calloc(unz, sizeof(int));
-    // Q = calloc(n, sizeof(int));
-    // R = calloc(nb+1, sizeof(int));
-
-    // // first, get LU decomposition
-    // // sloppy implementation, as there might be a smarter way to do this
-    // RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-    //RET = KLU_extract_quick(Numeric, Symbolic, Ui, Up, Q, R);
     Lp = calloc(n + 1, sizeof(int));
     Up = calloc(n + 1, sizeof(int));
     Fp = calloc(n + 1, sizeof(int));
@@ -187,9 +222,10 @@ int KLU_compute_path(
     Rs = calloc(n, sizeof(double));
     R = calloc(nb + 1, sizeof(int));
 
-    /* first, get LU decomposition
-     * sloppy implementation, as there might be a smarter way to do this
-     */
+    /* ---------------------------------------------------------------- */
+    /* first, get LU decomposition */
+    /* sloppy implementation, as there might be a smarter way to do this */
+    /* ---------------------------------------------------------------- */
     RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
 
     /* check if extraction of LU matrix broke */
@@ -198,63 +234,131 @@ int KLU_compute_path(
         return (FALSE);
     }
 
-    /* second, invert permutation vector
-     * Q gives "oldcol", we need "newcol"
-     */
+    /* ---------------------------------------------------------------- */
+    /* second, invert permutation vector */
+    /* Q gives "oldcol", we need "newcol" */
+    /* ---------------------------------------------------------------- */
     for (i = 0; i < n; i++)
     {
         Qi[Q[i]] = i;
     }
 
-    /* third, apply permutation on changeVector */
-    for (i = 0; i < changeLen; i++)
+    /* ---------------------------------------------------------------- */
+    /* third, apply permutation on variable_columns */
+    /* ---------------------------------------------------------------- */
+
+    for (i = 0; i < n_variable_entries; i++)
     {
-        changeVector_permuted[i] = Qi[changeVector[i]];
+        variable_columns_in_LU[i] = Qi[variable_columns[i]];
+        variable_rows_in_LU[i] = Pinv[variable_rows[i]];
     }
-    int* cV = (int*) calloc(n, sizeof(int));
-    for ( i = 0 ; i < changeLen ; i++)
+
+    /* ---------------------------------------------------------------- */
+    /* fourth, determine variable off-diagonal entries */
+    /* only necessary if BTF used */
+    /* if BTF is not used, no off-diagonal blocks are available */
+    /* ---------------------------------------------------------------- */
+
+    if(Common->btf == TRUE)
     {
-        cV[changeVector_permuted[i]] = 1;
-    }
-    for ( i = 0; i< changeLen ; i++)
-    {
-        changeVector_permuted[i] = 0;
-    } 
-    changeLen = 0;
-    for ( i = 0 ; i < n ; i++)
-    {
-        if(cV[i] == 1)
+        /* iterate over all blocks */
+        for(block = 0 ; block < nb ; block++)
         {
-            changeLen++;
+            k1 = R [block];
+            k2 = R [block+1];
+            nk = k2 - k1;
+            for (k = 0 ; k < nk ; k++)
+            {
+                oldcol = Q [k+k1] ;
+                pend = Ap [oldcol+1] ;
+                for (p = Ap [oldcol] ; p < pend ; p++)
+                {
+                    newrow = Pinv [Ai [p]] - k1 ;
+                    if (newrow < 0 && poff < nzoff)
+                    {
+                        /* entry in off-diagonal block */
+                        poff++ ;
+
+                        /* check if entry is in variable column */
+                        /* TODO */
+                        for(i = 0 ; i < n_variable_entries ; i++)
+                        {
+                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == newrow)
+                            {
+                                /* set to -1, because they're off-diagonal now */
+                                variable_columns_in_LU[i] = -1;
+                                variable_rows_in_LU[i] = -1;
+
+                                variable_offdiag_orig_entry[variable_offdiag_length] = p;
+                                variable_offdiag_perm_entry[variable_offdiag_length++] = poff;
+
+                                n_variable_entries_new--;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
-    int ctr = 0;
-    changeVector_permuted = (int*) realloc(changeVector_permuted, sizeof(int)*changeLen);
+
+    ASSERT(variable_offdiag_length == n_variable_entries - n_variable_entries_new);
+
+    Numeric->variable_offdiag_orig_entry = KLU_malloc(variable_offdiag_length, sizeof(Int), Common);
+    Numeric->variable_offdiag_perm_entry = KLU_malloc(variable_offdiag_length, sizeof(Int), Common);
+    Numeric->variable_offdiag_length = variable_offdiag_length;
+
+    for(i = 0; i < variable_offdiag_length ; i++)
+    {
+        Numeric->variable_offdiag_orig_entry[i] = variable_offdiag_orig_entry[i];
+        Numeric->variable_offdiag_perm_entry[i] = variable_offdiag_perm_entry[i];
+    }
+
+    int* cV = calloc(n, sizeof(int));
+    for(i = 0; i < n_variable_entries ; i++)
+    {
+        if(variable_columns_in_LU[i] != -1)
+        {
+            cV[variable_columns_in_LU[i]] = 1;
+        }
+    }
+    for( i = 0; i < n_variable_entries ; i++)
+    {
+        variable_columns_in_LU[i] = 0;
+    }
+    variable_columns_in_LU = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries_new);
     for ( i = 0 ; i < n ; i++)
     {
-        if(cV[i] == 1)
+        if(cV[i] != 0)
         {
-            changeVector_permuted[ctr] = i;
-            ctr++;
+            variable_columns_in_LU[ctr++] = i;
         }
     }
     free(cV);
 
-    /* fourth, compute factorization path */
+    ASSERT(ctr == variable_entries_new);
+
+    /* ---------------------------------------------------------------- */
+    /* fifth, compute factorization path of blocks */
+    /* ---------------------------------------------------------------- */
+
     if (Common->btf == FALSE)
     {
-        Numeric->bpath[0] = 1;
+        Numeric->variable_block = KLU_malloc(1, sizeof(int), Common);
+        Numeric->block_path[0] = 0;
+        Numeric->variable_block[0] = 0;
+        Numeric->n_variable_blocks = 1;
         /* no blocks */
-        for (i = 0; i < changeLen; i++)
+        for (i = 0; i < n_variable_entries_new; i++)
         {
             flag = 1;
-            pivot = changeVector_permuted[i];
-            if (Numeric->path[pivot] == 1)
+            pivot = variable_columns_in_LU[i];
+            if (path[pivot] == 1)
             {
                 /* already computed pivot? */
                 continue;
             }
-            Numeric->path[pivot] = 1;
+            path[pivot] = 1;
             
             /* GP-based version */
             while (pivot < n && flag)
@@ -279,7 +383,7 @@ int KLU_compute_path(
                             }
                         }
                         /* col is always well-defined */
-                        Numeric->path[col] = 1;
+                        path[col] = 1;
                         workpath[col] = 1;
                     }
                 }
@@ -295,17 +399,40 @@ int KLU_compute_path(
                 }
             }
         }
+        ctr = 0;
+        for( i = 0 ; i < n ; i++)
+        {
+            if(path[i] == 1)
+            {
+                ctr++;
+            }
+        }
+        Numeric->path = KLU_malloc(ctr, sizeof(int), Common);
+        for(i = 0; i < ctr ; i++)
+        {
+            Numeric->path[i] = 0;
+        }
+        Numeric->block_path[1] = ctr+1;
+        ctr = 0;
+        for(i = 0; i < n ; i++)
+        {
+            if(path[i] == 1)
+            {
+                Numeric->path[ctr++] = i;
+            }
+        }
     }
     else
     {
-        for (i = 0; i < changeLen; i++)
+        Numeric->n_variable_blocks = 0;
+        for (i = 0; i < n_variable_entries; i++)
         {
             flag = 1;
             /* get next changing column */
-            pivot = changeVector_permuted[i];
+            pivot = variable_columns_in_LU[i];
 
             /* check if it was already computed */
-            if (Numeric->path[pivot] == 1)
+            if (path[pivot] == 1)
             {
                 /* already computed pivot
                  * do nothing, go to next pivot
@@ -314,7 +441,7 @@ int KLU_compute_path(
             }
 
             /* set first value of singleton path */
-            Numeric->path[pivot] = 1;
+            path[pivot] = 1;
 
             /* find block of pivot */
             for (k = 0; k < nb; k++)
@@ -326,7 +453,12 @@ int KLU_compute_path(
                     nk = k2 - k1;
 
                     /* set varying block */
-                    Numeric->bpath[k] = 1;
+
+                    if(nvblocks[k] != 1)
+                    {
+                        nvblocks[k] = 1;
+                        Numeric->n_variable_blocks += 1;
+                    }
                     break;
                 }
             }
@@ -376,7 +508,7 @@ int KLU_compute_path(
                             if (j >= Up[k] && j < Up[k + 1])
                             {
                                 col = k;
-                                Numeric->path[col] = 1;
+                                path[col] = 1;
                                 workpath[col] = 1;
                                 break;
                             }
@@ -395,8 +527,63 @@ int KLU_compute_path(
                 }
             }
         }
+
+        /* count how many variable columns there are */
+        ctr = 0;
+        for( i = 0 ; i < n ; i++)
+        {
+            if(path[i] == 1)
+            {
+                ctr++;
+            }
+        }
+
+        /* allocate and initialize memory */
+        Numeric->path = KLU_malloc(ctr, sizeof(int), Common);
+        Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
+        for(i = 0; i < ctr ; i++)
+        {
+            Numeric->path[i] = 0;
+        }
+
+        /* set variable blocks */
+        ctr = 0;
+        for(i = 0 ; i < nb ; i++)
+        {
+            if(nvblocks[i] == 1)
+            {
+                Numeric->variable_block[ctr++] = i;
+            }
+        }
+
+        ASSERT(ctr == Numeric->n_variable_blocks);
+
+        /* assemble factorization path */
+        ctr = 0;
+        for(i = 0; i < n ; i++)
+        {
+            if(path[i] == 1)
+            {
+                Numeric->path[ctr++] = i;
+            }
+        }
+        block = 0;
+
+        /* determine from where to where in each block there are variable columns */
+        k = 0;
+        for(i = 0 ; i < Numeric->n_variable_blocks ; i++)
+        {
+            k1 = R[Numeric->variable_block[i]]; 
+            k2 = R[Numeric->variable_block[i]+1];
+            Numeric->block_path[Numeric->variable_block[i]] = k;
+            while(k < ctr && Numeric->path[k] < k2 - 1)
+            {
+                k++;
+            }
+            k++;
+            Numeric->block_path[Numeric->variable_block[i]+1] = k;
+        }
     }
-    free(workpath);
     free(Lp);
     free(Li);
     free(Lx);
@@ -411,7 +598,8 @@ int KLU_compute_path(
     free(Qi);
     free(R);
     free(Rs);
-    free(changeVector_permuted);
+    free(variable_columns_in_LU);
+    free(variable_rows_in_LU);
     return (TRUE);
 }
 
@@ -423,8 +611,8 @@ int KLU_determine_start(
         KLU_symbolic *Symbolic, 
         KLU_numeric *Numeric, 
         KLU_common *Common, 
-        Int *changeVector,
-        Int changeLen
+        Int *variable_columns,
+        Int n_variable_entries
     )
 {
     int n = Symbolic->n;
@@ -450,32 +638,33 @@ int KLU_determine_start(
 
     /* TODO: save sizeof(...) statically and not call for each alloc */
     Int *Qi = calloc(n, sizeof(Int));
-    Int *changeVector_permuted = calloc(changeLen, sizeof(Int));
+    Int *variable_columns_in_LU = calloc(n_variable_entries, sizeof(Int));
 
     if (Numeric->path)
     {
         KLU_free(Numeric->path, n, sizeof(int), Common);
     }
-    if (Numeric->bpath)
+    if (Numeric->block_path)
     {
-        KLU_free(Numeric->bpath, Numeric->nblocks, sizeof(int), Common);
+        KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
     }
     if (Numeric->start)
     {
         KLU_free(Numeric->start, Numeric->nblocks, sizeof(int), Common);
     }
 
-    Numeric->path = KLU_malloc(n, sizeof(int), Common);
-    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
+    /* Numeric->path = KLU_malloc(n, sizeof(int), Common); */
+    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
     Numeric->start = KLU_malloc(nb, sizeof(int), Common);
-
+/*
     for (i = 0; i < n; i++)
     {
         Numeric->path[i] = 0;
     }
+*/
     for (i = 0; i < nb; i++)
     {
-        Numeric->bpath[i] = 0;
+        Numeric->block_path[i] = 0;
         Numeric->start[i] = n;
     }
 
@@ -512,35 +701,35 @@ int KLU_determine_start(
         Qi[Q[i]] = i;
     }
 
-    /* third, apply permutation on changeVector */
-    for (i = 0; i < changeLen; i++)
+    /* third, apply permutation on variable_columns */
+    for (i = 0; i < n_variable_entries; i++)
     {
-        changeVector_permuted[i] = Qi[changeVector[i]];
+        variable_columns_in_LU[i] = Qi[variable_columns[i]];
     }
     int* cV = (int*) calloc(n, sizeof(int));
-    for ( i = 0 ; i < changeLen ; i++)
+    for ( i = 0 ; i < n_variable_entries ; i++)
     {
-        cV[changeVector_permuted[i]] = 1;
+        cV[variable_columns_in_LU[i]] = 1;
     }
-    for ( i = 0; i< changeLen ; i++)
+    for ( i = 0; i< n_variable_entries ; i++)
     {
-        changeVector_permuted[i] = 0;
+        variable_columns_in_LU[i] = 0;
     } 
-    changeLen = 0;
+    n_variable_entries = 0;
     for ( i = 0 ; i < n ; i++)
     {
         if(cV[i] == 1)
         {
-            changeLen++;
+            n_variable_entries++;
         }
     }
     int ctr = 0;
-    changeVector_permuted = (int*) realloc(changeVector_permuted, sizeof(int)*changeLen);
+    variable_columns_in_LU = (int*) realloc(variable_columns_in_LU, sizeof(int)*n_variable_entries);
     for ( i = 0 ; i < n ; i++)
     {
         if(cV[i] == 1)
         {
-            changeVector_permuted[ctr] = i;
+            variable_columns_in_LU[ctr] = i;
             ctr++;
         }
     }
@@ -550,15 +739,17 @@ int KLU_determine_start(
     {
         /* no btf case
          * => identify first varying entry in entire matrix */
-        Numeric->bpath[0] = 1;
+        Numeric->block_path[0] = 0;
+        Numeric->block_path[1] = 1;
+        /* Numeric->variable_block[0] = 0; */
 
-        /* find minimum in changeVector_permuted */
-        pivot = changeVector_permuted[0];
+        /* find minimum in variable_columns_in_LU */
+        pivot = variable_columns_in_LU[0];
         for(i = 1; i < n ; i++)
         {
-            if(pivot > changeVector_permuted[i])
+            if(pivot > variable_columns_in_LU[i])
             {
-                pivot = changeVector_permuted[i];
+                pivot = variable_columns_in_LU[i];
             }
         }
 
@@ -569,7 +760,7 @@ int KLU_determine_start(
     {
         /* btf case
          * 
-         * iterate over changeVector_permuted
+         * iterate over variable_columns_in_LU
          * for each variable column
          * find its block
          *      put block in block-path
@@ -577,10 +768,10 @@ int KLU_determine_start(
          *          start[block] = min(start[block], column), if start[block] != 0
          */
 
-         for(i = 0; i < changeLen ; i++)
+         for(i = 0; i < n_variable_entries ; i++)
          {
             /* grab variable column number i */
-            pivot = changeVector_permuted[i];
+            pivot = variable_columns_in_LU[i];
 
             /* find block */
             for (k = 0; k < nb; k++)
@@ -592,7 +783,8 @@ int KLU_determine_start(
                     nk = k2 - k1;
 
                     /* set varying block */
-                    Numeric->bpath[k] = 1;
+                    /* TODO!!! */
+                    /* Numeric->block_path[k] = 1; */
                     break;
                 }
             }
@@ -625,6 +817,6 @@ int KLU_determine_start(
     free(Qi);
     free(R);
     free(Rs);
-    free(changeVector_permuted);
+    free(variable_columns_in_LU);
     return (TRUE);
 }

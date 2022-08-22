@@ -8,41 +8,6 @@
 
 #include "klu_internal.h"
 
-static void saveM(Entry* Ax, Int* Ai, Int* Ap, int nnz, int n)
-{
-    FILE* a = fopen("A.txt", "w");
-    int i;
-    for(i=0;i<nnz;i++)
-        fprintf(a, "%lf, ", Ax[i]);
-    fprintf(a, "\n");
-    for(i=0;i<nnz;i++)
-        fprintf(a, "%d, ", Ai[i]);
-    fprintf(a, "\n");
-    for(i=0;i<n+1;i++)
-        fprintf(a, "%d, ", Ap[i]);
-    fclose(a);
-}
-
-static void savePerm(Int* P, Int* Q, int n)
-{
-    FILE* p = fopen("P.txt", "w");
-    FILE* q = fopen("Q.txt", "w");
-    int i;
-    int* Qi = (int*)calloc(n, sizeof(int));
-    int* Pi = (int*)calloc(n, sizeof(int));
-    for (i=0; i<n; i++)
-    {
-        Qi[Q[i]] = i;
-        Pi[P[i]] = i;
-    }
-    for(i=0; i<n; i++)
-        fprintf(p, "%d, ", Pi[i]);
-    for(i=0; i<n; i++)
-        fprintf(q, "%d, ", Qi[i]);
-    fclose(p);
-    fclose(q);
-}
-
 /* ========================================================================== */
 /* === KLU_factor2 ========================================================== */
 /* ========================================================================== */
@@ -70,8 +35,6 @@ static void factor2
         nblocks, poff, nzoff, lnz_block, unz_block, scale, max_lnz_block,
         max_unz_block ;
 
-    //saveM(Ax, Ai, Ap, Symbolic->nz, Symbolic->n);
-
     /* ---------------------------------------------------------------------- */
     /* initializations */
     /* ---------------------------------------------------------------------- */
@@ -80,6 +43,13 @@ static void factor2
     n = Symbolic->n ;
     P = Symbolic->P ;
     Q = Symbolic->Q ;
+
+#ifdef KLU_PRINT
+    static int counter = 0;
+    dumpKPermPre(Q, P, n, counter);
+    counter++;
+#endif
+
     R = Symbolic->R ;
     Lnz = Symbolic->Lnz ;
     nblocks = Symbolic->nblocks ;
@@ -527,8 +497,11 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
 
     /* only allocate if klu_compute_path is called */
     Numeric->path = NULL;
-    Numeric->bpath = NULL;
+    Numeric->block_path = NULL;
     Numeric->start = NULL;
+    Numeric->variable_block = NULL;
+    Numeric->variable_offdiag_orig_entry = NULL;
+    Numeric->variable_offdiag_perm_entry = NULL; 
 
     /* allocate permanent workspace for factorization and solve.  Note that the
      * solver will use an Xwork of size 4n, whereas the factorization codes use
@@ -585,7 +558,7 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
     }
 #ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && counter == 0)
+    if(counter == 0)
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;
@@ -611,6 +584,20 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
 
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+
+        free(Lp);
+        free(Up);
+        free(Fp);
+        free(Lx);
+        free(Ux);
+        free(Fx);
+        free(Li);
+        free(Ui);
+        free(Fi);
+        free(P);
+        free(Q);
+        free(Rs);
+        free(R);
     }
     counter++;
 #endif

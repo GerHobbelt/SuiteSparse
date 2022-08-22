@@ -281,13 +281,28 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
     Int k1, k2, nk, k, block, oldcol, pend, newcol, result, pc, p, newrow,
         maxnz, nzoff, ok, err = KLU_INVALID, i ;
 
+
+    /* BTF transform needs to be applied to varying entries */
     Int Varying2[n];
+    Int Qinv[n];
+
+    /* First, set vector containing varying columns to zero and determine inverse column permutation.
+     * Qbtf determines newcol -> oldcol, i.e. Qbtf[k] is the k-th column in the ORIGINAL matrix A 
+     * We need oldcol -> newcol so that Qinv[k] is the k-th column in the BTF-transformed matrix */
+
+    for(i = 0; i < n ; i++)
+    {
+        Varying2[i] = 0;
+        Qinv[Qbtf[i]] = i;
+    }
+
+    /* Apply BTF column-permutation on varying entries (columns) */
 
     for(i = 0; i < n ; i++)
     {
         if(Varying[i] == 1)
         {
-            Varying2[Qbtf[i]] = 1;
+            Varying2[Qinv[i]] = 1;
         }
     }
 
@@ -393,6 +408,8 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
             /* order the block with AMD (C+C') */
             /* -------------------------------------------------------------- */
 
+
+            /* if required ordering is either AMD-BRA or AMD-NV, use partial ordering of AMD */
             if(mode == BRA || mode == NV)
             {
                 result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying2, mode);

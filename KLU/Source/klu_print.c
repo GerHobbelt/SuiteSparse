@@ -2,6 +2,8 @@
 #include <string.h>
 #define PRECISION 20
 
+/* prints out BTF+AMD+PP (or any other ordering) permutation WITH partial pivoting */
+
 void dumpKPerm(int* Q, int* P, int n, int counter)
 {
     int i;
@@ -14,6 +16,46 @@ void dumpKPerm(int* Q, int* P, int n, int counter)
 
     strcpy(strQ, "KLU_Q");
     strcpy(strP, "KLU_P");
+    strcat(strQ, counterstring);
+    strcat(strP, counterstring);
+    strcat(strQ, ".txt");
+    strcat(strP, ".txt");
+
+    /* dump permutations into file */
+    FILE* fQ = fopen(strQ, "w");
+    FILE* fP = fopen(strP, "w");
+
+    /* dump Q */
+    for (i = 0 ; i < n-1; i++)
+    {
+        fprintf(fQ, "%d, ", Q[i]);
+    }
+    fprintf(fQ, "%d\n", Q[n-1]);
+
+    /* dump P */
+    for (i = 0 ; i < n-1; i++)
+    {
+        fprintf(fP, "%d, ", P[i]);
+    }
+    fprintf(fP, "%d\n", P[n-1]);
+
+    fclose(fQ);
+    fclose(fP);
+}
+
+/* prints out BTF+AMD (or any other ordering) permutation WITHOUT partial pivoting */
+void dumpKPermPre(int* Q, int* P, int n, int counter)
+{
+    int i;
+    char strQ[32];
+    char strQi[32];
+    char strP[32];
+    char strPi[32];
+    char counterstring[32];
+    sprintf(counterstring, "%d", counter);
+
+    strcpy(strQ, "KLU_QPrev");
+    strcpy(strP, "KLU_PPrev");
     strcat(strQ, counterstring);
     strcat(strP, counterstring);
     strcat(strQ, ".txt");
