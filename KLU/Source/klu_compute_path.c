@@ -9,107 +9,19 @@
  */
 #include "klu_internal.h"
 
-// int KLU_extract_quick(
-//     /* inputs: */
-//     KLU_numeric *Numeric,
-//     KLU_symbolic *Symbolic,
-
-//     /* outputs: */
-//     Int *Ui,
-//     Int *Up,
-//     Int *Q,
-//     Int *R
-// )
-// {
-//     /* placeholder */
-//     Entry *Lx2, *Ux2, *Ukk ;
-//     Unit* LU;
-//     Int *Lip, *Llen, *Uip, *Ulen, *Li2, *Ui2 ;
-//     Int nz, k1, k2, block, nk, kk, len, p, n, nblocks, k;
-//     n = Symbolic->n ;
-//     nblocks = Symbolic->nblocks ;
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract block boundaries */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (R != NULL)
-//     {
-//         for (block = 0 ; block <= nblocks ; block++)
-//         {
-//             R [block] = Symbolic->R [block] ;
-//         }
-//     }
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract column permutation */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (Q != NULL)
-//     {
-//         for (k = 0 ; k < n ; k++)
-//         {
-//             Q [k] = Symbolic->Q [k] ;
-//         }
-//     }
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract each block of U */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (Up != NULL && Ui != NULL)
-//     {
-//         nz = 0 ;
-//         for (block = 0 ; block < nblocks ; block++)
-//         {
-//             k1 = Symbolic->R [block] ;
-//             k2 = Symbolic->R [block+1] ;
-//             nk = k2 - k1 ;
-//             if (nk == 1)
-//             {
-//                 /* singleton block */
-//                 Up [k1] = nz ;
-//                 Ui [nz] = k1 ;
-//                 nz++ ;
-//             }
-//             else
-//             {
-//                 /* non-singleton block */
-//                 LU = Numeric->LUbx [block] ;
-//                 Uip = Numeric->Uip + k1 ;
-//                 Ulen = Numeric->Ulen + k1 ;
-//                 for (kk = 0 ; kk < nk ; kk++)
-//                 {
-//                     Up [k1+kk] = nz ;
-//                     GET_POINTER (LU, Uip, Ulen, Ui2, Ux2, kk, len) ;
-//                     for (p = 0 ; p < len ; p++)
-//                     {
-//                         Ui [nz] = k1 + Ui2 [p] ;
-//                         nz++ ;
-//                     }
-//                     /* add the diagonal entry */
-//                     Ui [nz] = k1 + kk ;
-//                     nz++ ;
-//                 }
-//             }
-//         }
-//         Up [n] = nz ;
-//         ASSERT (nz == Numeric->unz) ;
-//     }
-//     return (TRUE);
-// }
-
 /*
  * Computes Factorization Path.
  * Factorization-Path mode partial refactorization works as follows:
  * five arrays for two cases are needed.
- * for a variable entry, compute the permutation, i.e. from A to LU
+ * for a variable entry, compute the permutation, i.e. A to LU
  *                  - case 1: entry is in off-diagonal block F
  *                          - KLU handles these blocks annoyingly
- *                          - two arrays are used:
- *                              - variable_offdiag_orig_entry: refers to the entry in Ax that is varying
- *                              - variable_offdiag_perm_entry: refers to the corresponding position in F
+ *                          - two new arrays are used for partial refactorization:
+ *                              - variable_offdiag_orig_entry[i]: refers to the i-th entry in Ax that is varying
+ *                              - variable_offdiag_perm_entry[i]: refers to the corresponding position of i in F
  *                          - these entries are excluded from factorization path computation
+ *                          - in partial refactorization, these values are simply "copied" to the correct location
+ *                              - this can then be done very efficiently, i.e. with parallelization or SIMD
  *                  - case 2: entry is in a diagonal block
  *                          - three arrays are used:
  *                              - variable_block: has length n_variable_blocks, contains indices of variable blocks
@@ -969,3 +881,93 @@ int KLU_determine_start(
     free(variable_columns_in_LU);
     return (TRUE);
 }
+
+// int KLU_extract_quick(
+//     /* inputs: */
+//     KLU_numeric *Numeric,
+//     KLU_symbolic *Symbolic,
+
+//     /* outputs: */
+//     Int *Ui,
+//     Int *Up,
+//     Int *Q,
+//     Int *R
+// )
+// {
+//     /* placeholder */
+//     Entry *Lx2, *Ux2, *Ukk ;
+//     Unit* LU;
+//     Int *Lip, *Llen, *Uip, *Ulen, *Li2, *Ui2 ;
+//     Int nz, k1, k2, block, nk, kk, len, p, n, nblocks, k;
+//     n = Symbolic->n ;
+//     nblocks = Symbolic->nblocks ;
+
+//     /* ---------------------------------------------------------------------- */
+//     /* extract block boundaries */
+//     /* ---------------------------------------------------------------------- */
+
+//     if (R != NULL)
+//     {
+//         for (block = 0 ; block <= nblocks ; block++)
+//         {
+//             R [block] = Symbolic->R [block] ;
+//         }
+//     }
+
+//     /* ---------------------------------------------------------------------- */
+//     /* extract column permutation */
+//     /* ---------------------------------------------------------------------- */
+
+//     if (Q != NULL)
+//     {
+//         for (k = 0 ; k < n ; k++)
+//         {
+//             Q [k] = Symbolic->Q [k] ;
+//         }
+//     }
+
+//     /* ---------------------------------------------------------------------- */
+//     /* extract each block of U */
+//     /* ---------------------------------------------------------------------- */
+
+//     if (Up != NULL && Ui != NULL)
+//     {
+//         nz = 0 ;
+//         for (block = 0 ; block < nblocks ; block++)
+//         {
+//             k1 = Symbolic->R [block] ;
+//             k2 = Symbolic->R [block+1] ;
+//             nk = k2 - k1 ;
+//             if (nk == 1)
+//             {
+//                 /* singleton block */
+//                 Up [k1] = nz ;
+//                 Ui [nz] = k1 ;
+//                 nz++ ;
+//             }
+//             else
+//             {
+//                 /* non-singleton block */
+//                 LU = Numeric->LUbx [block] ;
+//                 Uip = Numeric->Uip + k1 ;
+//                 Ulen = Numeric->Ulen + k1 ;
+//                 for (kk = 0 ; kk < nk ; kk++)
+//                 {
+//                     Up [k1+kk] = nz ;
+//                     GET_POINTER (LU, Uip, Ulen, Ui2, Ux2, kk, len) ;
+//                     for (p = 0 ; p < len ; p++)
+//                     {
+//                         Ui [nz] = k1 + Ui2 [p] ;
+//                         nz++ ;
+//                     }
+//                     /* add the diagonal entry */
+//                     Ui [nz] = k1 + kk ;
+//                     nz++ ;
+//                 }
+//             }
+//         }
+//         Up [n] = nz ;
+//         ASSERT (nz == Numeric->unz) ;
+//     }
+//     return (TRUE);
+// }
