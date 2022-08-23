@@ -105,8 +105,12 @@ typedef struct
     void *Offx ;        /* size nzoff, numerical values */
     int nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
-    int *bpath ; /* block path to indicate which blocks contain varying entries */
-    int *start; /* first varying column in LU */
+    int *block_path ; /* block path to indicate which blocks contain varying entries */
+    int *variable_block ;
+    int n_variable_blocks;
+    int *variable_offdiag_orig_entry;
+    int *variable_offdiag_perm_entry;
+    int variable_offdiag_length;
 } klu_numeric ;
 
 typedef struct          /* 64-bit version (otherwise same as above) */
@@ -123,10 +127,13 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     SuiteSparse_long *Offp, *Offi ;
     void *Offx ;
     SuiteSparse_long nzoff ;
-    int *path ;
-    int *bpath ;
-    int *start; /* first varying column in LU */
-
+    int *path ;  /* factorization path contains columns with varying entries */
+    int *block_path ; /* block path to indicate which blocks contain varying entries */
+    int *variable_block ;
+    SuiteSparse_long n_variable_blocks;
+    int *variable_offdiag_orig_entry;
+    int *variable_offdiag_perm_entry;
+    SuiteSparse_long variable_offdiag_length;
 } klu_l_numeric ;
 
 /* -------------------------------------------------------------------------- */
@@ -190,8 +197,6 @@ typedef struct klu_common_struct
     */
 
     double pivot_tol_fail ; /* pivot below this tolerance? => failure */
-
-    int dump; /* dump LU factorized matrix, and factorization path */
 
     /* ---------------------------------------------------------------------- */
     /* statistics */
@@ -279,12 +284,12 @@ klu_symbolic *klu_analyze
 klu_l_symbolic *klu_l_analyze (SuiteSparse_long, SuiteSparse_long *,
     SuiteSparse_long *, klu_l_common *Common) ;
 
-/* -------------------------------------------------------------------------- */
-/* klu_analyze:  orders and analyzes a matrix */
-/* -------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------ */
+/* klu_analyze_partial:  orders and analyzes a matrix for partial refactorization */
+/* ------------------------------------------------------------------------------ */
 
-/* Order the matrix with BTF (or not), then order each block with AMD, COLAMD,
- * a natural ordering, or with a user-provided ordering function */
+/* Order the matrix with BTF (or not), then order each block with AMD, AMD-NV,
+ * or with AMD-BRA */
 
 klu_symbolic *klu_analyze_partial
 (
@@ -478,8 +483,11 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
     klu_symbolic* Symbolic, 
     klu_numeric* Numeric, 
     klu_common* Common, 
-    int changeVector [ ], 
-    int changeLen
+    int Ap [ ],
+    int Ai [ ],
+    int variable_columns [ ], 
+    int variable_rows [ ],
+    int variable_entries
 ) ; 
 
 /* -------------------------------------------------------------------------- */
@@ -496,10 +504,10 @@ int klu_determine_start       /* return TRUE if successful, FALSE otherwise */
 ) ; 
             
 /* -------------------------------------------------------------------------- */
-/* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
+/* klu_partial_factorization_path: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */
 
-int klu_partial            /* return TRUE if successful, FALSE otherwise */
+int klu_partial_factorization_path /* return TRUE if successful, FALSE otherwise */
 (
     /* inputs, not modified */
     int Ap [ ],         /* size n+1, column pointers */
@@ -513,10 +521,10 @@ int klu_partial            /* return TRUE if successful, FALSE otherwise */
 ) ;       
 
 /* -------------------------------------------------------------------------- */
-/* klu_partial: partially refactorizes matrix with same ordering as klu_factor */
+/* klu_partial_refactorization_restart: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */
 
-int klu_fpartial            /* return TRUE if successful, FALSE otherwise */
+int klu_partial_refactorization_restart     /* return TRUE if successful, FALSE otherwise */
 (
     /* inputs, not modified */
     int Ap [ ],         /* size n+1, column pointers */

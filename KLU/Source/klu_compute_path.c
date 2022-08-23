@@ -101,6 +101,30 @@
 
 /*
  * Computes Factorization Path.
+ * Factorization-Path mode partial refactorization works as follows:
+ * five arrays for two cases are needed.
+ * for a variable entry, compute the permutation, i.e. from A to LU
+ *                  - case 1: entry is in off-diagonal block F
+ *                          - KLU handles these blocks annoyingly
+ *                          - two arrays are used:
+ *                              - variable_offdiag_orig_entry: refers to the entry in Ax that is varying
+ *                              - variable_offdiag_perm_entry: refers to the corresponding position in F
+ *                          - these entries are excluded from factorization path computation
+ *                  - case 2: entry is in a diagonal block
+ *                          - three arrays are used:
+ *                              - variable_block: has length n_variable_blocks, contains indices of variable blocks
+ *                                  - e.g. variable_block = {0, 3} means that blocks 0 and 3 contain variable entries
+ *                              - block_path: has length nb, indicates position of varying columns for a block in the factorization path
+ *                                  - a bit more complicated
+ *                                  - e.g. block_path = {0, 0, 3, 3} means that block 1's variable columns are from index 0 to 2 in factorization path (variable_block = {1})
+ *                              - path: factorization path
+ *                                  - self-explanatory
+ *                                  - e.g. path = {3, 4}
+ *                           - in total:
+ *                                  - variable_block = {1}
+ *                                  - block_path = {0, 0, 3, 3}
+ *                                  - path = {3, 4, 5}
+ *                                  - means that block 1 contains varying entries. These are from index 0 to 2 in factorization path, which evaluates to columns 3, 4 and 5
  */
 int KLU_compute_path(
                     KLU_symbolic *Symbolic, 
@@ -155,8 +179,13 @@ int KLU_compute_path(
 
     Int n_variable_entries_new = n_variable_entries;
 
+/*
     Int* variable_offdiag_orig_entry = (Int*)calloc(nzoff, sizeof(Int));
     Int *variable_offdiag_perm_entry = (Int*)calloc(nzoff, sizeof(Int));
+*/
+    /* TODO: do I need to init those? */
+    int variable_offdiag_orig_entry[nzoff];
+    int variable_offdiag_perm_entry[nzoff];
 
     /* indices and temporary variables */
     int i, k, j, ent, block;
@@ -167,10 +196,25 @@ int KLU_compute_path(
     /* blocks */
     Int k2, k1, nk;
 
-    Int *Qi = calloc(n, sizeof(Int));
-    Int *variable_columns_in_LU = calloc(n_variable_entries, sizeof(Int));
-    Int *variable_rows_in_LU = calloc(n_variable_entries, sizeof(Int));
+    Int *Qi = (Int*)calloc(n, sizeof(Int));
+    if(Qi == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
 
+    Int *variable_columns_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
+    if(variable_columns_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+
+    Int *variable_rows_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
+    if(variable_rows_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+
+    /* if computation of fact. path (i.e. this function) was done before -> free memory */
     if (Numeric->path)
     {
         KLU_free(Numeric->path, n, sizeof(int), Common);
@@ -192,14 +236,17 @@ int KLU_compute_path(
         KLU_free(Numeric->variable_offdiag_perm_entry, Numeric->variable_offdiag_length, sizeof(int), Common);
     }
 
+    /* block path can be allocated now since its size is known */
     Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
     int workpath[n];
     Int path[n];
     Int nvblocks[nb];
     
+    /* initialize memory to zero */
     for (i  = 0 ; i < n ; i++)
     {
         path[i] = 0;
+        workpath[i] = 0;
     }
 
     for (i = 0; i < nb; i++)
@@ -208,6 +255,7 @@ int KLU_compute_path(
         Numeric->block_path[i] = 0;
     }
 
+    /* these are checked by klu_extract (I think) */
     Lp = calloc(n + 1, sizeof(int));
     Up = calloc(n + 1, sizeof(int));
     Fp = calloc(n + 1, sizeof(int));
@@ -244,7 +292,7 @@ int KLU_compute_path(
     }
 
     /* ---------------------------------------------------------------- */
-    /* third, apply permutation on variable_columns */
+    /* third, apply permutation on variable_columns and rows */
     /* ---------------------------------------------------------------- */
 
     for (i = 0; i < n_variable_entries; i++)
@@ -286,6 +334,8 @@ int KLU_compute_path(
                             if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == newrow)
                             {
                                 /* set to -1, because they're off-diagonal now */
+                                /* indicates that they are "removed" from variable columns and row "list" */
+                                /* subsequently, add to variable off-diag entries and reduce length of variable entries */
                                 variable_columns_in_LU[i] = -1;
                                 variable_rows_in_LU[i] = -1;
 
@@ -302,6 +352,7 @@ int KLU_compute_path(
         }
     }
 
+    /* safety first */
     ASSERT(variable_offdiag_length == n_variable_entries - n_variable_entries_new);
 
     Numeric->variable_offdiag_orig_entry = KLU_malloc(variable_offdiag_length, sizeof(Int), Common);
@@ -314,7 +365,12 @@ int KLU_compute_path(
         Numeric->variable_offdiag_perm_entry[i] = variable_offdiag_perm_entry[i];
     }
 
-    int* cV = calloc(n, sizeof(int));
+    int* cV = (int*) calloc(n, sizeof(int));
+    if(cV == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+
     for(i = 0; i < n_variable_entries ; i++)
     {
         if(variable_columns_in_LU[i] != -1)
@@ -326,15 +382,19 @@ int KLU_compute_path(
     {
         variable_columns_in_LU[i] = 0;
     }
+
     variable_columns_in_LU = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries_new);
-    for ( i = 0 ; i < n ; i++)
+    if(variable_columns_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+        for ( i = 0 ; i < n ; i++)
     {
         if(cV[i] != 0)
         {
             variable_columns_in_LU[ctr++] = i;
         }
     }
-    free(cV);
 
     ASSERT(ctr == variable_entries_new);
 
@@ -600,6 +660,7 @@ int KLU_compute_path(
     free(Rs);
     free(variable_columns_in_LU);
     free(variable_rows_in_LU);
+    free(cV);
     return (TRUE);
 }
 
@@ -636,6 +697,8 @@ int KLU_determine_start(
     /* blocks */
     Int k2, k1, nk;
 
+    int nvblocks[nb];
+
     /* TODO: save sizeof(...) statically and not call for each alloc */
     Int *Qi = calloc(n, sizeof(Int));
     Int *variable_columns_in_LU = calloc(n_variable_entries, sizeof(Int));
@@ -647,10 +710,6 @@ int KLU_determine_start(
     if (Numeric->block_path)
     {
         KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
-    }
-    if (Numeric->start)
-    {
-        KLU_free(Numeric->start, Numeric->nblocks, sizeof(int), Common);
     }
 
     /* Numeric->path = KLU_malloc(n, sizeof(int), Common); */
@@ -664,8 +723,8 @@ int KLU_determine_start(
 */
     for (i = 0; i < nb; i++)
     {
-        Numeric->block_path[i] = 0;
-        Numeric->start[i] = n;
+        Numeric->block_path[i] = n;
+        nvblocks[i] = 0;
     }
 
     Lp = calloc(n + 1, sizeof(int));
@@ -754,7 +813,7 @@ int KLU_determine_start(
         }
 
         /* set first varying column internally */
-        Numeric->start[0] = pivot;
+        Numeric->block_path[0] = pivot;
     }
     else
     {
@@ -783,8 +842,12 @@ int KLU_determine_start(
                     nk = k2 - k1;
 
                     /* set varying block */
-                    /* TODO!!! */
-                    /* Numeric->block_path[k] = 1; */
+
+                    if(nvblocks[k] != 1)
+                    {
+                        nvblocks[k] = 1;
+                        Numeric->n_variable_blocks += 1;
+                    }
                     break;
                 }
             }
@@ -796,9 +859,9 @@ int KLU_determine_start(
             }
 
             /* nk x nk block. check if pivot column is smaller (before) current minimum */
-            if(Numeric->start[k] > pivot)
+            if(Numeric->block_path[k] > pivot)
             {
-                Numeric->start[k] = pivot;
+                Numeric->block_path[k] = pivot;
             }
          }
     }

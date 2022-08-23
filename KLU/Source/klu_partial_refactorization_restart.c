@@ -38,9 +38,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
     Unit *LU;
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale, nblocks, poff, i, j, up, ulen, llen, maxblock,
         nzoff;
-
-    Int* start = Numeric->start;
-
+        
     int variable_offdiag_length, n_variable_blocks;
     int * variable_offdiag_orig_entry, *variable_offdiag_perm_entry;
 
@@ -176,7 +174,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
 
         for (i = 0; i < n_variable_blocks; i++)
         {
-            block = Numeric->block_path[i];
+            block = Numeric->variable_block[i];
 
             /* -------------------------------------------------------------- */
             /* the block is from rows/columns k1 to k2-1 */
@@ -217,7 +215,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                 Ulen = Numeric->Ulen + k1;
                 LU = LUbx[block];
 
-                for (k = start[block] - k1; k < nk ; k++)
+                for (k = Numeric->block_path[block] - k1; k < nk ; k++)
                 {
                     /* ------------------------------------------------------ */
                     /* scatter kth column of the block into workspace X */
@@ -315,7 +313,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
 
         for (i = 0; i < n_variable_blocks; i++)
         {
-            block = Numeric->block_path[i];
+            block = Numeric->variable_block[i];
 
             /* -------------------------------------------------------------- */
             /* the block is from rows/columns k1 to k2-1 */
@@ -355,7 +353,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                 Ulen = Numeric->Ulen + k1;
                 LU = LUbx[block];
 
-                for (k = start[block] - k1; k < nk ; k++)
+                for (k = Numeric->block_path[block] - k1; k < nk ; k++)
                 {
                     
                     /* ------------------------------------------------------ */
