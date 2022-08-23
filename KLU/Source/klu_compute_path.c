@@ -672,7 +672,10 @@ int KLU_determine_start(
         KLU_symbolic *Symbolic, 
         KLU_numeric *Numeric, 
         KLU_common *Common, 
+        Int Ap [ ],
+        Int Ai [ ],
         Int *variable_columns,
+        Int *variable_rows,
         Int n_variable_entries
     )
 {
@@ -681,27 +684,46 @@ int KLU_determine_start(
     int unz = Numeric->unz;
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
+    int *Pinv = Numeric->Pinv;
     int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
     int *P, *Q, *R;
     double *Rs;
     int RET;
 
+    /* TODO: do I need to init those? */
+    int variable_offdiag_orig_entry[nzoff];
+    int variable_offdiag_perm_entry[nzoff];
+
+    int nvblocks[nb];
+
     /* indices and temporary variables */
-    int i, k, j, ent, block;
+    int i, k, j, p, block;
     int pivot;
-    int col, nextcol;
-    int u_closest, l_closest;
+    int col, nextcol, oldcol, pend, newrow, poff = 0, variable_offdiag_length = 0;
+    int n_variable_entries_new = 0;
     int flag = 1;
 
     /* blocks */
     Int k2, k1, nk;
 
-    int nvblocks[nb];
+    Int *Qi = (Int*)calloc(n, sizeof(Int));
+    if(Qi == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
 
-    /* TODO: save sizeof(...) statically and not call for each alloc */
-    Int *Qi = calloc(n, sizeof(Int));
-    Int *variable_columns_in_LU = calloc(n_variable_entries, sizeof(Int));
+    Int *variable_columns_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
+    if(variable_columns_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+
+    Int *variable_rows_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
+    if(variable_rows_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
 
     if (Numeric->path)
     {
@@ -712,15 +734,8 @@ int KLU_determine_start(
         KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
     }
 
-    /* Numeric->path = KLU_malloc(n, sizeof(int), Common); */
     Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
-    Numeric->start = KLU_malloc(nb, sizeof(int), Common);
-/*
-    for (i = 0; i < n; i++)
-    {
-        Numeric->path[i] = 0;
-    }
-*/
+    
     for (i = 0; i < nb; i++)
     {
         Numeric->block_path[i] = n;
@@ -760,11 +775,82 @@ int KLU_determine_start(
         Qi[Q[i]] = i;
     }
 
-    /* third, apply permutation on variable_columns */
+    /* ---------------------------------------------------------------- */
+    /* third, apply permutation on variable_columns and rows */
+    /* ---------------------------------------------------------------- */
+
     for (i = 0; i < n_variable_entries; i++)
     {
         variable_columns_in_LU[i] = Qi[variable_columns[i]];
+        variable_rows_in_LU[i] = Pinv[variable_rows[i]];
     }
+
+    /* ---------------------------------------------------------------- */
+    /* fourth, determine variable off-diagonal entries */
+    /* only necessary if BTF used */
+    /* if BTF is not used, no off-diagonal blocks are available */
+    /* ---------------------------------------------------------------- */
+
+    if(Common->btf == TRUE)
+    {
+        /* iterate over all blocks */
+        for(block = 0 ; block < nb ; block++)
+        {
+            k1 = R [block];
+            k2 = R [block+1];
+            nk = k2 - k1;
+            for (k = 0 ; k < nk ; k++)
+            {
+                oldcol = Q [k+k1] ;
+                pend = Ap [oldcol+1] ;
+                for (p = Ap [oldcol] ; p < pend ; p++)
+                {
+                    newrow = Pinv [Ai [p]] - k1 ;
+                    if (newrow < 0 && poff < nzoff)
+                    {
+                        /* entry in off-diagonal block */
+                        poff++ ;
+
+                        /* check if entry is in variable column */
+                        /* TODO */
+                        for(i = 0 ; i < n_variable_entries ; i++)
+                        {
+                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == newrow)
+                            {
+                                /* set to -1, because they're off-diagonal now */
+                                /* indicates that they are "removed" from variable columns and row "list" */
+                                /* subsequently, add to variable off-diag entries and reduce length of variable entries */
+                                variable_columns_in_LU[i] = -1;
+                                variable_rows_in_LU[i] = -1;
+
+                                variable_offdiag_orig_entry[variable_offdiag_length] = p;
+                                variable_offdiag_perm_entry[variable_offdiag_length++] = poff;
+
+                                n_variable_entries_new--;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* safety first */
+    ASSERT(variable_offdiag_length == n_variable_entries - n_variable_entries_new);
+
+    Numeric->variable_offdiag_orig_entry = KLU_malloc(variable_offdiag_length, sizeof(Int), Common);
+    Numeric->variable_offdiag_perm_entry = KLU_malloc(variable_offdiag_length, sizeof(Int), Common);
+    Numeric->variable_offdiag_length = variable_offdiag_length;
+
+    for(i = 0; i < variable_offdiag_length ; i++)
+    {
+        Numeric->variable_offdiag_orig_entry[i] = variable_offdiag_orig_entry[i];
+        Numeric->variable_offdiag_perm_entry[i] = variable_offdiag_perm_entry[i];
+    }
+
+
+
     int* cV = (int*) calloc(n, sizeof(int));
     for ( i = 0 ; i < n_variable_entries ; i++)
     {

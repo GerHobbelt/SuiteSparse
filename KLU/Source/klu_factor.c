@@ -498,7 +498,6 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
     /* only allocate if klu_compute_path is called */
     Numeric->path = NULL;
     Numeric->block_path = NULL;
-    Numeric->start = NULL;
     Numeric->variable_block = NULL;
     Numeric->variable_offdiag_orig_entry = NULL;
     Numeric->variable_offdiag_perm_entry = NULL; 

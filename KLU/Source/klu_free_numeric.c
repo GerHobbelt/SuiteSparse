@@ -86,10 +86,6 @@ Int KLU_free_numeric
     {
         KLU_free (Numeric->variable_offdiag_perm_entry, Numeric->variable_offdiag_length, sizeof (int), Common);
     }
-    if(Numeric->start)
-    {
-        KLU_free (Numeric->start, Numeric->nblocks, sizeof (int), Common);
-    }
     KLU_free (Numeric, 1, sizeof (KLU_numeric), Common) ;
 
     *NumericHandle = NULL ;

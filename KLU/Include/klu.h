@@ -499,8 +499,11 @@ int klu_determine_start       /* return TRUE if successful, FALSE otherwise */
     klu_symbolic* Symbolic, 
     klu_numeric* Numeric, 
     klu_common* Common, 
-    int changeVector [ ], 
-    int changeLen
+    int Ap [ ],
+    int Ai [ ],
+    int variable_columns [ ], 
+    int variable_rows [ ],
+    int variable_entries
 ) ; 
             
 /* -------------------------------------------------------------------------- */
