@@ -585,7 +585,7 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
 #endif
 #ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && (counter == 0 || counter == 1000))
+    if(counter == 0 || counter == 1000)
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;

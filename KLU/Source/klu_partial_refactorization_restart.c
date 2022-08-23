@@ -13,7 +13,6 @@
  */
 
 #include "klu_internal.h"
-#include <string.h>
 
 /* ==========================================================================
  */
@@ -22,15 +21,16 @@
 /* ==========================================================================
  */
 
-Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
+Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
     (
         /* inputs, not modified */
         Int Ap[],                            /* size n+1, column pointers */
         Int Ai[],                            /* size nz, row indices */
-        double Ax[], KLU_symbolic *Symbolic, /* now also contains factorization path */
-
+        double Ax[], 
+        KLU_symbolic *Symbolic, /* now also contains factorization path */
         /* input/output */
-        KLU_numeric *Numeric, KLU_common *Common)
+        KLU_numeric *Numeric, 
+        KLU_common *Common)
 {
     Entry ukk, ujk, s;
     Entry *Offx, *Lx, *Ux, *X, *Az, *Udiag;
@@ -43,6 +43,8 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 
     Int z = 0;
     Int doRefact = 0;
+
+    Int* start = Numeric->start;
 
     /* ---------------------------------------------------------------------- */
     /* check inputs */
@@ -58,13 +60,6 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
     {
         /* invalid Numeric object */
         Common->status = KLU_INVALID;
-        return (FALSE);
-    }
-
-    if (Numeric->path == NULL)
-    {
-        /* no path computed */
-        Common->status = KLU_PATH_INVALID;
         return (FALSE);
     }
 
@@ -255,7 +250,8 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 
                     for (k = 0; k < nk; k++)
                     {
-                        if (Numeric->path[k + k1] != 1)
+
+                        if(k+k1 < start[block])
                         {
                             /* block contains varying entries, but column k of
                              * block has no refactorization effort only raise
@@ -274,11 +270,11 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                         else
                         {
                             /* ------------------------------------------------------
-                             */
+                            */
                             /* scatter kth column of the block into workspace X
-                             */
+                            */
                             /* ------------------------------------------------------
-                             */
+                            */
 
                             oldcol = Q[k + k1];
                             pend = Ap[oldcol + 1];
@@ -299,11 +295,11 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                             }
 
                             /* ------------------------------------------------------
-                             */
+                            */
                             /* compute kth column of U, and update kth column of
-                             * A */
+                            * A */
                             /* ------------------------------------------------------
-                             */
+                            */
 
                             GET_POINTER(LU, Uip, Ulen, Ui, Ux, k, ulen);
                             for (up = 0; up < ulen; up++)
@@ -353,7 +349,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                             }
                             Udiag[k + k1] = ukk;
                             /* gather and divide by pivot to get kth column of L
-                             */
+                            */
                             GET_POINTER(LU, Lip, Llen, Li, Lx, k, llen);
 
                             for (p = 0; p < llen; p++)
@@ -439,9 +435,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                 /* ---------------------------------------------------------- */
                 if (Numeric->bpath[block] != 1)
                 {
-                    /* unlikely
-                     * encountered a block > 1 that has no refact. effort
-                     * only raise counter */
+                    // unlikely
+                    // encountered a block > 1 that has no refact. effort
+                    // only raise counter
                     for (k = 0; k < nk; k++)
                     {
                         oldcol = Q[k + k1];
@@ -466,11 +462,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 
                     for (k = 0; k < nk; k++)
                     {
-                        /* ------------------------------------------------------ */
-                        /* scatter kth column of the block into workspace X */
-                        /* ------------------------------------------------------ */
-
-                        if (Numeric->path[k + k1] != 1)
+                        if(k+k1 < start[block])
                         {
                             /* block contains varying entries, but column k of
                              * block has no refactorization effort only raise
@@ -488,6 +480,9 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                         }
                         else
                         {
+                            /* ------------------------------------------------------ */
+                            /* scatter kth column of the block into workspace X */
+                            /* ------------------------------------------------------ */
                             oldcol = Q[k + k1];
                             pend = Ap[oldcol + 1];
                             for (p = Ap[oldcol]; p < pend; p++)
@@ -510,11 +505,11 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                             }
 
                             /* ------------------------------------------------------
-                             */
+                            */
                             /* compute kth column of U, and update kth column of
-                             * A */
+                            * A */
                             /* ------------------------------------------------------
-                             */
+                            */
 
                             GET_POINTER(LU, Uip, Ulen, Ui, Ux, k, ulen);
                             for (up = 0; up < ulen; up++)
@@ -564,7 +559,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
                             }
                             Udiag[k + k1] = ukk;
                             /* gather and divide by pivot to get kth column of L
-                             */
+                            */
                             GET_POINTER(LU, Lip, Llen, Li, Lx, k, llen);
                             for (p = 0; p < llen; p++)
                             {
@@ -631,7 +626,7 @@ Int KLU_partial /* returns TRUE if successful, FALSE otherwise */
 #endif
 #ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && (counter == 0 || counter == 1000))
+    if(counter == 0 || counter == 1000)
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;

@@ -34,8 +34,8 @@ all: library
 
 KLU_D = klu_d.o klu_d_kernel.o klu_d_dump.o \
     klu_d_factor.o klu_d_free_numeric.o klu_d_solve.o \
-    klu_d_scale.o klu_d_refactor.o klu_d_partial.o klu_d_compute_path.o klu_d_print.o\
-    klu_d_fpartial.o klu_d_tsolve.o klu_d_diagnostics.o klu_d_sort.o klu_d_extract.o
+    klu_d_scale.o klu_d_refactor.o klu_d_partial_factorization_path.o klu_d_compute_path.o klu_d_print.o\
+    klu_d_partial_refactorization_restart.o klu_d_tsolve.o klu_d_diagnostics.o klu_d_sort.o klu_d_extract.o
 
 KLU_Z = klu_z.o klu_z_kernel.o klu_z_dump.o \
     klu_z_factor.o klu_z_free_numeric.o klu_z_solve.o \
@@ -124,17 +124,29 @@ klu_d_refactor.o: ../Source/klu_refactor.c
 klu_z_refactor.o: ../Source/klu_refactor.c
 	$(C) -c -DCOMPLEX $(I) $< -o $@
 
-klu_d_partial.o: ../Source/klu_partial.c
+klu_d_partial_factorization_path.o: ../Source/klu_partial_factorization_path.c
 	$(C) -c $(I) $< -o $@
 
-klu_d_fpartial.o: ../Source/klu_fpartial.c
+klu_z_partial_factorization_path.o: ../Source/klu_partial_factorization_path.c
+	$(C) -c -DCOMPLEX $(I) $< -o $@
+
+klu_d_partial_refactorization_restart.o: ../Source/klu_partial_refactorization_restart.c
 	$(C) -c $(I) $< -o $@
+
+klu_z_partial_refactorization_restart.o: ../Source/klu_partial_refactorization_restart.c
+	$(C) -c -DCOMPLEX $(I) $< -o $@
 
 klu_d_compute_path.o: ../Source/klu_compute_path.c
 	$(C) -c $(I) $< -o $@
 
+klu_z_compute_path.o: ../Source/klu_compute_path.c
+	$(C) -c -DCOMPLEX $(I) $< -o $@
+
 klu_d_print.o: ../Source/klu_print.c
 	$(C) -c $(I) $< -o $@
+
+klu_z_print.o: ../Source/klu_print.c
+	$(C) -c -DCOMPLEX $(I) $< -o $@
 
 #klu_z_partial.o: ../Source/klu_partial.c
 #	$(C) -c $(I) $< -o $@
@@ -246,17 +258,29 @@ klu_l_refactor.o: ../Source/klu_refactor.c
 klu_zl_refactor.o: ../Source/klu_refactor.c
 	$(C) -c -DCOMPLEX -DDLONG $(I) $< -o $@
 
-#klu_l_partial.o: ../Source/klu_partial.c
-#	$(C) -c $(I) $< -o $@
+klu_l_partial_factorization_path.o: ../Source/klu_partial_factorization_path.c
+	$(C) -c -DDLONG $(I) $< -o $@
 
-#klu_l_compute_path.o: ../Source/klu_compute_path.c
-#	$(C) -c $(I) $< -o $@
+klu_zl_partial_factorization_path.o: ../Source/klu_partial_factorization_path.c
+	$(C) -c -DCOMPLEX -DDLONG $(I) $< -o $@
 
-#klu_zl_partial.o: ../Source/klu_partial.c
-#	$(C) -c $(I) $< -o $@
+klu_l_partial_refactorization_restart.o: ../Source/klu_partial_refactorization_restart.c
+	$(C) -c -DDLONG $(I) $< -o $@
 
-#klu_zl_compute_path.o: ../Source/klu_compute_path.c
-#	$(C) -c $(I) $< -o $@
+klu_zl_partial_refactorization_restart.o: ../Source/klu_partial_refactorization_restart.c
+	$(C) -c -DCOMPLEX -DDLONG $(I) $< -o $@
+
+klu_l_compute_path.o: ../Source/klu_compute_path.c
+	$(C) -c -DDLONG $(I) $< -o $@
+
+klu_zl_compute_path.o: ../Source/klu_compute_path.c
+	$(C) -c -DCOMPLEX -DDLONG $(I) $< -o $@
+
+klu_l_print.o: ../Source/klu_print.c
+	$(C) -c -DDLONG $(I) $< -o $@
+
+klu_zl_print.o: ../Source/klu_print.c
+	$(C) -c -DCOMPLEX -DDLONG $(I) $< -o $@
 
 klu_l_scale.o: ../Source/klu_scale.c
 	$(C) -c -DDLONG $(I) $< -o $@

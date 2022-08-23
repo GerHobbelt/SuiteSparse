@@ -585,7 +585,7 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
     }
 #ifdef KLU_PRINT
     static int counter = 0;
-    if(Common->dump == 1 && counter == 0)
+    if(counter == 0)
     {
         int n = Symbolic->n;
         int lnz = Numeric->lnz;
