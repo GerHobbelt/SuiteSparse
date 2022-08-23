@@ -145,13 +145,13 @@ int KLU_compute_path(
     {
         KLU_free(Numeric->path, n, sizeof(int), Common);
     }
-    if (Numeric->bpath)
+    if (Numeric->block_path)
     {
-        KLU_free(Numeric->bpath, Numeric->nblocks, sizeof(int), Common);
+        KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
     }
 
     Numeric->path = KLU_malloc(n, sizeof(int), Common);
-    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
+    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
     int *workpath = (int *)calloc(n, sizeof(int));
 
     for (i = 0; i < n; i++)
@@ -160,7 +160,7 @@ int KLU_compute_path(
     }
     for (i = 0; i < nb; i++)
     {
-        Numeric->bpath[i] = 0;
+        Numeric->block_path[i] = 0;
     }
 
 
@@ -243,7 +243,7 @@ int KLU_compute_path(
     /* fourth, compute factorization path */
     if (Common->btf == FALSE)
     {
-        Numeric->bpath[0] = 1;
+        Numeric->block_path[0] = 1;
         /* no blocks */
         for (i = 0; i < changeLen; i++)
         {
@@ -326,7 +326,7 @@ int KLU_compute_path(
                     nk = k2 - k1;
 
                     /* set varying block */
-                    Numeric->bpath[k] = 1;
+                    Numeric->block_path[k] = 1;
                     break;
                 }
             }
@@ -456,9 +456,9 @@ int KLU_determine_start(
     {
         KLU_free(Numeric->path, n, sizeof(int), Common);
     }
-    if (Numeric->bpath)
+    if (Numeric->block_path)
     {
-        KLU_free(Numeric->bpath, Numeric->nblocks, sizeof(int), Common);
+        KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
     }
     if (Numeric->start)
     {
@@ -466,7 +466,7 @@ int KLU_determine_start(
     }
 
     Numeric->path = KLU_malloc(n, sizeof(int), Common);
-    Numeric->bpath = KLU_malloc(nb, sizeof(int), Common);
+    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
     Numeric->start = KLU_malloc(nb, sizeof(int), Common);
 
     for (i = 0; i < n; i++)
@@ -475,7 +475,7 @@ int KLU_determine_start(
     }
     for (i = 0; i < nb; i++)
     {
-        Numeric->bpath[i] = 0;
+        Numeric->block_path[i] = 0;
         Numeric->start[i] = n;
     }
 
@@ -550,7 +550,7 @@ int KLU_determine_start(
     {
         /* no btf case
          * => identify first varying entry in entire matrix */
-        Numeric->bpath[0] = 1;
+        Numeric->block_path[0] = 1;
 
         /* find minimum in changeVector_permuted */
         pivot = changeVector_permuted[0];
@@ -592,7 +592,7 @@ int KLU_determine_start(
                     nk = k2 - k1;
 
                     /* set varying block */
-                    Numeric->bpath[k] = 1;
+                    Numeric->block_path[k] = 1;
                     break;
                 }
             }

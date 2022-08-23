@@ -475,8 +475,6 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
     klu_symbolic* Symbolic, 
     klu_numeric* Numeric, 
     klu_common* Common, 
-    int Ap [ ],
-    int Ai [ ],
     int changeVector [ ], 
     int changeLen
 ) ; 

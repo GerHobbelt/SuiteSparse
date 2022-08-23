@@ -527,7 +527,7 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
 
     /* only allocate if klu_compute_path is called */
     Numeric->path = NULL;
-    Numeric->bpath = NULL;
+    Numeric->block_path = NULL;
     Numeric->start = NULL;
 
     /* allocate permanent workspace for factorization and solve.  Note that the

@@ -1,9 +1,6 @@
-/* ==========================================================================
- */
-/* === KLU_partial ==========================================================
- */
-/* ==========================================================================
- */
+/* ========================================================================== */
+/* === KLU_partial ========================================================== */
+/* ========================================================================== */
 
 /* Factor the matrix, after ordering and analyzing it with KLU_analyze,
  * factoring it once with KLU_factor, and computing factorization path.
@@ -14,14 +11,11 @@
 
 #include "klu_internal.h"
 
-/* ==========================================================================
- */
-/* === KLU_partial ==========================================================
- */
-/* ==========================================================================
- */
+/* ========================================================================== */
+/* === KLU_partial_refactorization_restart  ================================= */
+/* ========================================================================== */
 
-Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
+Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE otherwise */
     (
         /* inputs, not modified */
         Int Ap[],                            /* size n+1, column pointers */
@@ -173,7 +167,7 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
                 /* singleton case */
                 /* ---------------------------------------------------------- */
 
-                if (Numeric->bpath[block] != 1)
+                if (Numeric->block_path[block] != 1)
                 {
                     /* ----------------------------------------------------------
                      */
@@ -217,7 +211,7 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
             }
             else
             {
-                if (Numeric->bpath[block] != 1)
+                if (Numeric->block_path[block] != 1)
                 {
                     /* 
                       unlikely
@@ -388,7 +382,7 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
                 /* ---------------------------------------------------------- */
                 /* singleton case */
                 /* ---------------------------------------------------------- */
-                if (Numeric->bpath[block] != 1)
+                if (Numeric->block_path[block] != 1)
                 {
                     /* --------------------------------------------------------- */
                     /* no refactorization, only raise block index ctr. */
@@ -436,7 +430,7 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
                 /* ---------------------------------------------------------- */
                 /* construct and factor the kth block */
                 /* ---------------------------------------------------------- */
-                if (Numeric->bpath[block] != 1)
+                if (Numeric->block_path[block] != 1)
                 {
                     // unlikely
                     // encountered a block > 1 that has no refact. effort
@@ -656,7 +650,7 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
         // first, get LU decomposition
         // sloppy implementation, as there might be a smarter way to do this
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-        dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->bpath, lnz, unz, n, nzoff, nb);
+        dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb);
         dumpKA(Ax, Ai, Ap, n);
     }
     counter++;
