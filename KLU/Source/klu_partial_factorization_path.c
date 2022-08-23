@@ -245,13 +245,7 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
                     for (p = Ap[oldcol]; p < pend; p++)
                     {
                         newrow = Pinv[Ai[p]] - k1;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal block */
-                            Offx[poff] = Az[p];
-                            poff++;
-                        }
-                        else
+                        if(newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
                             X[newrow] = Az[p];
@@ -391,14 +385,7 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
                     {
                         oldrow = Ai[p];
                         newrow = Pinv[oldrow] - k1;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal part */
-                            /* Offx [poff] = Az [p] / Rs [oldrow] */
-                            SCALE_DIV_ASSIGN(Offx[poff], Az[p], Rs[oldrow]);
-                            poff++;
-                        }
-                        else
+                        if(newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
                             /* X [newrow] = Az [p] / Rs [oldrow] */

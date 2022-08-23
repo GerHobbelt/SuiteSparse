@@ -68,6 +68,7 @@ Int KLU_free_numeric
      * is called, i.e. partial refactorization is used */
     if(Numeric->path)
     {
+        /* TODO: fix length n to be free'd. should be less. */
         KLU_free (Numeric->path, n, sizeof (int), Common) ;
     }
     if(Numeric->block_path)

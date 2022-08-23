@@ -219,6 +219,7 @@ int KLU_compute_path(
     /* if BTF is not used, no off-diagonal blocks are available */
     /* ---------------------------------------------------------------- */
 
+    /* maybe write this function externally, because it's needed again by pr-rr */
     if(Common->btf == TRUE)
     {
         /* iterate over all blocks */
@@ -243,7 +244,7 @@ int KLU_compute_path(
                         /* TODO */
                         for(i = 0 ; i < n_variable_entries ; i++)
                         {
-                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == newrow)
+                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == Pinv [Ai [p]])
                             {
                                 /* set to -1, because they're off-diagonal now */
                                 /* indicates that they are "removed" from variable columns and row "list" */
@@ -277,6 +278,16 @@ int KLU_compute_path(
         Numeric->variable_offdiag_perm_entry[i] = variable_offdiag_perm_entry[i];
     }
 
+    if(n_variable_entries_new == 0)
+    {
+        /* very good case, no varying columns in LU blocks */
+        /* free memory and return */
+        Numeric->n_variable_blocks = 0;
+        Numeric->path = KLU_malloc(0, sizeof(int), Common);
+        Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
+        goto EXIT;
+    }
+
     int* cV = (int*) calloc(n, sizeof(int));
     if(cV == NULL)
     {
@@ -307,6 +318,7 @@ int KLU_compute_path(
             variable_columns_in_LU[ctr++] = i;
         }
     }
+    free(cV);
 
     ASSERT(ctr == variable_entries_new);
 
@@ -397,7 +409,7 @@ int KLU_compute_path(
     else
     {
         Numeric->n_variable_blocks = 0;
-        for (i = 0; i < n_variable_entries; i++)
+        for (i = 0; i < n_variable_entries_new; i++)
         {
             flag = 1;
             /* get next changing column */
@@ -556,6 +568,7 @@ int KLU_compute_path(
             Numeric->block_path[Numeric->variable_block[i]+1] = k;
         }
     }
+EXIT:
     free(Lp);
     free(Li);
     free(Lx);
@@ -572,7 +585,6 @@ int KLU_compute_path(
     free(Rs);
     free(variable_columns_in_LU);
     free(variable_rows_in_LU);
-    free(cV);
     return (TRUE);
 }
 
@@ -613,7 +625,7 @@ int KLU_determine_start(
     int i, k, j, p, block;
     int pivot;
     int col, nextcol, oldcol, pend, newrow, poff = 0, variable_offdiag_length = 0;
-    int n_variable_entries_new = 0;
+    int n_variable_entries_new = n_variable_entries;
     int flag = 1;
 
     /* blocks */
@@ -727,7 +739,7 @@ int KLU_determine_start(
                         /* TODO */
                         for(i = 0 ; i < n_variable_entries ; i++)
                         {
-                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == newrow)
+                            if(variable_columns_in_LU[i] == k+k1 && variable_rows_in_LU[i] == Pinv [Ai [p]])
                             {
                                 /* set to -1, because they're off-diagonal now */
                                 /* indicates that they are "removed" from variable columns and row "list" */
@@ -756,17 +768,25 @@ int KLU_determine_start(
     Numeric->variable_offdiag_length = variable_offdiag_length;
 
     for(i = 0; i < variable_offdiag_length ; i++)
-    {
+    {   
         Numeric->variable_offdiag_orig_entry[i] = variable_offdiag_orig_entry[i];
         Numeric->variable_offdiag_perm_entry[i] = variable_offdiag_perm_entry[i];
     }
 
-
+    if(n_variable_entries_new == 0)
+    {
+        /* very good case, no varying columns in LU blocks */
+        /* free memory and return */
+        goto EXIT;
+    }
 
     int* cV = (int*) calloc(n, sizeof(int));
     for ( i = 0 ; i < n_variable_entries ; i++)
     {
-        cV[variable_columns_in_LU[i]] = 1;
+        if(variable_columns_in_LU[i] != -1)
+        {
+            cV[variable_columns_in_LU[i]] = 1;
+        }
     }
     for ( i = 0; i< n_variable_entries ; i++)
     {
@@ -796,9 +816,9 @@ int KLU_determine_start(
     {
         /* no btf case
          * => identify first varying entry in entire matrix */
-        Numeric->block_path[0] = 0;
-        Numeric->block_path[1] = 1;
-        /* Numeric->variable_block[0] = 0; */
+        Numeric->n_variable_blocks = 1;
+        Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
+        Numeric->variable_block[0] = 0;
 
         /* find minimum in variable_columns_in_LU */
         pivot = variable_columns_in_LU[0];
@@ -825,7 +845,7 @@ int KLU_determine_start(
          *          start[block] = min(start[block], column), if start[block] != 0
          */
 
-         for(i = 0; i < n_variable_entries ; i++)
+         for(i = 0; i < n_variable_entries_new ; i++)
          {
             /* grab variable column number i */
             pivot = variable_columns_in_LU[i];
@@ -862,8 +882,19 @@ int KLU_determine_start(
                 Numeric->block_path[k] = pivot;
             }
          }
+        ctr = 0;
+        Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
+        for(i = 0 ; i < nb ; i++)
+        {
+            if(nvblocks[i] == 1)
+            {
+                /* block i is varying */
+                Numeric->variable_block[ctr++] = i;
+            }
+        }
+        ASSERT(ctr == Numeric->n_variable_blocks);
     }
-
+EXIT:
     free(Lp);
     free(Li);
     free(Lx);

@@ -39,8 +39,11 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale, nblocks, poff, i, j, up, ulen, llen, maxblock,
         nzoff;
         
-    int variable_offdiag_length, n_variable_blocks;
-    int * variable_offdiag_orig_entry, *variable_offdiag_perm_entry;
+
+    Int variable_offdiag_length = Numeric->variable_offdiag_length;
+    Int n_variable_blocks = Numeric->n_variable_blocks;
+    int* variable_offdiag_perm_entry = Numeric->variable_offdiag_perm_entry;
+    int *variable_offdiag_orig_entry = Numeric->variable_offdiag_orig_entry;
 
     /* ---------------------------------------------------------------------- */
     /* check inputs */
@@ -226,13 +229,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     for (p = Ap[oldcol]; p < pend; p++)
                     {
                         newrow = Pinv[Ai[p]] - k1;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal block */
-                            Offx[poff] = Az[p];
-                            poff++;
-                        }
-                        else
+                        if(newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
                             X[newrow] = Az[p];
@@ -366,14 +363,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     {
                         oldrow = Ai[p];
                         newrow = Pinv[oldrow] - k1;
-                        if (newrow < 0 && poff < nzoff)
-                        {
-                            /* entry in off-diagonal part */
-                            /* Offx [poff] = Az [p] / Rs [oldrow] */
-                            SCALE_DIV_ASSIGN(Offx[poff], Az[p], Rs[oldrow]);
-                            poff++;
-                        }
-                        else
+                        if(newrow >= 0)
                         {
                             /* (newrow,k) is an entry in the block */
                             /* X [newrow] = Az [p] / Rs [oldrow] */
