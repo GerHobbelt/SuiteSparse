@@ -118,13 +118,16 @@ Int KLU_fpartial /* returns TRUE if successful, FALSE otherwise */
     /* check the input matrix compute the row scale factors, Rs */
     /* ---------------------------------------------------------------------- */
 
-    /* do no scale, or check the input matrix, if scale < 0 */
-    if (scale >= 0)
+    /* permute scaling Rs back */
+    if (scale > 0)
     {
-        /* check for out-of-range indices, but do not check for duplicates */
-        if (!KLU_scale(scale, n, Ap, Ai, Ax, Rs, NULL, Common))
+        for (k = 0; k < n; k++)
         {
-            return (FALSE);
+            REAL(X[k]) = Rs[Pinv[k]];
+        }
+        for (k = 0; k < n; k++)
+        {
+            Rs[k] = REAL(X[k]);
         }
     }
 
