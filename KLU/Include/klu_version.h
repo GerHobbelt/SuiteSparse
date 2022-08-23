@@ -120,8 +120,8 @@
 #define KLU_free_numeric klu_free_numeric
 #define KLU_factor klu_factor
 #define KLU_refactor klu_refactor
-#define KLU_partial klu_partial
-#define KLU_fpartial klu_fpartial
+#define KLU_partial_factorization_path klu_partial_factorization_path
+#define KLU_partial_refactorization_restart klu_partial_refactorization_restart
 #define KLU_compute_path klu_compute_path
 #define KLU_determine_start klu_determine_start
 //#define dumpAll dumpAll
