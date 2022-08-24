@@ -170,7 +170,7 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
     {
         for (i = 0; i < variable_offdiag_length ; i++)
         {
-            SCALE_DIV_ASSIGN(Offx[variable_offdiag_perm_entry[i]], Az[variable_offdiag_orig_entry[i]], Rs[Ap[variable_offdiag_orig_entry[i]]]);
+            SCALE_DIV_ASSIGN(Offx[variable_offdiag_perm_entry[i]], Az[variable_offdiag_orig_entry[i]], Rs[Ap[Ai[variable_offdiag_orig_entry[i]]]]);
         }
     }
 

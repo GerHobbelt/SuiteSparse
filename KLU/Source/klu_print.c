@@ -155,11 +155,14 @@ void dumpKPath(int* path, int* bpath, int n, int nb, int pathLen, int counter)
         }
         fprintf(fbpath, "%d\n", bpath[nb-1]);
 
-        for (i = 0; i < pathLen - 1; i++)
+        if(pathLen > 0)
         {
-            fprintf(fpath, "%d, ", path[i]);
+            for (i = 0; i < pathLen - 1; i++)
+            {
+                fprintf(fpath, "%d, ", path[i]);
+            }
+            fprintf(fpath, "%d\n", path[pathLen-1]);
         }
-        fprintf(fpath, "%d\n", path[pathLen-1]);
 
         fclose(fpath);
         fclose(fbpath);

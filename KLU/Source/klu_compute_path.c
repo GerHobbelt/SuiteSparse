@@ -627,6 +627,8 @@ int KLU_determine_start(
 
     int nvblocks[nb];
 
+    Numeric->pathLen = 0;
+
     /* indices and temporary variables */
     int i, k, j, p, block;
     int pivot;
@@ -832,7 +834,7 @@ int KLU_determine_start(
 
         /* find minimum in variable_columns_in_LU */
         pivot = variable_columns_in_LU[0];
-        for(i = 1; i < n ; i++)
+        for(i = 1; i < n_variable_entries_new ; i++)
         {
             if(pivot > variable_columns_in_LU[i])
             {
@@ -845,6 +847,7 @@ int KLU_determine_start(
     }
     else
     {
+        Numeric->n_variable_blocks = 0;
         /* btf case
          * 
          * iterate over variable_columns_in_LU
