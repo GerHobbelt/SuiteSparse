@@ -132,7 +132,7 @@ void dumpKLU(double *Lx, int *Li, int *Lp,
     fclose(u);
 }
 
-void dumpKPath(int* path, int* bpath, int n, int nb, int counter)
+void dumpKPath(int* path, int* bpath, int n, int nb, int pathLen, int counter)
 {
         int i;
         char counterstring[32];
@@ -155,11 +155,11 @@ void dumpKPath(int* path, int* bpath, int n, int nb, int counter)
         }
         fprintf(fbpath, "%d\n", bpath[nb-1]);
 
-        for (i = 0; i < n - 1; i++)
+        for (i = 0; i < pathLen - 1; i++)
         {
             fprintf(fpath, "%d, ", path[i]);
         }
-        fprintf(fpath, "%d\n", path[n-1]);
+        fprintf(fpath, "%d\n", path[pathLen-1]);
 
         fclose(fpath);
         fclose(fbpath);
@@ -182,13 +182,14 @@ void dumpKAll(double *Lx,
             int unz,
             int n,
             int nzoff,
-            int nb
+            int nb,
+            int pathLen
         )
 {
     static int counter = 0;
     dumpKPerm(Q, P, n, counter);
     dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
-    dumpKPath(path, bpath, n, nb, counter);
+    dumpKPath(path, bpath, n, nb, pathLen, counter);
     counter++;
 }
 

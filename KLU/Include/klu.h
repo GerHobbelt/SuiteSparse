@@ -105,6 +105,7 @@ typedef struct
     void *Offx ;        /* size nzoff, numerical values */
     int nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
+    int pathLen;
     int *block_path ; /* block path to indicate which blocks contain varying entries */
     int *variable_block ;
     int n_variable_blocks;
@@ -128,6 +129,7 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     void *Offx ;
     SuiteSparse_long nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
+    SuiteSparse_long pathLen;
     int *block_path ; /* block path to indicate which blocks contain varying entries */
     int *variable_block ;
     SuiteSparse_long n_variable_blocks;

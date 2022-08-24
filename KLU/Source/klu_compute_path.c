@@ -282,6 +282,7 @@ int KLU_compute_path(
     {
         /* very good case, no varying columns in LU blocks */
         /* free memory and return */
+        Numeric->pathLen = 0;
         Numeric->n_variable_blocks = 0;
         Numeric->path = KLU_malloc(0, sizeof(int), Common);
         Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
@@ -306,12 +307,16 @@ int KLU_compute_path(
         variable_columns_in_LU[i] = 0;
     }
 
-    variable_columns_in_LU = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries_new);
+    variable_columns_in_LU  = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries_new);
     if(variable_columns_in_LU == NULL)
     {
         return KLU_OUT_OF_MEMORY;
     }
-        for ( i = 0 ; i < n ; i++)
+    for ( i = 0; i< n_variable_entries_new ; i++)
+    {
+        variable_columns_in_LU[i] = 0;
+    } 
+    for ( i = 0 ; i < n ; i++)
     {
         if(cV[i] != 0)
         {
@@ -391,6 +396,7 @@ int KLU_compute_path(
                 ctr++;
             }
         }
+        Numeric->pathLen = ctr;
         Numeric->path = KLU_malloc(ctr, sizeof(int), Common);
         for(i = 0; i < ctr ; i++)
         {
@@ -521,7 +527,7 @@ int KLU_compute_path(
                 ctr++;
             }
         }
-
+        Numeric->pathLen = ctr;
         /* allocate and initialize memory */
         Numeric->path = KLU_malloc(ctr, sizeof(int), Common);
         Numeric->variable_block = KLU_malloc(Numeric->n_variable_blocks, sizeof(int), Common);
@@ -788,10 +794,6 @@ int KLU_determine_start(
             cV[variable_columns_in_LU[i]] = 1;
         }
     }
-    for ( i = 0; i< n_variable_entries ; i++)
-    {
-        variable_columns_in_LU[i] = 0;
-    } 
     n_variable_entries = 0;
     for ( i = 0 ; i < n ; i++)
     {
@@ -802,6 +804,14 @@ int KLU_determine_start(
     }
     int ctr = 0;
     variable_columns_in_LU = (int*) realloc(variable_columns_in_LU, sizeof(int)*n_variable_entries);
+    if(variable_columns_in_LU == NULL)
+    {
+        return KLU_OUT_OF_MEMORY;
+    }
+    for ( i = 0; i< n_variable_entries ; i++)
+    {
+        variable_columns_in_LU[i] = 0;
+    } 
     for ( i = 0 ; i < n ; i++)
     {
         if(cV[i] == 1)

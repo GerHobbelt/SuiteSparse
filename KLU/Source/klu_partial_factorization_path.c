@@ -536,7 +536,7 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
         R = calloc(nb + 1, sizeof(int));
 
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-        dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb);
+        dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb, Numeric->pathLen);
         dumpKA(Ax, Ai, Ap, n);
 
         free(Lp);
