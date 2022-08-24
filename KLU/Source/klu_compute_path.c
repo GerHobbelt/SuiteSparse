@@ -149,7 +149,7 @@ int KLU_compute_path(
     }
 
     /* block path can be allocated now since its size is known */
-    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
+    Numeric->block_path = KLU_malloc(nb+1, sizeof(int), Common);
     int workpath[n];
     Int path[n];
     Int nvblocks[nb];
@@ -238,7 +238,6 @@ int KLU_compute_path(
                     if (newrow < 0 && poff < nzoff)
                     {
                         /* entry in off-diagonal block */
-                        poff++ ;
 
                         /* check if entry is in variable column */
                         /* TODO */
@@ -259,6 +258,7 @@ int KLU_compute_path(
                                 break;
                             }
                         }
+                        poff++ ;
                     }
                 }
             }
@@ -666,7 +666,7 @@ int KLU_determine_start(
         KLU_free(Numeric->block_path, Numeric->nblocks, sizeof(int), Common);
     }
 
-    Numeric->block_path = KLU_malloc(nb, sizeof(int), Common);
+    Numeric->block_path = KLU_malloc(nb+1, sizeof(int), Common);
     
     for (i = 0; i < nb; i++)
     {
@@ -741,7 +741,6 @@ int KLU_determine_start(
                     if (newrow < 0 && poff < nzoff)
                     {
                         /* entry in off-diagonal block */
-                        poff++ ;
 
                         /* check if entry is in variable column */
                         /* TODO */
@@ -762,6 +761,7 @@ int KLU_determine_start(
                                 break;
                             }
                         }
+                        poff++ ;
                     }
                 }
             }
