@@ -89,7 +89,7 @@ int KLU_compute_path(
     int oldcol, pend, p, newrow;
     int poff = 0, ctr = 0, variable_offdiag_length = 0;
 
-    Int n_variable_entries_new = n_variable_entries;
+    Int n_variable_entries_new = n_variable_entries, n_variable_columns = 0;
 
 /*
     Int* variable_offdiag_orig_entry = (Int*)calloc(nzoff, sizeof(Int));
@@ -307,12 +307,21 @@ int KLU_compute_path(
         variable_columns_in_LU[i] = 0;
     }
 
-    variable_columns_in_LU  = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries_new);
+
+    for ( i = 0 ; i < n ; i++)
+    {
+        if(cV[i] == 1)
+        {
+            n_variable_columns++;
+        }
+    }
+
+    variable_columns_in_LU  = (Int*)realloc(variable_columns_in_LU, sizeof(Int)*n_variable_columns);
     if(variable_columns_in_LU == NULL)
     {
         return KLU_OUT_OF_MEMORY;
     }
-    for ( i = 0; i< n_variable_entries_new ; i++)
+    for ( i = 0; i< n_variable_columns ; i++)
     {
         variable_columns_in_LU[i] = 0;
     } 
@@ -338,7 +347,7 @@ int KLU_compute_path(
         Numeric->variable_block[0] = 0;
         Numeric->n_variable_blocks = 1;
         /* no blocks */
-        for (i = 0; i < n_variable_entries_new; i++)
+        for (i = 0; i < n_variable_columns; i++)
         {
             flag = 1;
             pivot = variable_columns_in_LU[i];
@@ -402,7 +411,7 @@ int KLU_compute_path(
         {
             Numeric->path[i] = 0;
         }
-        Numeric->block_path[1] = ctr+1;
+        Numeric->block_path[1] = ctr;
         ctr = 0;
         for(i = 0; i < n ; i++)
         {
@@ -415,7 +424,7 @@ int KLU_compute_path(
     else
     {
         Numeric->n_variable_blocks = 0;
-        for (i = 0; i < n_variable_entries_new; i++)
+        for (i = 0; i < n_variable_columns; i++)
         {
             flag = 1;
             /* get next changing column */
@@ -633,7 +642,7 @@ int KLU_determine_start(
     int i, k, j, p, block;
     int pivot;
     int col, nextcol, oldcol, pend, newrow, poff = 0, variable_offdiag_length = 0;
-    int n_variable_entries_new = n_variable_entries;
+    int n_variable_entries_new = n_variable_entries, n_variable_columns = 0;
     int flag = 1;
 
     /* blocks */
@@ -796,6 +805,8 @@ int KLU_determine_start(
             cV[variable_columns_in_LU[i]] = 1;
         }
     }
+
+    /* count how many variable columns there are (not necessarily equal to n_variable_entries_new) */
     n_variable_entries = 0;
     for ( i = 0 ; i < n ; i++)
     {
@@ -834,7 +845,7 @@ int KLU_determine_start(
 
         /* find minimum in variable_columns_in_LU */
         pivot = variable_columns_in_LU[0];
-        for(i = 1; i < n_variable_entries_new ; i++)
+        for(i = 1; i < n_variable_entries ; i++)
         {
             if(pivot > variable_columns_in_LU[i])
             {
@@ -858,7 +869,7 @@ int KLU_determine_start(
          *          start[block] = min(start[block], column), if start[block] != 0
          */
 
-         for(i = 0; i < n_variable_entries_new ; i++)
+         for(i = 0; i < n_variable_entries ; i++)
          {
             /* grab variable column number i */
             pivot = variable_columns_in_LU[i];
