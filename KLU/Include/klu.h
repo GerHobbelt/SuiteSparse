@@ -299,13 +299,15 @@ klu_symbolic *klu_analyze_partial
     int n,              /* A is n-by-n */
     int Ap [ ],         /* size n+1, column pointers */
     int Ai [ ],         /* size nz, row indices */
-    int Varying [ ],
+    int varyingColumns [ ],
+    int varyingRows [ ],
+    int n_varyingEntries, 
     int mode,
     klu_common *Common
 ) ;
 
 klu_l_symbolic *klu_l_analyze_partial (SuiteSparse_long, SuiteSparse_long *,
-    SuiteSparse_long *, SuiteSparse_long *, SuiteSparse_long, klu_l_common *Common) ;
+    SuiteSparse_long *, SuiteSparse_long *, SuiteSparse_long* , SuiteSparse_long, SuiteSparse_long, klu_l_common *Common) ;
 
 
 /* -------------------------------------------------------------------------- */
