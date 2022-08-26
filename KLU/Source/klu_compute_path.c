@@ -21,12 +21,12 @@
  *                              - variable_offdiag_perm_entry[i]: refers to the corresponding position of i in F
  *                          - these entries are excluded from factorization path computation
  *                          - in partial refactorization, these values are simply "copied" to the correct location
- *                              - this can then be done very efficiently, i.e. with parallelization or SIMD
+ *                              - this can then be done very efficiently, i.e. with parallelization or SIMD (maybe)
  *                  - case 2: entry is in a diagonal block
  *                          - three arrays are used:
  *                              - variable_block: has length n_variable_blocks, contains indices of variable blocks
  *                                  - e.g. variable_block = {0, 3} means that blocks 0 and 3 contain variable entries
- *                              - block_path: has length nb, indicates position of varying columns for a block in the factorization path
+ *                              - block_path: has length nblocks (number of blocks), indicates position of varying columns for a block in the factorization path
  *                                  - a bit more complicated
  *                                  - e.g. block_path = {0, 0, 3, 3} means that block 1's variable columns are from index 0 to 2 in factorization path (variable_block = {1})
  *                              - path: factorization path
@@ -937,6 +937,10 @@ EXIT:
     return (TRUE);
 }
 
+/* this function is meant to be a quicker extration+transposition function for the U-part of LU
+ * L and F are not needed. U will be stored in column-major form, so that the off-diagonal row entries
+ * can be accessed quickly */
+
 // int KLU_extract_quick(
 //     /* inputs: */
 //     KLU_numeric *Numeric,
@@ -946,6 +950,7 @@ EXIT:
 //     Int *Ui,
 //     Int *Up,
 //     Int *Q,
+//     Int *P,
 //     Int *R
 // )
 // {

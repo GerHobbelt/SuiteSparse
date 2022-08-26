@@ -156,6 +156,9 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_AMD_BRA_RR (2)
 #define KLU_AMD_RR (3)
 
+#define KLU_MAX_METHOD (3)
+#define KLU_MIN_METHOD (0)
+
 typedef struct klu_common_struct
 {
 
