@@ -80,7 +80,7 @@ int KLU_compute_path(
     int unz = Numeric->unz;
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
-    int *Pinv = Numeric->Pinv;
+    Int *Pinv = Numeric->Pinv;
     int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
     int *P, *Q, *R;
@@ -96,8 +96,8 @@ int KLU_compute_path(
     Int *variable_offdiag_perm_entry = (Int*)calloc(nzoff, sizeof(Int));
 */
     /* TODO: do I need to init those? */
-    int variable_offdiag_orig_entry[nzoff];
-    int variable_offdiag_perm_entry[nzoff];
+    Int variable_offdiag_orig_entry[nzoff];
+    Int variable_offdiag_perm_entry[nzoff];
 
     /* indices and temporary variables */
     int i, k, j, ent, block;
@@ -623,7 +623,7 @@ int KLU_determine_start(
     int unz = Numeric->unz;
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
-    int *Pinv = Numeric->Pinv;
+    Int *Pinv = Numeric->Pinv;
     int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
     int *P, *Q, *R;
