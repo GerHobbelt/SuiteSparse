@@ -81,9 +81,9 @@ int KLU_compute_path(
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
     Int *Pinv = Numeric->Pinv;
-    int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
+    Int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
-    int *P, *Q, *R;
+    Int *P, *Q, *R;
     double *Rs;
     int RET;
     int oldcol, pend, p, newrow;
@@ -624,9 +624,9 @@ int KLU_determine_start(
     int nzoff = Numeric->nzoff;
     int nb = Symbolic->nblocks;
     Int *Pinv = Numeric->Pinv;
-    int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
+    Int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
     double *Lx, *Ux, *Fx;
-    int *P, *Q, *R;
+    Int *P, *Q, *R;
     double *Rs;
     int RET;
 
@@ -816,7 +816,7 @@ int KLU_determine_start(
         }
     }
     int ctr = 0;
-    variable_columns_in_LU = (int*) realloc(variable_columns_in_LU, sizeof(int)*n_variable_entries);
+    variable_columns_in_LU = (Int*) realloc(variable_columns_in_LU, sizeof(Int)*n_variable_entries);
     if(variable_columns_in_LU == NULL)
     {
         return KLU_OUT_OF_MEMORY;
