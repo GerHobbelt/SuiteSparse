@@ -9,35 +9,6 @@
  */
 #include "klu_internal.h"
 
-/*
- * Computes Factorization Path.
- * Factorization-Path mode partial refactorization works as follows:
- * five arrays for two cases are needed.
- * for a variable entry, compute the permutation, i.e. A to LU
- *                  - case 1: entry is in off-diagonal block F
- *                          - KLU handles these blocks annoyingly
- *                          - two new arrays are used for partial refactorization:
- *                              - variable_offdiag_orig_entry[i]: refers to the i-th entry in Ax that is varying
- *                              - variable_offdiag_perm_entry[i]: refers to the corresponding position of i in F
- *                          - these entries are excluded from factorization path computation
- *                          - in partial refactorization, these values are simply "copied" to the correct location
- *                              - this can then be done very efficiently, i.e. with parallelization or SIMD (maybe)
- *                  - case 2: entry is in a diagonal block
- *                          - three arrays are used:
- *                              - variable_block: has length n_variable_blocks, contains indices of variable blocks
- *                                  - e.g. variable_block = {0, 3} means that blocks 0 and 3 contain variable entries
- *                              - block_path: has length nblocks (number of blocks), indicates position of varying columns for a block in the factorization path
- *                                  - a bit more complicated
- *                                  - e.g. block_path = {0, 0, 3, 3} means that block 1's variable columns are from index 0 to 2 in factorization path (variable_block = {1})
- *                              - path: factorization path
- *                                  - self-explanatory
- *                                  - e.g. path = {3, 4}
- *                           - in total:
- *                                  - variable_block = {1}
- *                                  - block_path = {0, 0, 3, 3}
- *                                  - path = {3, 4, 5}
- *                                  - means that block 1 contains varying entries. These are from index 0 to 2 in factorization path, which evaluates to columns 3, 4 and 5
- */
 int KLU_compute_path(
                     KLU_symbolic *Symbolic,
                     KLU_numeric *Numeric,
@@ -50,13 +21,34 @@ int KLU_compute_path(
                     )
 {
 
-    /* This method computes the factorization path.
-     * "output":
-     *          - variable_offdiag_orig_entry: position of entries in Ax, which end up in off-diagonal block F
-     *          - variable_offdiag_perm_entry: position of entries in F, which are varying in Ax
-     *          - bpath: array of length nblocks+1. bpath[k]...bpath[k+1]-1 indicate the variable columns in block k
-     *          - path: path[bpath[k]]...path[bpath[k+1]-1] contain the variable columns in block k
-     *
+    /*
+     * Computes Factorization Path.
+     * Factorization-Path mode partial refactorization works as follows:
+     * five arrays for two cases are needed.
+     * for a variable entry, compute the permutation, i.e. A to LU
+     *                  - case 1: entry is in off-diagonal block F
+     *                          - KLU handles these blocks annoyingly
+     *                          - two new arrays are used for partial refactorization:
+     *                              - variable_offdiag_orig_entry[i]: refers to the i-th entry in Ax that is varying
+     *                              - variable_offdiag_perm_entry[i]: refers to the corresponding position of i in F
+     *                          - these entries are excluded from factorization path computation
+     *                          - in partial refactorization, these values are simply "copied" to the correct location
+     *                              - this can then be done very efficiently, i.e. with parallelization or SIMD (maybe)
+     *                  - case 2: entry is in a diagonal block
+     *                          - three arrays are used:
+     *                              - variable_block: has length n_variable_blocks, contains indices of variable blocks
+     *                                  - e.g. variable_block = {0, 3} means that blocks 0 and 3 contain variable entries
+     *                              - block_path: has length nblocks (number of blocks), indicates position of varying columns for a block in the factorization path
+     *                                  - a bit more complicated
+     *                                  - e.g. block_path = {0, 0, 3, 3} means that block 1's variable columns are from index 0 to 2 in factorization path (variable_block = {1})
+     *                              - path: factorization path
+     *                                  - self-explanatory
+     *                                  - e.g. path = {3, 4}
+     *                           - in total:
+     *                                  - variable_block = {1}
+     *                                  - block_path = {0, 0, 3, 3}
+     *                                  - path = {3, 4, 5}
+     *                                  - means that block 1 contains varying entries. These are from index 0 to 2 in factorization path, which evaluates to columns 3, 4 and 5
      */
 
     if(variable_columns == NULL)
@@ -71,7 +63,8 @@ int KLU_compute_path(
     {
         return TRUE;
     }
-    /* This function is very long, because you have to implement BTF and no BTF-case... */
+
+    /* This function is very long, because cases with and without BTF are implemented */
     /* Declarations */
     /* LU data */
 
@@ -91,11 +84,7 @@ int KLU_compute_path(
 
     Int n_variable_entries_new = n_variable_entries, n_variable_columns = 0;
 
-/*
-    Int* variable_offdiag_orig_entry = (Int*)calloc(nzoff, sizeof(Int));
-    Int *variable_offdiag_perm_entry = (Int*)calloc(nzoff, sizeof(Int));
-*/
-    /* TODO: do I need to init those? */
+    /* arrays for the offdiagonal entries. are empty if BTF is not used */
     Int variable_offdiag_orig_entry[nzoff];
     Int variable_offdiag_perm_entry[nzoff];
 
@@ -114,6 +103,7 @@ int KLU_compute_path(
         return KLU_OUT_OF_MEMORY;
     }
 
+    /* variable columns and rows in A are given. We need to know those in LU */
     Int *variable_columns_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
     if(variable_columns_in_LU == NULL)
     {
@@ -167,26 +157,25 @@ int KLU_compute_path(
         Numeric->block_path[i] = 0;
     }
 
-    /* these are checked by klu_extract (I think) */
-    Lp = calloc(n + 1, sizeof(int));
-    Up = calloc(n + 1, sizeof(int));
-    Fp = calloc(n + 1, sizeof(int));
-    Lx = calloc(lnz, sizeof(double));
-    Ux = calloc(unz, sizeof(double));
-    Fx = calloc(nzoff, sizeof(double));
-    Li = calloc(lnz, sizeof(int));
-    Ui = calloc(unz, sizeof(int));
-    Fi = calloc(nzoff, sizeof(int));
-    P = calloc(n, sizeof(int));
-    Q = calloc(n, sizeof(int));
-    Rs = calloc(n, sizeof(double));
-    R = calloc(nb + 1, sizeof(int));
+    Lp = (Int*) calloc(n + 1, sizeof(Int));
+    Up = (Int*) calloc(n + 1, sizeof(Int));
+    Fp = (Int*) calloc(n + 1, sizeof(Int));
+    Lx = (double*) calloc(lnz, sizeof(double));
+    Ux = (double*) calloc(unz, sizeof(double));
+    Fx = (double*) calloc(nzoff, sizeof(double));
+    Li = (Int*) calloc(lnz, sizeof(Int));
+    Ui = (Int*) calloc(unz, sizeof(Int));
+    Fi = (Int*) calloc(nzoff, sizeof(Int));
+    P = (Int*) calloc(n, sizeof(Int));
+    Q = (Int*) calloc(n, sizeof(Int));
+    Rs = (double*) calloc(n, sizeof(double));
+    R = (Int*) calloc(nb + 1, sizeof(Int));
 
     /* ---------------------------------------------------------------- */
     /* first, get LU decomposition */
     /* sloppy implementation, as there might be a smarter way to do this */
     /* ---------------------------------------------------------------- */
-    RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+    RET = KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
 
     /* check if extraction of LU matrix broke */
     if (RET != (TRUE))
@@ -491,7 +480,6 @@ int KLU_compute_path(
                    find Up[k] <= j < Up[k+1], k > pivot
                    ALTERNATIVELY
                    Transpose U
-                   do the same as for L
                  */
 
                 /* This loop finds all nnz in row "pivot",
@@ -501,7 +489,7 @@ int KLU_compute_path(
                 {
                     if (Ui[j] == pivot)
                     {
-                        // find column in which j is
+                        /* find column in which j is */
                         for (k = k1; k < k2; k++)
                         {
                             if (j >= Up[k] && j < Up[k + 1])
@@ -683,24 +671,24 @@ int KLU_determine_start(
         nvblocks[i] = 0;
     }
 
-    Lp = calloc(n + 1, sizeof(int));
-    Up = calloc(n + 1, sizeof(int));
-    Fp = calloc(n + 1, sizeof(int));
-    Lx = calloc(lnz, sizeof(double));
-    Ux = calloc(unz, sizeof(double));
-    Fx = calloc(nzoff, sizeof(double));
-    Li = calloc(lnz, sizeof(int));
-    Ui = calloc(unz, sizeof(int));
-    Fi = calloc(nzoff, sizeof(int));
-    P = calloc(n, sizeof(int));
-    Q = calloc(n, sizeof(int));
-    Rs = calloc(n, sizeof(double));
-    R = calloc(nb + 1, sizeof(int));
+    Lp = (Int*) calloc(n + 1, sizeof(Int));
+    Up = (Int*) calloc(n + 1, sizeof(Int));
+    Fp = (Int*) calloc(n + 1, sizeof(Int));
+    Lx = (double*) calloc(lnz, sizeof(double));
+    Ux = (double*) calloc(unz, sizeof(double));
+    Fx = (double*) calloc(nzoff, sizeof(double));
+    Li = (Int*) calloc(lnz, sizeof(Int));
+    Ui = (Int*) calloc(unz, sizeof(Int));
+    Fi = (Int*) calloc(nzoff, sizeof(Int));
+    P = (Int*) calloc(n, sizeof(Int));
+    Q = (Int*) calloc(n, sizeof(Int));
+    Rs = (double*) calloc(n, sizeof(double));
+    R = (Int*) calloc(nb + 1, sizeof(Int));
 
     /* first, get LU decomposition
      * sloppy implementation, as there might be a smarter way to do this
      */
-    RET = klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+    RET = KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
 
     /* check if extraction of LU matrix broke */
     if (RET != (TRUE))
@@ -936,98 +924,3 @@ EXIT:
     free(variable_columns_in_LU);
     return (TRUE);
 }
-
-/* this function is meant to be a quicker extration+transposition function for the U-part of LU
- * L and F are not needed. U will be stored in column-major form, so that the off-diagonal row entries
- * can be accessed quickly */
-
-// int KLU_extract_quick(
-//     /* inputs: */
-//     KLU_numeric *Numeric,
-//     KLU_symbolic *Symbolic,
-
-//     /* outputs: */
-//     Int *Ui,
-//     Int *Up,
-//     Int *Q,
-//     Int *P,
-//     Int *R
-// )
-// {
-//     /* placeholder */
-//     Entry *Lx2, *Ux2, *Ukk ;
-//     Unit* LU;
-//     Int *Lip, *Llen, *Uip, *Ulen, *Li2, *Ui2 ;
-//     Int nz, k1, k2, block, nk, kk, len, p, n, nblocks, k;
-//     n = Symbolic->n ;
-//     nblocks = Symbolic->nblocks ;
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract block boundaries */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (R != NULL)
-//     {
-//         for (block = 0 ; block <= nblocks ; block++)
-//         {
-//             R [block] = Symbolic->R [block] ;
-//         }
-//     }
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract column permutation */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (Q != NULL)
-//     {
-//         for (k = 0 ; k < n ; k++)
-//         {
-//             Q [k] = Symbolic->Q [k] ;
-//         }
-//     }
-
-//     /* ---------------------------------------------------------------------- */
-//     /* extract each block of U */
-//     /* ---------------------------------------------------------------------- */
-
-//     if (Up != NULL && Ui != NULL)
-//     {
-//         nz = 0 ;
-//         for (block = 0 ; block < nblocks ; block++)
-//         {
-//             k1 = Symbolic->R [block] ;
-//             k2 = Symbolic->R [block+1] ;
-//             nk = k2 - k1 ;
-//             if (nk == 1)
-//             {
-//                 /* singleton block */
-//                 Up [k1] = nz ;
-//                 Ui [nz] = k1 ;
-//                 nz++ ;
-//             }
-//             else
-//             {
-//                 /* non-singleton block */
-//                 LU = Numeric->LUbx [block] ;
-//                 Uip = Numeric->Uip + k1 ;
-//                 Ulen = Numeric->Ulen + k1 ;
-//                 for (kk = 0 ; kk < nk ; kk++)
-//                 {
-//                     Up [k1+kk] = nz ;
-//                     GET_POINTER (LU, Uip, Ulen, Ui2, Ux2, kk, len) ;
-//                     for (p = 0 ; p < len ; p++)
-//                     {
-//                         Ui [nz] = k1 + Ui2 [p] ;
-//                         nz++ ;
-//                     }
-//                     /* add the diagonal entry */
-//                     Ui [nz] = k1 + kk ;
-//                     nz++ ;
-//                 }
-//             }
-//         }
-//         Up [n] = nz ;
-//         ASSERT (nz == Numeric->unz) ;
-//     }
-//     return (TRUE);
-// }
