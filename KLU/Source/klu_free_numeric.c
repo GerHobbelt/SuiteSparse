@@ -68,15 +68,23 @@ Int KLU_free_numeric
      * is called, i.e. partial refactorization is used */
     if(Numeric->path)
     {
-        KLU_free (Numeric->path, n, sizeof (int), Common) ;
+        KLU_free (Numeric->path, Numeric->pathLen, sizeof (int), Common) ;
     }
     if(Numeric->block_path)
     {
         KLU_free (Numeric->block_path, Numeric->nblocks, sizeof (int), Common);
     }
-    if(Numeric->start)
+    if(Numeric->variable_block)
     {
-        KLU_free (Numeric->start, Numeric->nblocks, sizeof (int), Common);
+        KLU_free (Numeric->variable_block, Numeric->n_variable_blocks, sizeof (int), Common);
+    }
+    if(Numeric->variable_offdiag_orig_entry)
+    {
+        KLU_free (Numeric->variable_offdiag_orig_entry, Numeric->variable_offdiag_length, sizeof (int), Common);
+    }
+    if(Numeric->variable_offdiag_perm_entry)
+    {
+        KLU_free (Numeric->variable_offdiag_perm_entry, Numeric->variable_offdiag_length, sizeof (int), Common);
     }
     KLU_free (Numeric, 1, sizeof (KLU_numeric), Common) ;
 

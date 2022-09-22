@@ -24,7 +24,7 @@ codes are authored or co-authored by Timothy A. Davis.
 
 
 -----------------------------------------------------------------------------
-KLU-Partial: KLU with factorization path based partial refactorisation
+KLU-Partial: KLU with factorization path based partial refactorization
 -----------------------------------------------------------------------------
 
 March 3, 2022
@@ -34,6 +34,15 @@ March 3, 2022
 
 Author:
    Lennart Schumacher
+
+-----------------------------------------------------------------------------
+CMake
+-----------------------------------------------------------------------------
+CMake has been added by modifying the repository
+https://github.com/sergiud/SuiteSparse
+which offers CMake for SuiteSparse under the Apache 2.0 License. A copy of that
+license is in this repository. The cmake-code has been adapted to support partial
+refactorization and only build KLU and its libraries
 
 -----------------------------------------------------------------------------
 About the BLAS and LAPACK libraries

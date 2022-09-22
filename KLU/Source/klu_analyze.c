@@ -273,23 +273,22 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
     KLU_symbolic *Symbolic,
     KLU_common *Common,
 
-    Int Varying [ ],
+    Int varyingColumns [ ],
+    Int varyingRows [ ],
+    Int n_varyingEntries,
     Int mode
 )
 {
     double amd_Info [AMD_INFO], lnz, lnz1, flops, flops1 ;
     Int k1, k2, nk, k, block, oldcol, pend, newcol, result, pc, p, newrow,
-        maxnz, nzoff, ok, err = KLU_INVALID, i ;
+        maxnz, nzoff, ok, err = KLU_INVALID, i, n_varyingEntries_new = n_varyingEntries;
 
-    Int Varying2[n];
 
-    for(i = 0; i < n ; i++)
-    {
-        if(Varying[i] == 1)
-        {
-            Varying2[Qbtf[i]] = 1;
-        }
-    }
+    /* BTF transform needs to be applied to varying entries */
+    Int varyingColumns_in_PAQ[n_varyingEntries];
+    Int varyingRows_in_PAQ[n_varyingEntries];
+    Int Qi[n];
+    Int Varying[n];
 
     /* ---------------------------------------------------------------------- */
     /* initializations */
@@ -317,6 +316,78 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
     maxnz = 0 ;
     flops = 0 ;
     Symbolic->symmetry = EMPTY ;        /* only computed by AMD */
+
+
+    /* First, determine inverse column permutation.
+     * Qbtf determines newcol -> oldcol, i.e. Qbtf[k] is the k-th column in the ORIGINAL matrix A 
+     * We need oldcol -> newcol so that Qi[k] is the k-th column in the BTF-transformed matrix.
+     * Same for row permutation Pbtf */
+
+    for(i = 0; i < n ; i++)
+    {
+        Varying[i] = 0;
+        Qi[Qbtf[i]] = i;
+    }
+
+    /* Apply BTF column-permutation on varying entries */
+
+    for(i = 0; i < n_varyingEntries ; i++)
+    {
+        varyingColumns_in_PAQ[i] = Qi[varyingColumns[i]];
+        varyingRows_in_PAQ[i] = Pinv[varyingRows[i]];
+    }
+
+    /* determine entries that are varying but in an off-diagonal block */
+    if(Common->btf == TRUE)
+    {
+        /* iterate over all blocks */
+        for(block = 0 ; block < nblocks ; block++)
+        {
+            k1 = R [block];
+            k2 = R [block+1];
+            nk = k2 - k1;
+            for (k = 0 ; k < nk ; k++)
+            {
+                oldcol = Qbtf [k+k1] ;
+                pend = Ap [oldcol+1] ;
+                for (p = Ap [oldcol] ; p < pend ; p++)
+                {
+                    newrow = Pinv [Ai [p]] - k1 ;
+                    if (newrow < 0)
+                    {
+                        /* entry in off-diagonal block */
+                        /* check if entry is in variable column */
+                        for(i = 0 ; i < n_varyingEntries ; i++)
+                        {
+                            if(varyingColumns_in_PAQ[i] == k+k1 && varyingRows_in_PAQ[i] == Pinv [Ai [p]])
+                            {
+                                /* set to -1, because they're off-diagonal now */
+                                /* indicates that they are "removed" from variable columns and row "list" */
+                                /* subsequently, add to variable off-diag entries and reduce length of variable entries */
+                                varyingColumns_in_PAQ[i] = -1;
+                                varyingRows_in_PAQ[i] = -1;
+
+                                n_varyingEntries_new--;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* determine new Varying-vector.
+     * it is Varying[i] = 1 if column i is varying, 0 else */
+    for(i = 0; i < n_varyingEntries ; i++)
+    {
+        /*  */
+        if(varyingColumns_in_PAQ[i] != -1)
+        {
+            Varying[varyingColumns_in_PAQ[i]] = 1;
+        }
+    }
+
 
     /* ---------------------------------------------------------------------- */
     /* order each block */
@@ -393,9 +464,11 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
             /* order the block with AMD (C+C') */
             /* -------------------------------------------------------------- */
 
+
+            /* if required ordering is either AMD-BRA or AMD-NV, use partial ordering of AMD */
             if(mode == BRA || mode == NV)
             {
-                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying2, mode);
+                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying, mode);
             }
             else
             {
@@ -673,7 +746,9 @@ static KLU_symbolic *order_and_analyze_partial  /* returns NULL if error, or a v
     Int n,              /* A is n-by-n */
     Int Ap [ ],         /* size n+1, column pointers */
     Int Ai [ ],         /* size nz, row indices */
-    Int Varying [ ],
+    Int varyingColumns [ ],
+    Int varyingRows [ ],
+    Int n_varyingEntries,
     Int mode,
     /* --------------------- */
     KLU_common *Common
@@ -810,7 +885,7 @@ static KLU_symbolic *order_and_analyze_partial  /* returns NULL if error, or a v
     {
         PRINTF (("calling analyze_worker\n")) ;
         Common->status = analyze_worker_partial (n, Ap, Ai, nblocks, Pbtf, Qbtf, R,
-            ordering, P, Q, Lnz, Pblk, Cp, Ci, Cilen, Pinv, Symbolic, Common, Varying, mode) ;
+            ordering, P, Q, Lnz, Pblk, Cp, Ci, Cilen, Pinv, Symbolic, Common, varyingColumns, varyingRows, n_varyingEntries, mode) ;
         PRINTF (("analyze_worker done\n")) ;
     }
 
@@ -891,7 +966,9 @@ KLU_symbolic *KLU_analyze_partial       /* returns NULL if error, or a valid
     Int n,              /* A is n-by-n */
     Int Ap [ ],         /* size n+1, column pointers */
     Int Ai [ ],         /* size nz, row indices */
-    Int Varying [ ],
+    Int varyingColumns [ ],
+    Int varyingRows [ ],
+    Int n_varyingEntries,
     Int mode,
     /* -------------------- */
     KLU_common *Common
@@ -913,5 +990,5 @@ KLU_symbolic *KLU_analyze_partial       /* returns NULL if error, or a valid
     /* order and analyze */
     /* ---------------------------------------------------------------------- */
 
-    return (order_and_analyze_partial (n, Ap, Ai, Varying, mode, Common)) ;
+    return (order_and_analyze_partial (n, Ap, Ai, varyingColumns, varyingRows, n_varyingEntries, mode, Common)) ;
 }

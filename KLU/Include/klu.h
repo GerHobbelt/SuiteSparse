@@ -25,7 +25,7 @@ typedef struct
 {
     /* A (P,Q) is in upper block triangular form.  The kth block goes from
      * row/col index R [k] to R [k+1]-1.  The estimated number of nonzeros
-     * in the L factor of the kth block is Lnz [k]. 
+     * in the L factor of the kth block is Lnz [k].
      */
 
     /* only computed if the AMD ordering is chosen: */
@@ -105,8 +105,13 @@ typedef struct
     void *Offx ;        /* size nzoff, numerical values */
     int nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
+    int pathLen;
     int *block_path ; /* block path to indicate which blocks contain varying entries */
-    int *start;
+    int *variable_block ;
+    int n_variable_blocks;
+    int *variable_offdiag_orig_entry;
+    int *variable_offdiag_perm_entry;
+    int variable_offdiag_length;
 } klu_numeric ;
 
 typedef struct          /* 64-bit version (otherwise same as above) */
@@ -124,8 +129,13 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     void *Offx ;
     SuiteSparse_long nzoff ;
     int *path ;  /* factorization path contains columns with varying entries */
+    SuiteSparse_long pathLen;
     int *block_path ; /* block path to indicate which blocks contain varying entries */
-    int *start;
+    int *variable_block ;
+    SuiteSparse_long n_variable_blocks;
+    int *variable_offdiag_orig_entry;
+    int *variable_offdiag_perm_entry;
+    SuiteSparse_long variable_offdiag_length;
 } klu_l_numeric ;
 
 /* -------------------------------------------------------------------------- */
@@ -145,6 +155,9 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_AMD_NV_FP (1)
 #define KLU_AMD_BRA_RR (2)
 #define KLU_AMD_RR (3)
+
+#define KLU_MAX_METHOD (3)
+#define KLU_MIN_METHOD (0)
 
 typedef struct klu_common_struct
 {
@@ -289,13 +302,15 @@ klu_symbolic *klu_analyze_partial
     int n,              /* A is n-by-n */
     int Ap [ ],         /* size n+1, column pointers */
     int Ai [ ],         /* size nz, row indices */
-    int Varying [ ],
+    int varyingColumns [ ],
+    int varyingRows [ ],
+    int n_varyingEntries,
     int mode,
     klu_common *Common
 ) ;
 
 klu_l_symbolic *klu_l_analyze_partial (SuiteSparse_long, SuiteSparse_long *,
-    SuiteSparse_long *, SuiteSparse_long *, SuiteSparse_long, klu_l_common *Common) ;
+    SuiteSparse_long *, SuiteSparse_long *, SuiteSparse_long* , SuiteSparse_long, SuiteSparse_long, klu_l_common *Common) ;
 
 
 /* -------------------------------------------------------------------------- */
@@ -421,7 +436,7 @@ int klu_z_tsolve
     double B [ ],           /* size 2*ldim*nrhs */
     int conj_solve,         /* TRUE: conjugate solve, FALSE: solve A.'x=b */
     klu_common *Common
-     
+
 ) ;
 
 SuiteSparse_long klu_l_tsolve (klu_l_symbolic *, klu_l_numeric *,
@@ -472,12 +487,15 @@ SuiteSparse_long klu_zl_refactor (SuiteSparse_long *, SuiteSparse_long *,
 
 int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
 (
-    klu_symbolic* Symbolic, 
-    klu_numeric* Numeric, 
-    klu_common* Common, 
-    int changeVector [ ], 
-    int changeLen
-) ; 
+    klu_symbolic* Symbolic,
+    klu_numeric* Numeric,
+    klu_common* Common,
+    int Ap [ ],
+    int Ai [ ],
+    int variable_columns [ ],
+    int variable_rows [ ],
+    int variable_entries
+) ;
 
 /* -------------------------------------------------------------------------- */
 /* klu_determine_start: determines first varying column for partial refactorization  */
@@ -485,13 +503,16 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
 
 int klu_determine_start       /* return TRUE if successful, FALSE otherwise */
 (
-    klu_symbolic* Symbolic, 
-    klu_numeric* Numeric, 
-    klu_common* Common, 
-    int changeVector [ ], 
-    int changeLen
-) ; 
-            
+    klu_symbolic* Symbolic,
+    klu_numeric* Numeric,
+    klu_common* Common,
+    int Ap [ ],
+    int Ai [ ],
+    int variable_columns [ ],
+    int variable_rows [ ],
+    int variable_entries
+) ;
+
 /* -------------------------------------------------------------------------- */
 /* klu_partial_factorization_path: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */
@@ -507,7 +528,7 @@ int klu_partial_factorization_path /* return TRUE if successful, FALSE otherwise
     /* input, and numerical values modified on output */
     klu_numeric *Numeric,
     klu_common *Common
-) ;       
+) ;
 
 /* -------------------------------------------------------------------------- */
 /* klu_partial_refactorization_restart: partially refactorizes matrix with same ordering as klu_factor */

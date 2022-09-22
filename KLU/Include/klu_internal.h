@@ -264,7 +264,8 @@ void dumpKAll(
     Int unz,
     Int n,
     Int nzoff,
-    Int nb
+    Int nb,
+    Int pathLen
 ) ;
 
 void dumpKA(

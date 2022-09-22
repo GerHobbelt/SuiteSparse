@@ -14,7 +14,6 @@ demos: all
 # Compile all C code.  Do not compile the FORTRAN versions.
 all:
 	( cd Lib    ; $(MAKE) )
-	( cd Demo   ; $(MAKE) )
 
 # compile just the C-callable libraries (not Demos)
 library:
