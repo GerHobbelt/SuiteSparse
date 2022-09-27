@@ -4,7 +4,7 @@
 
 /* prints out BTF+AMD+PP (or any other ordering) permutation WITH partial pivoting */
 
-void dumpKPerm(int* Q, int* P, int n, int counter)
+void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
@@ -44,7 +44,7 @@ void dumpKPerm(int* Q, int* P, int n, int counter)
 }
 
 /* prints out BTF+AMD (or any other ordering) permutation WITHOUT partial pivoting */
-void dumpKPermPre(int* Q, int* P, int n, int counter)
+void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
@@ -83,7 +83,7 @@ void dumpKPermPre(int* Q, int* P, int n, int counter)
     fclose(fP);
 }
 
-void printKMTX(FILE* f, double* values, int* indices, int* pointers, int n, int nz)
+void printKMTX(FILE* f, double* values, Int* indices, Int* pointers, Int n, Int nz)
 {
     int i,j;
     fprintf(f, "%%%%MatrixMarket matrix coordinate real general\n");
@@ -97,11 +97,11 @@ void printKMTX(FILE* f, double* values, int* indices, int* pointers, int n, int 
     }
 }
 
-void dumpKLU(double *Lx, int *Li, int *Lp, 
-            double *Ux, int *Ui, int *Up, 
-            double *Fx, int *Fi, int *Fp, 
-            int lnz, int unz, int n, 
-            int nzoff, int counter)
+void dumpKLU(double *Lx, Int *Li, Int *Lp, 
+            double *Ux, Int *Ui, Int *Up, 
+            double *Fx, Int *Fi, Int *Fp, 
+            Int lnz, Int unz, Int n, 
+            Int nzoff, Int counter)
 {
     char strL[32];
     char strU[32];
@@ -132,7 +132,7 @@ void dumpKLU(double *Lx, int *Li, int *Lp,
     fclose(u);
 }
 
-void dumpKPath(int* path, int* bpath, int n, int nb, int pathLen, int counter)
+void dumpKPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
 {
         int i;
         char counterstring[32];
@@ -169,27 +169,27 @@ void dumpKPath(int* path, int* bpath, int n, int nb, int pathLen, int counter)
 }
 
 void dumpKAll(double *Lx, 
-            int *Li, 
-            int *Lp,
+            Int *Li, 
+            Int *Lp,
             double *Ux, 
-            int *Ui, 
-            int *Up, 
+            Int *Ui, 
+            Int *Up, 
             double *Fx, 
-            int *Fi, 
-            int *Fp, 
-            int *P,
-            int *Q,
-            int *path,
-            int *bpath,
-            int lnz,
-            int unz,
-            int n,
-            int nzoff,
-            int nb,
-            int pathLen
+            Int *Fi, 
+            Int *Fp, 
+            Int *P,
+            Int *Q,
+            Int *path,
+            Int *bpath,
+            Int lnz,
+            Int unz,
+            Int n,
+            Int nzoff,
+            Int nb,
+            Int pathLen
         )
 {
-    static int counter = 0;
+    static Int counter = 0;
     dumpKPerm(Q, P, n, counter);
     dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
     dumpKPath(path, bpath, n, nb, pathLen, counter);
@@ -197,12 +197,12 @@ void dumpKAll(double *Lx,
 }
 
 void dumpKA(double* Ax,
-            int* Ai,
-            int* Ap,
-            int n
+            Int* Ai,
+            Int* Ap,
+            Int n
         )
 {
-    static int counter = 0;
+    static Int counter = 0;
     char str[32];
     char counterstring[32];
     sprintf(counterstring, "%d", counter);

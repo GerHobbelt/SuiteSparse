@@ -38,7 +38,11 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
     Unit *LU;
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale, nblocks, poff, i, j, up, ulen, llen, maxblock,
         nzoff;
-        
+
+    #ifdef KLU_PRINT
+        /* print out flops as printing feature */
+        Int countflops = 0;
+    #endif
 
     Int variable_offdiag_length = Numeric->variable_offdiag_length;
     Int n_variable_blocks = Numeric->n_variable_blocks;
@@ -254,6 +258,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB(X[Li[p]], Lx[p], ujk);
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
                     /* get the diagonal entry of U */
@@ -392,6 +399,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB(X[Li[p]], Lx[p], ujk);
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
                     /* get the diagonal entry of U */
@@ -519,6 +529,8 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb, Numeric->pathLen);
         dumpKA(Ax, Ai, Ap, n);
+
+        printf("FLOPS %d\n", countflops);
 
         free(Lp);
         free(Up);

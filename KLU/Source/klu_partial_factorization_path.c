@@ -41,6 +41,11 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
 
     Int z = 0;
 
+    #ifdef KLU_PRINT
+        /* print out flops as printing feature */
+        Int countflops = 0;
+    #endif
+
     Int variable_offdiag_length = Numeric->variable_offdiag_length;
     Int n_variable_blocks = Numeric->n_variable_blocks;
     int* variable_offdiag_perm_entry = Numeric->variable_offdiag_perm_entry;
@@ -270,6 +275,9 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB(X[Li[p]], Lx[p], ujk);
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
                     /* get the diagonal entry of U */
@@ -411,6 +419,9 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB(X[Li[p]], Lx[p], ujk);
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
                     /* get the diagonal entry of U */
@@ -538,6 +549,8 @@ Int KLU_partial_factorization_path /* returns TRUE if successful, FALSE otherwis
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb, Numeric->pathLen);
         dumpKA(Ax, Ai, Ap, n);
+
+        printf("FLOPS %d\n", countflops);
 
         free(Lp);
         free(Up);

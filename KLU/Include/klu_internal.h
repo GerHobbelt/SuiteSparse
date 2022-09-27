@@ -246,6 +246,20 @@ Int KLU_extract_quick(
     Int R [ ]
 ) ;
 
+void dumpKPerm(
+    Int Q [ ],
+    Int P [ ],
+    Int n,
+    Int counter
+) ;
+
+void dumpKPermPre(
+    Int Q [ ],
+    Int P [ ],
+    Int n,
+    Int counter
+) ;
+
 void dumpKAll(
     Entry Lx [ ], 
     Int Li [ ], 

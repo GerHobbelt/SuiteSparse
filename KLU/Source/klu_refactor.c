@@ -36,6 +36,11 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
     Int k1, k2, nk, k, block, oldcol, pend, oldrow, n, p, newrow, scale,
         nblocks, poff, i, j, up, ulen, llen, maxblock, nzoff ;
 
+    #ifdef KLU_PRINT
+        /* print out flops as printing feature */
+        Int countflops = 0;
+    #endif
+
     /* ---------------------------------------------------------------------- */
     /* check inputs */
     /* ---------------------------------------------------------------------- */
@@ -237,9 +242,12 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB (X [Li [p]], Lx [p], ujk) ;
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
-                    /* Anmerkung: ukk ist das (partielle) Pivotelement */
+                    /* Remark: ukk is the (partial) pivot element */
                     /* get the diagonal entry of U */
                     ukk = X [k] ;
                     /* X [k] = 0 */
@@ -383,6 +391,9 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
                         {
                             /* X [Li [p]] -= Lx [p] * ujk */
                             MULT_SUB (X [Li [p]], Lx [p], ujk) ;
+                            #ifdef KLU_PRINT
+                                countflops += MULTSUB_FLOPS;
+                            #endif
                         }
                     }
                     /* get the diagonal entry of U */
@@ -500,6 +511,8 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
         dumpKA(Ax, Ai, Ap, n);
+
+        printf("FLOPS %d\n", countflops);
 
         free(Lp);
         free(Up);
