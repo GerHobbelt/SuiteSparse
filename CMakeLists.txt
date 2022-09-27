@@ -157,6 +157,7 @@ set (KLU_SRCS
   KLU/Source/klu_free_symbolic.c
   KLU/Source/klu_kernel.c
   KLU/Source/klu_memory.c
+  KLU/Source/klu_print.c
   KLU/Source/klu_partial_factorization_path.c
   KLU/Source/klu_partial_refactorization_restart.c
   KLU/Source/klu_refactor.c
