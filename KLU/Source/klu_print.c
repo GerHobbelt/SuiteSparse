@@ -2,6 +2,34 @@
 #include <string.h>
 #define PRECISION 20
 
+/* definitions for printing. if data type Int is defined to be long int, %ld printing is used. otherwise,
+ * %d printing. */
+#ifdef DLONG
+    #define TYPE ("%ld")
+    #define TYPEC ("%ld, ")
+    #define TYPEN ("%ld\n")
+    #define TYPEH ("%ld %ld %ld\n")
+#ifdef COMPLEX
+    #define TYPEF ("%ld %d %.*e %.*e\n")
+    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate complex general\n")
+#else
+    #define TYPEF ("%ld %d %.*e\n")
+    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate real general\n")
+#endif
+#else
+    #define TYPE ("%d")
+    #define TYPEC ("%d, ")
+    #define TYPEN ("%d\n")
+    #define TYPEH ("%d %d %d\n")
+#ifdef COMPLEX
+    #define TYPEF ("%d %d %.*e %.*e\n")
+    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate complex general\n")
+#else
+    #define TYPEF ("%d %d %.*e\n")
+    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate real general\n")
+#endif
+#endif
+
 /* prints out BTF+AMD+PP (or any other ordering) permutation WITH partial pivoting */
 
 void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
@@ -12,7 +40,7 @@ void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
     char strP[32];
     char strPi[32];
     char counterstring[32];
-    sprintf(counterstring, "%d", counter);
+    sprintf(counterstring, TYPE, counter);
 
     strcpy(strQ, "KLU_Q");
     strcpy(strP, "KLU_P");
@@ -28,16 +56,16 @@ void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
     /* dump Q */
     for (i = 0 ; i < n-1; i++)
     {
-        fprintf(fQ, "%d, ", Q[i]);
+        fprintf(fQ, TYPEC, Q[i]);
     }
-    fprintf(fQ, "%d\n", Q[n-1]);
+    fprintf(fQ, TYPEN, Q[n-1]);
 
     /* dump P */
     for (i = 0 ; i < n-1; i++)
     {
-        fprintf(fP, "%d, ", P[i]);
+        fprintf(fP, TYPEC, P[i]);
     }
-    fprintf(fP, "%d\n", P[n-1]);
+    fprintf(fP, TYPEN, P[n-1]);
 
     fclose(fQ);
     fclose(fP);
@@ -52,7 +80,7 @@ void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
     char strP[32];
     char strPi[32];
     char counterstring[32];
-    sprintf(counterstring, "%d", counter);
+    sprintf(counterstring, TYPE, counter);
 
     strcpy(strQ, "KLU_QPrev");
     strcpy(strP, "KLU_PPrev");
@@ -68,16 +96,16 @@ void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
     /* dump Q */
     for (i = 0 ; i < n-1; i++)
     {
-        fprintf(fQ, "%d, ", Q[i]);
+        fprintf(fQ, TYPEC, Q[i]);
     }
-    fprintf(fQ, "%d\n", Q[n-1]);
+    fprintf(fQ, TYPEN, Q[n-1]);
 
     /* dump P */
     for (i = 0 ; i < n-1; i++)
     {
-        fprintf(fP, "%d, ", P[i]);
+        fprintf(fP, TYPEC, P[i]);
     }
-    fprintf(fP, "%d\n", P[n-1]);
+    fprintf(fP, TYPEN, P[n-1]);
 
     fclose(fQ);
     fclose(fP);
@@ -86,13 +114,13 @@ void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
 void printKMTX(FILE* f, double* values, Int* indices, Int* pointers, Int n, Int nz)
 {
     int i,j;
-    fprintf(f, "%%%%MatrixMarket matrix coordinate real general\n");
-    fprintf(f, "%d %d %d\n", n, n, nz);
+    fprintf(f, MATRIXMARKET_HEADER);
+    fprintf(f, TYPEH, n, n, nz);
     for(i = 0; i < n ; i++)
     {
         for(j = pointers[i] ; j < pointers[i+1] ; j++)
         {
-            fprintf(f, "%d %d %.*e\n", indices[j]+1, i+1, PRECISION, values[j]);
+            fprintf(f, TYPEF, indices[j]+1, i+1, PRECISION, values[j]);
         }
     }
 }
@@ -107,7 +135,7 @@ void dumpKLU(double *Lx, Int *Li, Int *Lp,
     char strU[32];
     char strF[32];
     char counterstring[32];
-    sprintf(counterstring, "%d", counter);
+    sprintf(counterstring, TYPE, counter);
     strcpy(strL, "KLU_L");
     strcpy(strU, "KLU_U");
     strcpy(strF, "KLU_F");
@@ -136,7 +164,7 @@ void dumpKPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
 {
         int i;
         char counterstring[32];
-        sprintf(counterstring, "%d", counter);
+        sprintf(counterstring, TYPE, counter);
         char strbpath[32];
         char strpath[32];
         strcpy(strbpath, "KLU_bpath");
@@ -151,17 +179,17 @@ void dumpKPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
         /* dump path into file */
         for (i = 0; i < nb - 1; i++)
         {
-            fprintf(fbpath, "%d, ", bpath[i]);
+            fprintf(fbpath, TYPEC, bpath[i]);
         }
-        fprintf(fbpath, "%d\n", bpath[nb-1]);
+        fprintf(fbpath, TYPEN, bpath[nb-1]);
 
         if(pathLen > 0)
         {
             for (i = 0; i < pathLen - 1; i++)
             {
-                fprintf(fpath, "%d, ", path[i]);
+                fprintf(fpath, TYPEC, path[i]);
             }
-            fprintf(fpath, "%d\n", path[pathLen-1]);
+            fprintf(fpath, TYPEN, path[pathLen-1]);
         }
 
         fclose(fpath);
@@ -205,7 +233,7 @@ void dumpKA(double* Ax,
     static Int counter = 0;
     char str[32];
     char counterstring[32];
-    sprintf(counterstring, "%d", counter);
+    sprintf(counterstring, TYPE, counter);
     strcpy(str, "KLU_A");
     strcat(str, counterstring);
     strcat(str, ".mtx");
