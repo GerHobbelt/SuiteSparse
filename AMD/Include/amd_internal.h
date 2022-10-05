@@ -166,8 +166,8 @@
 #define AMD_info amd_l_info
 #define AMD_1 amd_l1
 #define AMD_2 amd_l2
-#define AMD_BRA amd_l_nv
-#define AMD_NV amd_l_bra
+#define AMD_BRA amd_l_bra
+#define AMD_NV amd_l_nv
 #define AMD_valid amd_l_valid
 #define AMD_aat amd_l_aat
 #define AMD_postorder amd_l_postorder
@@ -192,8 +192,8 @@
 #define AMD_1 amd_1
 #define AMD_1_partial amd_1_partial
 #define AMD_2 amd_2
-#define AMD_BRA amd_nv
-#define AMD_NV amd_bra
+#define AMD_BRA amd_bra
+#define AMD_NV amd_nv
 #define AMD_valid amd_valid
 #define AMD_aat amd_aat
 #define AMD_postorder amd_postorder

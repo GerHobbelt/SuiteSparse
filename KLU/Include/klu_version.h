@@ -124,7 +124,6 @@
 #define KLU_partial_refactorization_restart klu_partial_refactorization_restart
 #define KLU_compute_path klu_compute_path
 #define KLU_determine_start klu_determine_start
-//#define dumpAll dumpAll
 #define KLU_extract_quick klu_extract_quick
 #define KLU_kernel_factor klu_kernel_factor 
 #define KLU_lsolve klu_lsolve
