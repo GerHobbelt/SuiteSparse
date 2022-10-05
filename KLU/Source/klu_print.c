@@ -11,10 +11,10 @@
     #define TYPEH ("%ld %ld %ld\n")
 #ifdef COMPLEX
     #define TYPEF ("%ld %d %.*e %.*e\n")
-    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate complex general\n")
+    #define MATRIXMARKET_HEADER ("%%%%MatrixMarket matrix coordinate complex general\n")
 #else
     #define TYPEF ("%ld %d %.*e\n")
-    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate real general\n")
+    #define MATRIXMARKET_HEADER ("%%%%MatrixMarket matrix coordinate real general\n")
 #endif
 #else
     #define TYPE ("%d")
@@ -23,10 +23,10 @@
     #define TYPEH ("%d %d %d\n")
 #ifdef COMPLEX
     #define TYPEF ("%d %d %.*e %.*e\n")
-    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate complex general\n")
+    #define MATRIXMARKET_HEADER ("%%%%MatrixMarket matrix coordinate complex general\n")
 #else
     #define TYPEF ("%d %d %.*e\n")
-    #define MATRIXMARKET_HEADER ("%%MatrixMarket matrix coordinate real general\n")
+    #define MATRIXMARKET_HEADER ("%%%%MatrixMarket matrix coordinate real general\n")
 #endif
 #endif
 
