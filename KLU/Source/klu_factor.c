@@ -559,27 +559,27 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
     static int counter = 0;
     if(counter == 0)
     {
-        int n = Symbolic->n;
-        int lnz = Numeric->lnz;
-        int unz = Numeric->unz;
-        int nzoff = Numeric->nzoff;
-        int nb = Symbolic->nblocks;
-        int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
+        Int n = Symbolic->n;
+        Int lnz = Numeric->lnz;
+        Int unz = Numeric->unz;
+        Int nzoff = Numeric->nzoff;
+        Int nb = Symbolic->nblocks;
+        Int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
         double *Lx, *Ux, *Fx, *Rs;
-        int *P, *Q, *R;
-        Lp = calloc(n + 1, sizeof(int));
-        Up = calloc(n + 1, sizeof(int));
-        Fp = calloc(n + 1, sizeof(int));
+        Int *P, *Q, *R;
+        Lp = calloc(n + 1, sizeof(Int));
+        Up = calloc(n + 1, sizeof(Int));
+        Fp = calloc(n + 1, sizeof(Int));
         Lx = calloc(lnz, sizeof(double));
         Ux = calloc(unz, sizeof(double));
         Fx = calloc(nzoff, sizeof(double));
-        Li = calloc(lnz, sizeof(int));
-        Ui = calloc(unz, sizeof(int));
-        Fi = calloc(nzoff, sizeof(int));
-        P = calloc(n, sizeof(int));
-        Q = calloc(n, sizeof(int));
+        Li = calloc(lnz, sizeof(Int));
+        Ui = calloc(unz, sizeof(Int));
+        Fi = calloc(nzoff, sizeof(Int));
+        P = calloc(n, sizeof(Int));
+        Q = calloc(n, sizeof(Int));
         Rs = calloc(n, sizeof(double));
-        R = calloc(nb + 1, sizeof(int));
+        R = calloc(nb + 1, sizeof(Int));
 
         KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
