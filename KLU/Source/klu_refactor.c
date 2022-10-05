@@ -508,7 +508,7 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         Rs = calloc(n, sizeof(double));
         R = calloc(nb + 1, sizeof(int));
 
-        klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+        KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
         dumpKA(Ax, Ai, Ap, n);
 

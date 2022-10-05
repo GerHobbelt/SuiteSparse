@@ -166,6 +166,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
         for (i = 0; i < variable_offdiag_length ; i++)
         {
             SCALE_DIV_ASSIGN(Offx[variable_offdiag_perm_entry[i]], Az[variable_offdiag_orig_entry[i]], Rs[Ai[variable_offdiag_orig_entry[i]]]);
+            #ifdef KLU_PRINT
+                countflops += SCALE_FLOPS;
+            #endif
         }
     }
 
@@ -303,6 +306,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     {
                         i = Li[p];
                         DIV(Lx[p], X[i], ukk);
+                        #ifdef KLU_PRINT
+                            countflops += DIV_FLOPS;
+                        #endif
                         CLEAR(X[i]);
                     }
                 }
@@ -341,6 +347,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                         /* singleton */
                         /* s = Az [p] / Rs [oldrow] */
                         SCALE_DIV_ASSIGN(s, Az[p], Rs[oldrow]);
+                        #ifdef KLU_PRINT
+                            countflops += SCALE_FLOPS;
+                        #endif
                     }
                 }
                 Udiag[k1] = s;
@@ -375,6 +384,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                             /* (newrow,k) is an entry in the block */
                             /* X [newrow] = Az [p] / Rs [oldrow] */
                             SCALE_DIV_ASSIGN(X[newrow], Az[p], Rs[oldrow]);
+                            #ifdef KLU_PRINT
+                                countflops += SCALE_FLOPS;
+                            #endif
                         }
                     }
 
@@ -443,6 +455,9 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     {
                         i = Li[p];
                         DIV(Lx[p], X[i], ukk);
+                        #ifdef KLU_PRINT
+                            countflops += DIV_FLOPS;
+                        #endif
                         CLEAR(X[i]);
                     }
                 }
@@ -526,7 +541,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
         Rs = calloc(n, sizeof(double));
         R = calloc(nb + 1, sizeof(int));
 
-        klu_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
+        KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
         dumpKAll(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, P, Q, Numeric->path, Numeric->block_path, lnz, unz, n, nzoff, nb, Numeric->pathLen);
         dumpKA(Ax, Ai, Ap, n);
 
