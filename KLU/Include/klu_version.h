@@ -47,6 +47,8 @@
 #define KLU_free_numeric klu_zl_free_numeric
 #define KLU_factor klu_zl_factor
 #define KLU_refactor klu_zl_refactor
+#define KLU_partial_factorization_path klu_zl_partial_factorization_path
+#define KLU_partial_refactorization_restart klu_zl_partial_refactorization_restart
 #define KLU_kernel_factor klu_zl_kernel_factor 
 #define KLU_lsolve klu_zl_lsolve
 #define KLU_ltsolve klu_zl_ltsolve
@@ -70,6 +72,8 @@
 #define KLU_free_numeric klu_z_free_numeric
 #define KLU_factor klu_z_factor
 #define KLU_refactor klu_z_refactor
+#define KLU_partial_factorization_path klu_z_partial_factorization_path
+#define KLU_partial_refactorization_restart klu_z_partial_refactorization_restart
 #define KLU_kernel_factor klu_z_kernel_factor 
 #define KLU_lsolve klu_z_lsolve
 #define KLU_ltsolve klu_z_ltsolve
@@ -97,6 +101,8 @@
 #define KLU_free_numeric klu_l_free_numeric
 #define KLU_factor klu_l_factor
 #define KLU_refactor klu_l_refactor
+#define KLU_partial_factorization_path klu_l_partial_factorization_path
+#define KLU_partial_refactorization_restart klu_l_partial_refactorization_restart
 #define KLU_kernel_factor klu_l_kernel_factor 
 #define KLU_lsolve klu_l_lsolve
 #define KLU_ltsolve klu_l_ltsolve
@@ -122,8 +128,6 @@
 #define KLU_refactor klu_refactor
 #define KLU_partial_factorization_path klu_partial_factorization_path
 #define KLU_partial_refactorization_restart klu_partial_refactorization_restart
-#define KLU_compute_path klu_compute_path
-#define KLU_determine_start klu_determine_start
 #define KLU_extract_quick klu_extract_quick
 #define KLU_kernel_factor klu_kernel_factor 
 #define KLU_lsolve klu_lsolve
@@ -150,6 +154,8 @@
 #define KLU_analyze klu_l_analyze
 #define KLU_analyze_partial klu_l_analyze_partial
 #define KLU_analyze_given klu_l_analyze_given
+#define KLU_compute_path klu_l_compute_path
+#define KLU_determine_start klu_l_determine_start
 #define KLU_alloc_symbolic klu_l_alloc_symbolic
 #define KLU_free_symbolic klu_l_free_symbolic
 #define KLU_defaults klu_l_defaults
@@ -176,6 +182,8 @@
 #define KLU_analyze klu_analyze
 #define KLU_analyze_partial klu_analyze_partial
 #define KLU_analyze_given klu_analyze_given
+#define KLU_compute_path klu_compute_path
+#define KLU_determine_start klu_determine_start
 #define KLU_alloc_symbolic klu_alloc_symbolic
 #define KLU_free_symbolic klu_free_symbolic
 #define KLU_defaults klu_defaults

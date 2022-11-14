@@ -33,6 +33,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
     Entry ukk, ujk, s;
     Entry *Offx, *Lx, *Ux, *X, *Az, *Udiag;
     double *Rs;
+    double abs_pivot;
     Int *Q, *R, *Pnum, *Ui, *Li, *Pinv, *Lip, *Uip, *Llen, *Ulen;
     Unit **LUbx;
     Unit *LU;
@@ -41,13 +42,13 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
 
     #ifdef KLU_PRINT
         /* print out flops as printing feature */
-        Int countflops = 0;
+        int countflops = 0;
     #endif
 
     Int variable_offdiag_length = Numeric->variable_offdiag_length;
     Int n_variable_blocks = Numeric->n_variable_blocks;
-    int* variable_offdiag_perm_entry = Numeric->variable_offdiag_perm_entry;
-    int *variable_offdiag_orig_entry = Numeric->variable_offdiag_orig_entry;
+    Int* variable_offdiag_perm_entry = Numeric->variable_offdiag_perm_entry;
+    Int *variable_offdiag_orig_entry = Numeric->variable_offdiag_orig_entry;
 
     /* ---------------------------------------------------------------------- */
     /* check inputs */
@@ -268,6 +269,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     }
                     /* get the diagonal entry of U */
                     ukk = X[k];
+                    ABS(abs_pivot, ukk);
                     /* X [k] = 0 */
                     CLEAR(X[k]);
                     /* singular case */
@@ -287,7 +289,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                         }
                     }
                     /* pivot vadility testing */
-                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail)
+                    else if (abs_pivot < Common->pivot_tol_fail)
                     {
                         /* pivot is too small */
                         Common->status = KLU_PIVOT_FAULT;
@@ -418,6 +420,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                     }
                     /* get the diagonal entry of U */
                     ukk = X[k];
+                    ABS(abs_pivot, ukk);
                     /* X [k] = 0 */
                     CLEAR(X[k]);
                     /* singular case */
@@ -437,7 +440,7 @@ Int KLU_partial_refactorization_restart /* returns TRUE if successful, FALSE oth
                         }
                     }
                     /* pivot vadility testing */
-                    else if (SCALAR_ABS(ukk) < Common->pivot_tol_fail)
+                    else if (abs_pivot < Common->pivot_tol_fail)
                     {
                         /* pivot is too small */
                         Common->status = KLU_PIVOT_FAULT;

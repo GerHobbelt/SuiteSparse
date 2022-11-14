@@ -38,7 +38,7 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
 
     #ifdef KLU_PRINT
         /* print out flops as printing feature */
-        Int countflops = 0;
+        int countflops = 0;
     #endif
 
     /* ---------------------------------------------------------------------- */

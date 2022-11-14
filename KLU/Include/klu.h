@@ -15,7 +15,6 @@ extern "C" {
 #include "amd.h"
 #include "colamd.h"
 #include "btf.h"
-//#include "klu_list.h"
 
 /* -------------------------------------------------------------------------- */
 /* Symbolic object - contains the pre-ordering computed by klu_analyze */
@@ -128,13 +127,13 @@ typedef struct          /* 64-bit version (otherwise same as above) */
     SuiteSparse_long *Offp, *Offi ;
     void *Offx ;
     SuiteSparse_long nzoff ;
-    int *path ;  /* factorization path contains columns with varying entries */
+    SuiteSparse_long *path ;  /* factorization path contains columns with varying entries */
     SuiteSparse_long pathLen;
-    int *block_path ; /* block path to indicate which blocks contain varying entries */
-    int *variable_block ;
+    SuiteSparse_long *block_path ; /* block path to indicate which blocks contain varying entries */
+    SuiteSparse_long *variable_block ;
     SuiteSparse_long n_variable_blocks;
-    int *variable_offdiag_orig_entry;
-    int *variable_offdiag_perm_entry;
+    SuiteSparse_long *variable_offdiag_orig_entry;
+    SuiteSparse_long *variable_offdiag_perm_entry;
     SuiteSparse_long variable_offdiag_length;
 } klu_l_numeric ;
 
@@ -497,6 +496,9 @@ int klu_compute_path       /* return TRUE if successful, FALSE otherwise */
     int variable_entries
 ) ;
 
+SuiteSparse_long klu_l_compute_path (klu_l_symbolic*, klu_l_numeric*, klu_l_common*, SuiteSparse_long*,
+    SuiteSparse_long*, SuiteSparse_long*, SuiteSparse_long*, SuiteSparse_long);
+
 /* -------------------------------------------------------------------------- */
 /* klu_determine_start: determines first varying column for partial refactorization  */
 /* -------------------------------------------------------------------------- */
@@ -512,6 +514,9 @@ int klu_determine_start       /* return TRUE if successful, FALSE otherwise */
     int variable_rows [ ],
     int variable_entries
 ) ;
+
+SuiteSparse_long klu_l_determine_start (klu_l_symbolic*, klu_l_numeric*, klu_l_common*, SuiteSparse_long*,
+    SuiteSparse_long*, SuiteSparse_long*, SuiteSparse_long*, SuiteSparse_long);
 
 /* -------------------------------------------------------------------------- */
 /* klu_partial_factorization_path: partially refactorizes matrix with same ordering as klu_factor */
@@ -530,6 +535,22 @@ int klu_partial_factorization_path /* return TRUE if successful, FALSE otherwise
     klu_common *Common
 ) ;
 
+int klu_z_partial_factorization_path /* return TRUE if successful, FALSE otherwise */
+(
+    /* inputs, not modified */
+    int Ap [ ],         /* size n+1, column pointers */
+    int Ai [ ],         /* size nz, row indices */
+    double Ax [ ],      /* size 2*nz, numerical values */
+    klu_symbolic *Symbolic,
+
+    /* input, and numerical values modified on output */
+    klu_numeric *Numeric,
+    klu_common *Common
+) ;
+
+SuiteSparse_long klu_l_partial_factorization_path(SuiteSparse_long*, SuiteSparse_long*, double*, klu_l_symbolic*, klu_l_numeric*, klu_l_common*);
+SuiteSparse_long klu_zl_partial_factorization_path(SuiteSparse_long*, SuiteSparse_long*, double*, klu_l_symbolic*, klu_l_numeric*, klu_l_common*);
+
 /* -------------------------------------------------------------------------- */
 /* klu_partial_refactorization_restart: partially refactorizes matrix with same ordering as klu_factor */
 /* -------------------------------------------------------------------------- */
@@ -546,6 +567,22 @@ int klu_partial_refactorization_restart     /* return TRUE if successful, FALSE 
     klu_numeric *Numeric,
     klu_common *Common
 ) ;
+
+int klu_z_partial_refactorization_restart     /* return TRUE if successful, FALSE otherwise */
+(
+    /* inputs, not modified */
+    int Ap [ ],         /* size n+1, column pointers */
+    int Ai [ ],         /* size nz, row indices */
+    double Ax [ ],      /* size 2*nz, numerical values */
+    klu_symbolic *Symbolic,
+
+    /* input, and numerical values modified on output */
+    klu_numeric *Numeric,
+    klu_common *Common
+) ;
+
+SuiteSparse_long klu_l_partial_refactorization_restart(SuiteSparse_long*, SuiteSparse_long*, double*, klu_l_symbolic*, klu_l_numeric*, klu_l_common*);
+SuiteSparse_long klu_zl_partial_refactorization_restart(SuiteSparse_long*, SuiteSparse_long*, double*, klu_l_symbolic*, klu_l_numeric*, klu_l_common*);
 
 /* -------------------------------------------------------------------------- */
 /* klu_free_symbolic: destroys the Symbolic object */

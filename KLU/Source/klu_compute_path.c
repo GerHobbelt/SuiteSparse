@@ -9,7 +9,7 @@
  */
 #include "klu_internal.h"
 
-int KLU_compute_path(
+Int KLU_compute_path(
                     KLU_symbolic *Symbolic,
                     KLU_numeric *Numeric,
                     KLU_common *Common,
@@ -595,7 +595,7 @@ EXIT:
  * This function determines the first varying column for
  * partial refactorization by refactorization restart (PR-RR)
  */
-int KLU_determine_start(
+Int KLU_determine_start(
         KLU_symbolic *Symbolic,
         KLU_numeric *Numeric,
         KLU_common *Common,
