@@ -46,7 +46,7 @@ static void factor2
 
 #ifdef KLU_PRINT
     static int counter = 0;
-    dumpKPermPre(Q, P, n, counter);
+    KLU_dumpPermPre(Q, P, n, counter);
     counter++;
 #endif
 
@@ -582,7 +582,7 @@ KLU_numeric *KLU_factor         /* returns NULL if error, or a valid
         R = calloc(nb + 1, sizeof(Int));
 
         KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-        dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+        KLU_dumpLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
 
         free(Lp);
         free(Up);

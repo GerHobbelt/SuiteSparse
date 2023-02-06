@@ -246,21 +246,21 @@ Int KLU_extract_quick(
     Int R [ ]
 ) ;
 
-void dumpKPerm(
+void KLU_dumpPerm(
     Int Q [ ],
     Int P [ ],
     Int n,
     Int counter
 ) ;
 
-void dumpKPermPre(
+void KLU_dumpPermPre(
     Int Q [ ],
     Int P [ ],
     Int n,
     Int counter
 ) ;
 
-void dumpKAll(
+void KLU_dumpAll(
     Entry Lx [ ], 
     Int Li [ ], 
     Int Lp [ ],
@@ -282,14 +282,14 @@ void dumpKAll(
     Int pathLen
 ) ;
 
-void dumpKA(
+void KLU_dumpA(
     Entry Ax [ ], 
     Int Ai [ ],
     Int Ap [ ],
     Int n
 ) ;
 
-void dumpKLU(
+void KLU_dumpKLU(
     Entry Lx [ ], 
     Int Li [ ], 
     Int Lp [ ],

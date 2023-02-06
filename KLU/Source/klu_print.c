@@ -32,7 +32,7 @@
 
 /* prints out BTF+AMD+PP (or any other ordering) permutation WITH partial pivoting */
 
-void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
+void KLU_dumpPerm(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
@@ -72,7 +72,7 @@ void dumpKPerm(Int* Q, Int* P, Int n, Int counter)
 }
 
 /* prints out BTF+AMD (or any other ordering) permutation WITHOUT partial pivoting */
-void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
+void KLU_dumpPermPre(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
@@ -111,7 +111,7 @@ void dumpKPermPre(Int* Q, Int* P, Int n, Int counter)
     fclose(fP);
 }
 
-void printKMTX(FILE* f, double* values, Int* indices, Int* pointers, Int n, Int nz)
+void KLU_printMTX(FILE* f, double* values, Int* indices, Int* pointers, Int n, Int nz)
 {
     int i,j;
     fprintf(f, MATRIXMARKET_HEADER);
@@ -125,7 +125,7 @@ void printKMTX(FILE* f, double* values, Int* indices, Int* pointers, Int n, Int 
     }
 }
 
-void dumpKLU(double *Lx, Int *Li, Int *Lp, 
+void KLU_dumpLU(double *Lx, Int *Li, Int *Lp, 
             double *Ux, Int *Ui, Int *Up, 
             double *Fx, Int *Fi, Int *Fp, 
             Int lnz, Int unz, Int n, 
@@ -151,16 +151,16 @@ void dumpKLU(double *Lx, Int *Li, Int *Lp,
     l = fopen(strL, "w");
     u = fopen(strU, "w");
 
-    printKMTX(g, Fx, Fi, Fp, n, nzoff);
-    printKMTX(l, Lx, Li, Lp, n, lnz);
-    printKMTX(u, Ux, Ui, Up, n, unz);
+    KLU_printMTX(g, Fx, Fi, Fp, n, nzoff);
+    KLU_printMTX(l, Lx, Li, Lp, n, lnz);
+    KLU_printMTX(u, Ux, Ui, Up, n, unz);
 
     fclose(g);
     fclose(l);
     fclose(u);
 }
 
-void dumpKPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
+void KLU_dumpPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
 {
         int i;
         char counterstring[32];
@@ -196,7 +196,7 @@ void dumpKPath(Int* path, Int* bpath, Int n, Int nb, Int pathLen, Int counter)
         fclose(fbpath);
 }
 
-void dumpKAll(double *Lx, 
+void KLU_dumpAll(double *Lx, 
             Int *Li, 
             Int *Lp,
             double *Ux, 
@@ -218,13 +218,13 @@ void dumpKAll(double *Lx,
         )
 {
     static Int counter = 0;
-    dumpKPerm(Q, P, n, counter);
-    dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
-    dumpKPath(path, bpath, n, nb, pathLen, counter);
+    KLU_dumpPerm(Q, P, n, counter);
+    KLU_dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+    KLU_dumpPath(path, bpath, n, nb, pathLen, counter);
     counter++;
 }
 
-void dumpKA(double* Ax,
+void KLU_dumpA(double* Ax,
             Int* Ai,
             Int* Ap,
             Int n
@@ -241,7 +241,7 @@ void dumpKA(double* Ax,
     FILE *a;
     a = fopen(str, "w");
 
-    printKMTX(a, Ax, Ai, Ap, n, Ap[n]);
+    KLU_printMTX(a, Ax, Ai, Ap, n, Ap[n]);
 
     fclose(a);
     counter++;

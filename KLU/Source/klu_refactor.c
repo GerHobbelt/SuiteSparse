@@ -500,7 +500,7 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         Lx = calloc(lnz, sizeof(double));
         Ux = calloc(unz, sizeof(double));
         Fx = calloc(nzoff, sizeof(double));
-        Li = calloc(lnz, sizeof(Int));
+        Li = calloc(lKLU_nz, sizeof(Int));
         Ui = calloc(unz, sizeof(Int));
         Fi = calloc(nzoff, sizeof(Int));
         P = calloc(n, sizeof(Int));
@@ -509,8 +509,8 @@ Int KLU_refactor        /* returns TRUE if successful, FALSE otherwise */
         R = calloc(nb + 1, sizeof(Int));
 
         KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
-        dumpKLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
-        dumpKA(Ax, Ai, Ap, n);
+        KLU_dumpLU(Lx, Li, Lp, Ux, Ui, Up, Fx, Fi, Fp, lnz, unz, n, nzoff, counter);
+        KLU_dumpA(Ax, Ai, Ap, n);
 
         printf("FLOPS %d\n", countflops);
 

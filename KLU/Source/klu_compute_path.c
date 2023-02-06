@@ -173,7 +173,7 @@ Int KLU_compute_path(
 
     /* ---------------------------------------------------------------- */
     /* first, get LU decomposition */
-    /* sloppy implementation, as there might be a smarter way to do this */
+    /* sloppy implementation, there might be a smarter way to do this */
     /* ---------------------------------------------------------------- */
     RET = KLU_extract(Numeric, Symbolic, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, Common);
 
