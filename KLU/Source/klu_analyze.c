@@ -285,10 +285,10 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
 
 
     /* BTF transform needs to be applied to varying entries */
-    Int varyingColumns_in_PAQ[n_varyingEntries];
-    Int varyingRows_in_PAQ[n_varyingEntries];
-    Int Qi[n];
-    Int Varying[n];
+    Int * varyingColumns_in_PAQ = (Int*)malloc(sizeof(Int)*n_varyingEntries);
+    Int * varyingRows_in_PAQ = (Int*)malloc(sizeof(Int)*n_varyingEntries);
+    Int * Qi = (Int*)malloc(sizeof(Int)*n);
+    Int * Varying = (Int*)malloc(sizeof(Int)*n);
 
     /* ---------------------------------------------------------------------- */
     /* initializations */
@@ -537,6 +537,12 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
     Symbolic->unz = lnz ;
     Symbolic->nzoff = nzoff ;
     Symbolic->est_flops = flops ;   /* EMPTY if COLAMD or user-ordering used */
+
+    free(varyingColumns_in_PAQ);
+    free(varyingRows_in_PAQ);
+    free(Qi);
+    free(Varying);
+
     return (KLU_OK) ;
 }
 

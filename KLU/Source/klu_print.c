@@ -36,9 +36,7 @@ void KLU_dumpPerm(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
-    char strQi[32];
     char strP[32];
-    char strPi[32];
     char counterstring[32];
     sprintf(counterstring, TYPE, counter);
 
@@ -76,9 +74,7 @@ void KLU_dumpPermPre(Int* Q, Int* P, Int n, Int counter)
 {
     int i;
     char strQ[32];
-    char strQi[32];
     char strP[32];
-    char strPi[32];
     char counterstring[32];
     sprintf(counterstring, TYPE, counter);
 

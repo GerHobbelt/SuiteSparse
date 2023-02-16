@@ -85,8 +85,11 @@ Int KLU_compute_path(
     Int n_variable_entries_new = n_variable_entries, n_variable_columns = 0;
 
     /* arrays for the offdiagonal entries. are empty if BTF is not used */
-    Int variable_offdiag_orig_entry[nzoff];
-    Int variable_offdiag_perm_entry[nzoff];
+    Int* variable_offdiag_orig_entry = (Int*)calloc(nzoff, sizeof(Int));
+    Int* variable_offdiag_perm_entry = (Int*)calloc(nzoff, sizeof(Int));
+    int* workpath = (int*)calloc(n, sizeof(int));
+    Int* path = (Int*)calloc(n, sizeof(Int)); 
+    Int* nvblocks = (Int*)calloc(nb, sizeof(Int));
 
     /* indices and temporary variables */
     int i, k, j, ent, block;
@@ -140,20 +143,9 @@ Int KLU_compute_path(
 
     /* block path can be allocated now since its size is known */
     Numeric->block_path = KLU_malloc(nb+1, sizeof(int), Common);
-    int workpath[n];
-    Int path[n];
-    Int nvblocks[nb];
-
-    /* initialize memory to zero */
-    for (i  = 0 ; i < n ; i++)
-    {
-        path[i] = 0;
-        workpath[i] = 0;
-    }
 
     for (i = 0; i < nb; i++)
     {
-        nvblocks[i] = 0;
         Numeric->block_path[i] = 0;
     }
 
@@ -588,6 +580,11 @@ EXIT:
     free(Rs);
     free(variable_columns_in_LU);
     free(variable_rows_in_LU);
+    free(variable_offdiag_orig_entry);
+    free(variable_offdiag_perm_entry);
+    free(workpath);
+    free(path);
+    free(nvblocks);
     return (TRUE);
 }
 
@@ -618,11 +615,9 @@ Int KLU_determine_start(
     double *Rs;
     int RET;
 
-    /* TODO: do I need to init those? */
-    int variable_offdiag_orig_entry[nzoff];
-    int variable_offdiag_perm_entry[nzoff];
-
-    int nvblocks[nb];
+    int *variable_offdiag_orig_entry = (int*)calloc(nzoff, sizeof(int));
+    int *variable_offdiag_perm_entry = (int*)calloc(nzoff, sizeof(int));
+    int *nvblocks = (int*)calloc(nb, sizeof(int));
 
     Numeric->pathLen = 0;
 
@@ -668,7 +663,6 @@ Int KLU_determine_start(
     for (i = 0; i < nb; i++)
     {
         Numeric->block_path[i] = n;
-        nvblocks[i] = 0;
     }
 
     Lp = (Int*) calloc(n + 1, sizeof(Int));
@@ -922,5 +916,9 @@ EXIT:
     free(R);
     free(Rs);
     free(variable_columns_in_LU);
+    free(variable_offdiag_orig_entry);
+    free(variable_offdiag_perm_entry);
+    free(nvblocks);
+
     return (TRUE);
 }
