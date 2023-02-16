@@ -1,4 +1,4 @@
-/* klu_simpler: a simple KLU demo; solution is x = (1,2,3,4,5)xxx */
+/* klu_path: a partial refactorization KLU demo, for testing */
 
 #include <stdio.h>
 #include <math.h>
@@ -42,22 +42,57 @@ int main (void)
     varying_rows[1] = 6;
 
     klu_defaults (&Common) ;
-    Symbolic = klu_analyze (n, Ap, Ai, &Common) ;
-    Numeric = klu_factor (Ap, Ai, Ax, Symbolic, &Common) ;
 
+    /* preprocess matrix */
+    Symbolic = klu_analyze_partial (n, Ap, Ai, varying_cols, varying_rows, n_variable_entries, KLU_AMD_FP, &Common) ;
+    if(!Symbolic)
+    {
+        goto FAIL;
+    }
+
+    /* numerically factor the matrix */
+    Numeric = klu_factor (Ap, Ai, Ax, Symbolic, &Common) ;
+    if(!Numeric)
+    {
+        goto FAIL;
+    }
+
+    /* compute factorization path */
     RET = klu_compute_path(Symbolic, Numeric, &Common, Ap, Ai, varying_cols, varying_rows, n_variable_entries);
+    if(RET != (1))
+    {
+        goto FAIL;
+    }
+    printf("------------------\n");
     printf("------------------\n");
     
+    /* partially refactor based on factorization path */
     RET = klu_partial_factorization_path(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
+    if(RET != (1))
+    {
+        goto FAIL;
+    }
 
+    /* solve rhs */
     klu_solve (Symbolic, Numeric, 10, 1, b, &Common) ;
-    printf("------------------\n");
     printf("Partial solution:\n");
     for (i = 0 ; i < n ; i++) printf ("xp [%d] = %g\n", i, b [i]) ;
     printf("------------------\n");
 
+    /* compute full refactorization */
     RET = klu_refactor(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
-    klu_solve (Symbolic, Numeric, 10, 1, c, &Common) ;
+    if(RET != (1))
+    {
+        goto FAIL;
+    }
+
+    /* solve rhs */
+    RET = klu_solve (Symbolic, Numeric, 10, 1, c, &Common) ;
+    if(RET != (1))
+    {
+        goto FAIL;
+    }
+
     printf("------------------\n");
     printf("Refactor solution:\n");
     for (i = 0 ; i < n ; i++) printf ("xr [%d] = %g\n", i, c [i]) ;
@@ -68,6 +103,7 @@ int main (void)
     for(i = 0; i < n ; i++) printf("xp[%d] - xr[%d] = %g\n", i, i, fabs(b[i]-c[i]));
     printf("------------------\n");
 
+    /* check for errors */
     max_error = fabs(b[0]-c[0]);
     for(i = 1 ; i < n ; i++)
     {
@@ -88,5 +124,12 @@ int main (void)
     free(varying_cols);
     free(varying_rows);
     return (0) ;
+
+FAIL:
+    klu_free_symbolic (&Symbolic, &Common) ;
+    klu_free_numeric (&Numeric, &Common) ;
+    free(varying_cols);
+    free(varying_rows);
+    return (1) ;
 }
 
