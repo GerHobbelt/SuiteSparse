@@ -393,7 +393,7 @@ set_target_properties (${_SuiteSparse_TARGETS} PROPERTIES
 feature_summary (WHAT ALL)
 
 add_executable(klu_path KLU/Demo/klu_path.c)
-target_link_libraries(klu_path PRIVATE ${KLU_LIBS})
+target_link_libraries(klu_path PRIVATE klu)
 
 enable_testing()
 
