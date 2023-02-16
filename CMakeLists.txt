@@ -256,6 +256,10 @@ set (SuiteSparse_COLAMD_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/SuiteSparse/COLA
 set (SuiteSparse_SUITESPARSECONFIG_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/SuiteSparse)
 set (SuiteSparse_KLU_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/SuiteSparse/KLU)
 
+if (HAVE_M)
+  target_link_libraries (suitesparseconfig INTERFACE m)
+endif (HAVE_M)
+
 target_include_directories (suitesparseconfig PUBLIC
   "$<INSTALL_INTERFACE:${SuiteSparse_SUITESPARSECONFIG_INCLUDE_DIR}>"
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/SuiteSparse_config>"
@@ -279,10 +283,10 @@ target_include_directories (klu PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/KLU/Include>"
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${SuiteSparse_KLU_INCLUDE_DIR}>")
 
-target_link_libraries (amd PUBLIC suitesparseconfig m)
-target_link_libraries (colamd PUBLIC suitesparseconfig m)
-target_link_libraries (btf PUBLIC suitesparseconfig m)
-target_link_libraries (klu PUBLIC suitesparseconfig m)
+target_link_libraries (amd PUBLIC suitesparseconfig)
+target_link_libraries (colamd PUBLIC suitesparseconfig)
+target_link_libraries (btf PUBLIC suitesparseconfig)
+target_link_libraries (klu PUBLIC suitesparseconfig)
 
 if (NOT HAVE_COMPLEX_H)
   #target_compile_definitions (SuiteSparse PUBLIC NCOMPLEX)
