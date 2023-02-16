@@ -279,10 +279,10 @@ target_include_directories (klu PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/KLU/Include>"
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${SuiteSparse_KLU_INCLUDE_DIR}>")
 
-target_link_libraries (amd PUBLIC suitesparseconfig)
-target_link_libraries (colamd PUBLIC suitesparseconfig)
-target_link_libraries (btf PUBLIC suitesparseconfig)
-target_link_libraries (klu PUBLIC suitesparseconfig)
+target_link_libraries (amd PUBLIC suitesparseconfig m)
+target_link_libraries (colamd PUBLIC suitesparseconfig m)
+target_link_libraries (btf PUBLIC suitesparseconfig m)
+target_link_libraries (klu PUBLIC suitesparseconfig m)
 
 if (NOT HAVE_COMPLEX_H)
   #target_compile_definitions (SuiteSparse PUBLIC NCOMPLEX)
@@ -351,7 +351,7 @@ install (TARGETS ${_SuiteSparse_TARGETS}
   LIBRARY DESTINATION ${SuiteSparse_CMake_LIBDIR} COMPONENT Development
   ARCHIVE DESTINATION ${SuiteSparse_CMake_LIBDIR} COMPONENT Development)
 
-set (SuiteSparse_NAMESPACE SuiteSparse::)
+#set (SuiteSparse_NAMESPACE SuiteSparse::)
 
 configure_package_config_file (suitesparse-config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/suitesparse-config.cmake
@@ -391,3 +391,13 @@ set_target_properties (${_SuiteSparse_TARGETS} PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
 
 feature_summary (WHAT ALL)
+
+add_executable(klu_path KLU/Demo/klu_path.c)
+target_link_libraries(klu_path PRIVATE ${KLU_LIBS})
+
+enable_testing()
+
+add_test(
+  NAME klu_path
+  COMMAND $<TARGET_FILE:klu_path>
+)

@@ -1,7 +1,10 @@
 /* klu_simpler: a simple KLU demo; solution is x = (1,2,3,4,5)xxx */
 
 #include <stdio.h>
-#include "klu.h"
+#include <math.h>
+#include <klu.h>
+
+#define TOLERANCE 1e-8
 
 int    n = 10 ;
 int    Ap [ ] = { 0,  2,  3,  6,  9, 12, 15, 20, 21, 27, 31 } ;
@@ -23,128 +26,29 @@ double Ax_new [ ] = {8.18413247, 0.31910091, 0.95960852, 7.9683539 , 3.27076739,
 double b [ ] = {1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0} ;
 double c [ ] = {1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0} ;
 
-void showLU(klu_symbolic* symb, klu_numeric* num, klu_common* com){
-    int n = symb->n;
-    int lnz = num->lnz;
-    int unz = num->unz;
-    int nzoff = num->nzoff;
-    int *Lp, *Li, *Up, *Ui, *Fi, *Fp;
-    double *Lx, *Ux, *Fx;
-    int *P, *Q, *R;
-    double* Rs;
-    int nb = symb->nblocks;
-    int i;
-    Lp = calloc(n+1, sizeof(int));
-    Up = calloc(n+1, sizeof(int));
-    Fp = calloc(n+1, sizeof(int));
-    Lx = calloc(lnz, sizeof(double));
-    Ux = calloc(unz, sizeof(double));
-    Fx = calloc(nzoff, sizeof(double));
-    Li = calloc(lnz, sizeof(int));
-    Ui = calloc(unz, sizeof(int));
-    Fi = calloc(nzoff, sizeof(int));
-    P = calloc(n, sizeof(int));
-    Q = calloc(n, sizeof(int));
-    Rs = calloc(n, sizeof(double));
-    R = calloc(nb+1, sizeof(int));
-
-    int RET = klu_extract(num, symb, Lp, Li, Lx, Up, Ui, Ux, Fp, Fi, Fx, P, Q, Rs, R, com);
-    printf("KLU extract: %d\n", RET);
-
-    printf("--------------\nU:");
-    printf(" unz: %d\n", unz);
-    for(i=0; i<unz; i++)
-        printf("%lf,\t", Ux[i]);
-    printf("\n");
-    for(i=0; i<unz; i++)
-        printf("%d,\t", Ui[i]);
-    printf("\n");
-    for(i=0; i<n+1; i++)
-        printf("%d,\t", Up[i]);
-    printf("\n");
-
-    printf("--------------\nL:");
-    printf(" lnz: %d\n", lnz);
-    for(i=0; i<lnz; i++)
-        printf("%lf,\t", Lx[i]);
-    printf("\n");
-    for(i=0; i<lnz; i++)
-        printf("%d,\t", Li[i]);
-    printf("\n");
-    for(i=0; i<n+1; i++)
-        printf("%d,\t", Lp[i]);
-    printf("\n");
-
-    printf("--------------\nF:");
-    printf(" nzoff: %d\n", nzoff);
-    for(i=0; i<nzoff; i++)
-        printf("%lf,\t", Fx[i]);
-    printf("\n");
-    for(i=0; i<nzoff; i++)
-        printf("%d,\t", Fi[i]);
-    printf("\n");
-    for(i=0; i<n+1; i++)
-        printf("%d,\t", Fp[i]);
-    printf("\n");
-
-    
-    printf("--------------\nRs:\n");
-    for(i=0; i<n; i++)
-        printf("%lf,\t", Rs[i]);
-    printf("\n");
-    printf("--------------\nP:\n");
-    for(i=0; i<n; i++)
-        printf("%d,\t", P[i]);
-    printf("\n");
-    printf("--------------\nQ:\n");
-    for(i=0; i<n; i++)
-        printf("%d,\t", Q[i]);
-    printf("\n");
-
-    printf("--------------\nR:");
-    printf(" nblocks: %d\n", symb->nblocks);
-    for(i=0; i<symb->nblocks+1; i++)
-        printf("%d\t", R[i]);
-    printf("\n");
-
-    free(Lp);
-    free(Up);
-    free(Fp);
-    free(Li);
-    free(Ui);
-    free(Fi);
-    free(Lx);
-    free(Ux);
-    free(Fx);
-    free(P);
-    free(Q);
-    free(Rs);
-    free(R);
-}
-
 int main (void)
 {
     klu_symbolic *Symbolic ;
     klu_numeric *Numeric ;
     klu_common Common ;
+    double max_error, error;
     int i , RET;
-    klu_defaults (&Common) ;
+    int n_variable_entries = 2;
+    int* varying_cols = (int*)calloc(n_variable_entries, sizeof(int));
+    int* varying_rows = (int*)calloc(n_variable_entries, sizeof(int));
+    varying_cols[0] = 3;
+    varying_cols[1] = 8;
+    varying_rows[0] = 4;
+    varying_rows[1] = 6;
 
+    klu_defaults (&Common) ;
     Symbolic = klu_analyze (n, Ap, Ai, &Common) ;
     Numeric = klu_factor (Ap, Ai, Ax, Symbolic, &Common) ;
 
-    int changeLen = 2;
-    int* changeVector = (int*) calloc(sizeof(int), changeLen);
-    changeVector[0] = 3;
-    changeVector[1] = 8;
-    RET = klu_compute_path(Symbolic, Numeric, &Common, changeVector, changeLen);
+    RET = klu_compute_path(Symbolic, Numeric, &Common, Ap, Ai, varying_cols, varying_rows, n_variable_entries);
     printf("------------------\n");
-    printf("Factorization path\n");
-    printlist(Numeric->path);
-    printf("------------------\n");
-    free(changeVector);
     
-    RET = klu_partial(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
+    RET = klu_partial_factorization_path(Ap, Ai, Ax_new, Symbolic, Numeric, &Common);
 
     klu_solve (Symbolic, Numeric, 10, 1, b, &Common) ;
     printf("------------------\n");
@@ -161,10 +65,28 @@ int main (void)
 
     printf("------------------\n");
     printf("Difference:\n");
-    for(i = 0; i < n ; i++) printf("xp[%d] - xr[%d] = %g\n", i, i, b[i]-c[i]);
+    for(i = 0; i < n ; i++) printf("xp[%d] - xr[%d] = %g\n", i, i, fabs(b[i]-c[i]));
     printf("------------------\n");
+
+    max_error = fabs(b[0]-c[0]);
+    for(i = 1 ; i < n ; i++)
+    {
+        error = fabs(b[i]-c[i]);
+        if(error > max_error)
+        {
+            max_error = error;
+        }
+    }
+
+    if(error > TOLERANCE)
+    {
+        return (1);
+    }
+
     klu_free_symbolic (&Symbolic, &Common) ;
     klu_free_numeric (&Numeric, &Common) ;
+    free(varying_cols);
+    free(varying_rows);
     return (0) ;
 }
 
