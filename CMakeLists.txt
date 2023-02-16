@@ -396,12 +396,18 @@ set_target_properties (${_SuiteSparse_TARGETS} PROPERTIES
 
 feature_summary (WHAT ALL)
 
-add_executable(klu_path KLU/Demo/klu_path.c)
-target_link_libraries(klu_path PRIVATE klu)
+add_executable(klu_test_partial_factorization_path KLU/Demo/klu_test_partial_factorization_path.c)
+target_link_libraries(klu_test_partial_factorization_path PRIVATE klu)
+add_executable(klu_test_partial_refactorization_restart KLU/Demo/klu_test_partial_refactorization_restart.c)
+target_link_libraries(klu_test_partial_refactorization_restart PRIVATE klu)
 
 enable_testing()
 
 add_test(
-  NAME klu_path
-  COMMAND $<TARGET_FILE:klu_path>
+  NAME klu_test_partial_factorization_path
+  COMMAND $<TARGET_FILE:klu_test_partial_factorization_path>
+)
+add_test(
+  NAME klu_test_partial_refactorization_restart
+  COMMAND $<TARGET_FILE:klu_test_partial_refactorization_restart>
 )

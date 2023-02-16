@@ -1,4 +1,4 @@
-/* klu_path: a partial refactorization KLU demo, for testing */
+/* klu_test_partial_factorization_path: a partial refactorization KLU demo, for testing */
 
 #include <stdio.h>
 #include <math.h>
