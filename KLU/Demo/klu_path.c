@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <klu.h>
+#include "klu.h"
 
 #define TOLERANCE 1e-8
 
