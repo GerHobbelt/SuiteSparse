@@ -92,13 +92,13 @@ Int KLU_compute_path(
     Int* nvblocks = (Int*)calloc(nb, sizeof(Int));
 
     /* indices and temporary variables */
-    int i, k, j, ent, block;
+    int i, k, j, block;
     int pivot;
-    int col, nextcol;
+    int col = 0, nextcol;
     int flag = 1;
 
     /* blocks */
-    Int k2, k1, nk;
+    Int k2 = n, k1 = 0, nk = 1;
 
     Int *Qi = (Int*)calloc(n, sizeof(Int));
     if(Qi == NULL)
@@ -622,11 +622,10 @@ Int KLU_determine_start(
     Numeric->pathLen = 0;
 
     /* indices and temporary variables */
-    int i, k, j, p, block;
+    int i, k, p, block;
     int pivot;
-    int col, nextcol, oldcol, pend, newrow, poff = 0, variable_offdiag_length = 0;
-    int n_variable_entries_new = n_variable_entries, n_variable_columns = 0;
-    int flag = 1;
+    int oldcol, pend, newrow, poff = 0, variable_offdiag_length = 0;
+    int n_variable_entries_new = n_variable_entries;
 
     /* blocks */
     Int k2, k1, nk;
@@ -640,12 +639,15 @@ Int KLU_determine_start(
     Int *variable_columns_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
     if(variable_columns_in_LU == NULL)
     {
+        free(Qi);
         return KLU_OUT_OF_MEMORY;
     }
 
     Int *variable_rows_in_LU = (Int*)calloc(n_variable_entries, sizeof(Int));
     if(variable_rows_in_LU == NULL)
     {
+        free(Qi);
+        free(variable_columns_in_LU);
         return KLU_OUT_OF_MEMORY;
     }
 
@@ -687,6 +689,9 @@ Int KLU_determine_start(
     /* check if extraction of LU matrix broke */
     if (RET != (TRUE))
     {
+        free(Qi);
+        free(variable_columns_in_LU);
+        free(variable_rows_in_LU);
         return (FALSE);
     }
 

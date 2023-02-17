@@ -31,7 +31,7 @@ int main (void)
     klu_symbolic *Symbolic ;
     klu_numeric *Numeric ;
     klu_common Common ;
-    double max_error, error;
+    double max_error, error = 0.0;
     int i , RET;
     int n_variable_entries = 2;
     int* varying_cols = (int*)calloc(n_variable_entries, sizeof(int));

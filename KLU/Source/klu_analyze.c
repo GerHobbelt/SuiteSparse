@@ -499,6 +499,10 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
 
         if (!ok)
         {
+            free(Varying);
+            free(varyingColumns_in_PAQ);
+            free(varyingRows_in_PAQ);
+            free(Qi);
             return (err) ;  /* ordering method failed */
         }
 
