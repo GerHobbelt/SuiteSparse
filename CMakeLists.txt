@@ -29,6 +29,12 @@ set (CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set (CMAKE_DEBUG_POSTFIX _debug)
+set (CMAKE_C_FLAGS "-Wall -pedantic")
+
+# set(CMAKE_C_CLANG_TIDY 
+#   clang-tidy;
+#   -header-filter=.;
+#   -checks=-*,clang-analyzer-*,bugprone-*,google-*,performance-*;)
 
 include (CheckCCompilerFlag)
 include (CheckFunctionExists)
