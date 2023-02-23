@@ -1,0 +1,34 @@
+name: package upload workflow
+# https://www.patriksvensson.se/2020/03/creating-release-artifacts-with-github-actions/
+# https://github.com/actions/download-artifact
+
+on:
+  push:
+    tags:
+      - 'release-v*'
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        node-version: [16.x]
+    runs-on: ubuntu-latest
+    name: A job to build the packages
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Compress
+      id: compression
+      shell: bash
+      run: |
+        tag=$(git describe --tags --abbrev=0)
+        release_name="SuiteSparse-$tag.tar.gz"
+        tar czvf ${release_name} KLU AMD BTF COLAMD SuiteSparse_config cmake CMakeLists.txt LICENSE.txt LICENSE.CMake suitesparse-config.cmake.in
+
+        echo ::set-output name=NAME::${release_name}
+    - name: Release
+      uses: actions/upload-artifact@v2
+      with:
+        name: bundle
+        path: ${{github.workspace}}/${{steps.compression.NAME}}
