@@ -9,9 +9,6 @@ on:
 
 jobs:
   package:
-    strategy:
-      matrix:
-        node-version: [16.x]
     runs-on: ubuntu-latest
     name: A job to build the packages
     steps:
