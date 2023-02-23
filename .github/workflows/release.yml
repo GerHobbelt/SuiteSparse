@@ -25,7 +25,9 @@ jobs:
 
         echo ::set-output name=NAME::${release_name}
     - name: Release
-      uses: actions/upload-artifact@v2
+      uses: softprops/action-gh-release@v1
       with:
         name: bundle
-        path: ${{github.workspace}}/${{steps.compression.NAME}}
+        files: "SuiteSparse-*.tar.gz"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
