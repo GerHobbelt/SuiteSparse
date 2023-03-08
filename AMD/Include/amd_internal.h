@@ -166,7 +166,7 @@
 #define AMD_info amd_l_info
 #define AMD_1 amd_l1
 #define AMD_2 amd_l2
-#define AMD_BRA amd_l_bra
+#define AMD_RA amd_l_ra
 #define AMD_NV amd_l_nv
 #define AMD_valid amd_l_valid
 #define AMD_aat amd_l_aat
@@ -192,7 +192,7 @@
 #define AMD_1 amd_1
 #define AMD_1_partial amd_1_partial
 #define AMD_2 amd_2
-#define AMD_BRA amd_bra
+#define AMD_RA amd_ra
 #define AMD_NV amd_nv
 #define AMD_valid amd_valid
 #define AMD_aat amd_aat
@@ -248,7 +248,7 @@ GLOBAL void AMD_1_partial
     double Info [ ],
     Int k1,
     Int varying [ ],
-    Int mode
+    Int orderingMethod
 ) ;
 
 GLOBAL void AMD_postorder

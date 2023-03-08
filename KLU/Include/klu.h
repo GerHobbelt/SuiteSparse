@@ -150,11 +150,6 @@ typedef struct          /* 64-bit version (otherwise same as above) */
 #define KLU_PIVOT_FAULT (-5)        /* pivot became too small during (partial) refactorization */
 #define KLU_PATH_INVALID (-6)       /* path is NULL. klu_compute_path wasn't called properly. */
 
-#define KLU_AMD_FP (0)
-#define KLU_AMD_NV_FP (1)
-#define KLU_AMD_BRA_RR (2)
-#define KLU_AMD_RR (3)
-
 #define KLU_MAX_METHOD (3)
 #define KLU_MIN_METHOD (0)
 
@@ -304,7 +299,7 @@ klu_symbolic *klu_analyze_partial
     int varyingColumns [ ],
     int varyingRows [ ],
     int n_varyingEntries,
-    int mode,
+    int orderingMethod,
     klu_common *Common
 ) ;
 

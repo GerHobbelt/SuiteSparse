@@ -194,7 +194,7 @@ GLOBAL void AMD_1_partial
     double Info [ ],	/* output array of size AMD_INFO */
     Int offset,
 	Int varying [ ],
-	Int mode
+	Int orderingMethod
 )
 {
     Int i, j, k, p, pfree, iwlen, pj, p1, p2, pj2, *Iw, *Pe, *Nv, *Head,
@@ -330,12 +330,17 @@ GLOBAL void AMD_1_partial
     /* --------------------------------------------------------------------- */
     /* order the matrix */
     /* --------------------------------------------------------------------- */
-    if(mode == BRA)
+    if(orderingMethod == AMD_ORDERING_RA)
     {
-        AMD_BRA (n, Pe, Iw, Len, iwlen, pfree, Nv, Pinv, P, Head, Elen, Degree, W, Control, Info, offset, varying) ;
+        AMD_RA (n, Pe, Iw, Len, iwlen, pfree, Nv, Pinv, P, Head, Elen, Degree, W, Control, Info, offset, varying) ;
     }
-    else
+    else if(orderingMethod == AMD_ORDERING_NV)
     {
         AMD_NV (n, Pe, Iw, Len, iwlen, pfree, Nv, Pinv, P, Head, Elen, Degree, W, Control, Info, offset, varying) ;
     }
+	else
+	{
+		// default to regular AMD
+		AMD_2 (n, Pe, Iw, Len, iwlen, pfree, Nv, Pinv, P, Head, Elen, Degree, W, Control, Info);
+	}
 }

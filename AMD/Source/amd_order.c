@@ -213,7 +213,7 @@ GLOBAL Int AMD_order_partial
     double Info [ ],
     Int offset,
     Int varying [ ],
-    Int mode
+    Int orderingMethod
 )
 {
     Int *Len, *S, nz, i, *Pinv, info, status, *Rp, *Ri, *Cp, *Ci, ok ;
@@ -371,7 +371,7 @@ GLOBAL Int AMD_order_partial
     /* order the matrix */
     /* --------------------------------------------------------------------- */
 
-    AMD_1_partial(n, Cp, Ci, P, Pinv, Len, slen, S, Control, Info, offset, varying, mode);
+    AMD_1_partial(n, Cp, Ci, P, Pinv, Len, slen, S, Control, Info, offset, varying, orderingMethod);
 
     /* --------------------------------------------------------------------- */
     /* free the workspace */

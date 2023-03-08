@@ -44,7 +44,7 @@ int main (void)
     klu_defaults (&Common) ;
 
     /* preprocess matrix */
-    Symbolic = klu_analyze_partial (n, Ap, Ai, varying_cols, varying_rows, n_variable_entries, KLU_AMD_FP, &Common) ;
+    Symbolic = klu_analyze_partial (n, Ap, Ai, varying_cols, varying_rows, n_variable_entries, AMD_ORDERING, &Common) ;
     if(!Symbolic)
     {
         goto FAIL;

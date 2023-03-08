@@ -74,24 +74,24 @@ int amd_order_partial          /* returns AMD_OK, AMD_OK_BUT_JUMBLED,
     const int Ai [ ],          /* row indices of A, of size nz = Ap [n] */
     int P [ ],                 /* output permutation, of size n */
     double Control [ ],        /* input Control settings, of size AMD_CONTROL */
-    double Info [ ],            /* output Info statistics, of size AMD_INFO */
+    double Info [ ],           /* output Info statistics, of size AMD_INFO */
     int offset,
-    int varying [ ],             /* indicating varying columns */
-    int mode                    /* indicates partial ordering mode */
+    int varying [ ],           /* indicating varying columns */
+    int orderingMethod         /* indicates partial ordering mode */
 ) ;
 
-SuiteSparse_long amd_l_order_partial          /* returns AMD_OK, AMD_OK_BUT_JUMBLED,
-                                * AMD_INVALID, or AMD_OUT_OF_MEMORY */
+SuiteSparse_long amd_l_order_partial        /* returns AMD_OK, AMD_OK_BUT_JUMBLED,
+                                             * AMD_INVALID, or AMD_OUT_OF_MEMORY */
 (
     SuiteSparse_long n,                     /* A is n-by-n.  n must be >= 0. */
     const SuiteSparse_long Ap [ ],          /* column pointers for A, of size n+1 */
     const SuiteSparse_long Ai [ ],          /* row indices of A, of size nz = Ap [n] */
     SuiteSparse_long P [ ],                 /* output permutation, of size n */
-    double Control [ ],        /* input Control settings, of size AMD_CONTROL */
-    double Info [ ],            /* output Info statistics, of size AMD_INFO */
-    SuiteSparse_long offset,
-    SuiteSparse_long varying [ ],             /* indicating varying columns */
-    SuiteSparse_long mode                    /* indicates partial ordering mode */
+    double Control [ ],                     /* input Control settings, of size AMD_CONTROL */
+    double Info [ ],                        /* output Info statistics, of size AMD_INFO */
+    SuiteSparse_long offset,                /* offset of BTF */
+    SuiteSparse_long varying [ ],           /* indicating varying columns */
+    SuiteSparse_long orderingMethod         /* indicates partial ordering mode */
 ) ;
 
 /* Input arguments (not modified):
@@ -301,7 +301,7 @@ void amd_l2
     double Info [ ]
 ) ;
 
-void amd_bra
+void amd_ra
 (
     int n,
     int Pe [ ],
@@ -322,7 +322,7 @@ void amd_bra
     int varying [ ]
 ) ;
 
-void amd_l_bra
+void amd_l_ra
 (
     SuiteSparse_long n,
     SuiteSparse_long Pe [ ],
@@ -437,8 +437,9 @@ void amd_l_control  (double Control [ ]) ;
 void amd_info       (double Info [ ]) ;
 void amd_l_info     (double Info [ ]) ;
 
-#define NV (1)
-#define BRA (2)
+#define AMD_ORDERING (0)
+#define AMD_ORDERING_NV (1)
+#define AMD_ORDERING_RA (2)
 
 #define AMD_CONTROL 5          /* size of Control array */
 #define AMD_INFO 20            /* size of Info array */

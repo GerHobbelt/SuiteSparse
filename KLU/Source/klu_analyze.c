@@ -276,7 +276,7 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
     Int varyingColumns [ ],
     Int varyingRows [ ],
     Int n_varyingEntries,
-    Int mode
+    Int orderingMethod
 )
 {
     double amd_Info [AMD_INFO], lnz, lnz1, flops, flops1 ;
@@ -465,10 +465,10 @@ static Int analyze_worker_partial    /* returns KLU_OK or < 0 if error */
             /* -------------------------------------------------------------- */
 
 
-            /* if required ordering is either AMD-BRA or AMD-NV, use partial ordering of AMD */
-            if(mode == BRA || mode == NV)
+            /* if required ordering is either AMD-RA or AMD-NV, use partial ordering of AMD */
+            if(orderingMethod == AMD_ORDERING_RA || orderingMethod == AMD_ORDERING_NV)
             {
-                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying, mode);
+                result = AMD_order_partial (nk, Cp, Ci, Pblk, NULL, amd_Info, k1, Varying, orderingMethod);
             }
             else
             {
@@ -759,7 +759,7 @@ static KLU_symbolic *order_and_analyze_partial  /* returns NULL if error, or a v
     Int varyingColumns [ ],
     Int varyingRows [ ],
     Int n_varyingEntries,
-    Int mode,
+    Int orderingMethod,
     /* --------------------- */
     KLU_common *Common
 )
@@ -895,7 +895,7 @@ static KLU_symbolic *order_and_analyze_partial  /* returns NULL if error, or a v
     {
         PRINTF (("calling analyze_worker\n")) ;
         Common->status = analyze_worker_partial (n, Ap, Ai, nblocks, Pbtf, Qbtf, R,
-            ordering, P, Q, Lnz, Pblk, Cp, Ci, Cilen, Pinv, Symbolic, Common, varyingColumns, varyingRows, n_varyingEntries, mode) ;
+            ordering, P, Q, Lnz, Pblk, Cp, Ci, Cilen, Pinv, Symbolic, Common, varyingColumns, varyingRows, n_varyingEntries, orderingMethod) ;
         PRINTF (("analyze_worker done\n")) ;
     }
 
@@ -979,7 +979,7 @@ KLU_symbolic *KLU_analyze_partial       /* returns NULL if error, or a valid
     Int varyingColumns [ ],
     Int varyingRows [ ],
     Int n_varyingEntries,
-    Int mode,
+    Int orderingMethod,
     /* -------------------- */
     KLU_common *Common
 )
@@ -1000,5 +1000,5 @@ KLU_symbolic *KLU_analyze_partial       /* returns NULL if error, or a valid
     /* order and analyze */
     /* ---------------------------------------------------------------------- */
 
-    return (order_and_analyze_partial (n, Ap, Ai, varyingColumns, varyingRows, n_varyingEntries, mode, Common)) ;
+    return (order_and_analyze_partial (n, Ap, Ai, varyingColumns, varyingRows, n_varyingEntries, orderingMethod, Common)) ;
 }
