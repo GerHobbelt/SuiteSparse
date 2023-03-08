@@ -27,7 +27,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        name: bundle
+        name: SuiteSparse-release
         files: "SuiteSparse-*.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
