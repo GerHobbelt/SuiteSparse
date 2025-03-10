@@ -294,8 +294,8 @@ GB_JIT_CUDA_KERNEL_SELECT_SPARSE_PROTO (GB_jit_kernel)
     }
 
     // allocate workspace
-    W_2 = GB_MALLOC_MEMORY (cnz + 1, sizeof (int64_t), &W_2_size) ;
-    W_3 = GB_MALLOC_MEMORY (cnz + 1, sizeof (int64_t), &W_3_size) ;
+    W_2 = (int64_t *) GB_MALLOC_MEMORY (cnz + 1, sizeof (int64_t), &W_2_size) ;
+    W_3 = (int64_t *) GB_MALLOC_MEMORY (cnz + 1, sizeof (int64_t), &W_3_size) ;
     if (W_2 == NULL || W_3 == NULL)
     {
         // out of memory
@@ -353,8 +353,10 @@ GB_JIT_CUDA_KERNEL_SELECT_SPARSE_PROTO (GB_jit_kernel)
     C->nvec = cnvec ;
     C->nvec_nonempty = cnvec ;  // FIXME
     C->nvals = cnz ;
-    C->p = GB_MALLOC_MEMORY (C->plen + 1, sizeof (GB_Cp_TYPE), &(C->p_size)) ;
-    C->h = GB_MALLOC_MEMORY (C->plen, sizeof (GB_Cj_TYPE), &(C->h_size)) ;
+    C->p = (GB_Cp_TYPE *) GB_MALLOC_MEMORY (C->plen + 1, sizeof (GB_Cp_TYPE),
+        &(C->p_size)) ;
+    C->h = (GB_Cj_TYPE *) GB_MALLOC_MEMORY (C->plen, sizeof (GB_Cj_TYPE),
+        &(C->h_size)) ;
     if (C->p == NULL || C->h == NULL)
     {
         // The contents of C will be freed with GB_phybix_free()
