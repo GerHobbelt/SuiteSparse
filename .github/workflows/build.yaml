@@ -145,7 +145,7 @@ jobs:
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
-            cmake -DCMAKE_BUILD_TYPE=${{ matrix.compiler == 'clang' && 'Debug' || 'Release' }} \
+            cmake -DCMAKE_BUILD_TYPE='Release' \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
                   -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \

@@ -2,7 +2,7 @@
 # SuiteSparse/Example/CMakeLists.txt:  cmake for Example user library, "my"
 #-------------------------------------------------------------------------------
 
-# Copyright (c) 2022-2023, Timothy A. Davis, All Rights Reserved.
+# Copyright (c) 2022-2025, Timothy A. Davis, All Rights Reserved.
 # SPDX-License-Identifier: BSD-3-clause
 
 # See the section below, "help with building this Example ..." for how to tell
@@ -53,7 +53,7 @@ message ( STATUS "MY prefix path:    ${CMAKE_PREFIX_PATH}" )
 #-------------------------------------------------------------------------------
 
 # cmake inserts the date and version number into Include/my.h:
-set ( MY_DATE "Dec 20, 2024" )
+set ( MY_DATE "Feb 20, 2025" )
 set ( MY_VERSION_MAJOR 1 )
 set ( MY_VERSION_MINOR 8 )
 set ( MY_VERSION_PATCH 4 )
@@ -92,7 +92,7 @@ find_package ( AMD 3.3.3 REQUIRED )
 find_package ( BTF 2.3.2 REQUIRED )
 find_package ( CAMD 3.3.3 REQUIRED )
 find_package ( CCOLAMD 3.3.4 REQUIRED )
-find_package ( CHOLMOD 5.3.0 REQUIRED )
+find_package ( CHOLMOD 5.3.1 REQUIRED )
 find_package ( COLAMD 3.3.4 REQUIRED )
 find_package ( CXSparse 4.4.1 REQUIRED )
 find_package ( GraphBLAS 9.4.5 )

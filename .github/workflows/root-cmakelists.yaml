@@ -139,7 +139,7 @@ jobs:
       - name: configure
         run: |
           mkdir -p ${GITHUB_WORKSPACE}/build && cd ${GITHUB_WORKSPACE}/build
-          cmake -DCMAKE_BUILD_TYPE=${{ matrix.compiler == 'clang' && 'Debug' || 'Release' }} \
+          cmake -DCMAKE_BUILD_TYPE='Release' \
                 -DCMAKE_INSTALL_PREFIX=".." \
                 -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
                 -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \

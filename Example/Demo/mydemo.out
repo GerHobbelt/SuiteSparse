@@ -1,17 +1,17 @@
 My demo
-Date from #include 'my.h':  Dec 20, 2024
-Date from compiled library: Dec 20, 2024
+Date from #include 'my.h':  Feb 20, 2025
+Date from compiled library: Feb 20, 2025
 version from #include 'my.h.': 1.8.4
 version from compiled library: 1.8.4
 
 ------------------------------------------------------------
-MY: v1.8.4 (Dec 20, 2024)
+MY: v1.8.4 (Feb 20, 2025)
 MY: v1.8.4 (in library)
 MY version code: 1008004
-MY date: Dec 20, 2024
+MY date: Feb 20, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.9.0 (Dec 20, 2024)
+SuiteSparse_config: v7.9.0 (Feb 20, 2025)
 SuiteSparse_config: v7.9.0 (in library)
 SuiteSparse_config version code: 7009000
 
@@ -67,19 +67,19 @@ P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-CHOLMOD: v5.3.0 (June 20, 2024)
-CHOLMOD: v5.3.0 (in library)
-CHOLMOD version code: 5003000
+CHOLMOD: v5.3.1 (Feb 20, 2025)
+CHOLMOD: v5.3.1 (in library)
+CHOLMOD version code: 5003001
 
 ------------------------------------------------------------
-GraphBLAS: v9.4.3 (Dec 20, 2024)
-GraphBLAS: v9.4.3 (in library)
-GraphBLAS version code: 9004003
+GraphBLAS: v9.4.5 (Feb 20, 2025)
+GraphBLAS: v9.4.5 (in library)
+GraphBLAS version code: 9004005
 
 ------------------------------------------------------------
-LAGraph: v1.1.4 (Aug 20, 2024)
-LAGraph: v1.1.4 (in library)
-LAGraph version code: 1001004
+LAGraph: v1.1.5 (Feb 20, 2025)
+LAGraph: v1.1.5 (in library)
+LAGraph version code: 1001005
 
 ------------------------------------------------------------
 KLU: v2.3.5 (Oct 10, 2024)
@@ -113,9 +113,9 @@ iua                        2             2             4             0
  11 21 12 22
 
 ------------------------------------------------------------
-SPEX: v3.2.1 (Aug 20, 2024)
-SPEX: v3.2.1 (in library)
-SPEX version code: 3002001
+SPEX: v3.2.3 (Feb 20, 2025)
+SPEX: v3.2.3 (in library)
+SPEX version code: 3002003
 
 ------------------------------------------------------------
 SuiteSparseQR: v4.3.4 (June 20, 2024)
@@ -140,11 +140,11 @@ UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 UMFPACK License: SPDX-License-Identifier: GPL-2.0+
    UMFPACK is available under alternate licenses,
    contact T. Davis for details.
-BLAS used: Intel MKL 64lp BLAS (32-bit integers)
+BLAS used: Apple Accelerate Framework BLAS (32-bit integers)
 BLAS integer size: 4 bytes
 x [0] = 36.4
 x [1] = -32.7
-error: 5.68434e-14
+error: 2.84217e-14
 
 UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 
@@ -160,7 +160,7 @@ UMFPACK V6.3.5 (Sept 23, 2024): OK
 UMFPACK V6.3.5 (Sept 23, 2024), Info:
     matrix entry defined as:          double
     Int (generic integer) defined as: int64_t
-    BLAS library used: Intel MKL 64lp BLAS (32-bit integers).  size of BLAS integer: 4
+    BLAS library used: Apple Accelerate Framework BLAS (32-bit integers).  size of BLAS integer: 4
     MATLAB: no.
     CPU timer: omp_get_wtime
     number of rows in matrix A:       2
@@ -243,7 +243,7 @@ UMFPACK V6.3.5 (Sept 23, 2024), Info:
     solve flops:                                   4.20000e+01
     iterative refinement steps taken:              0
     iterative refinement steps attempted:          0
-    sparse backward error omega1:                  7.44e-17
+    sparse backward error omega1:                  0.00e+00
     sparse backward error omega2:                  0.00e+00
     solve wall clock time (sec):                   0.00
 
