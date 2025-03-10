@@ -1,4 +1,29 @@
-Mar 1, 2025: version 7.10.0
+Mar 6, 2025: version 7.10.1
+
+    * GraphBLAS v10.0.1: bug fix, when using user-defined monoids in GrB_mxm
+    * Package versions in this release: (* denotes a new version)
+        SuiteSparse_config 7.10.1   *
+        AMD 3.3.3
+        BTF 2.3.2
+        CAMD 3.3.3
+        CCOLAMD 3.3.4
+        CHOLMOD 5.3.1
+        COLAMD 3.3.4
+        CSparse 4.3.2
+        CXSparse 4.4.1
+        Example 1.8.6               *
+        GraphBLAS 10.0.1            *
+        KLU 2.3.5
+        LDL 3.3.2
+        LAGraph 1.1.5
+        SuiteSparse_Mongoose 3.3.4
+        ParU 1.0.0
+        RBio 4.3.4
+        SPEX 3.2.3
+        SPQR 4.3.4
+        UMFPACK 6.3.5
+
+Mar 3, 2025: version 7.10.0
 
     * GraphBLAS v10.0.0: major upgrade, now supporting 32-bit/64-bit integer
         indices.  Note the SO version change from 9 to 10.  GraphBLAS v10 is

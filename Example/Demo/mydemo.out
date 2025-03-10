@@ -1,19 +1,19 @@
 My demo
-Date from #include 'my.h':  Feb 20, 2025
-Date from compiled library: Feb 20, 2025
-version from #include 'my.h.': 1.8.4
-version from compiled library: 1.8.4
+Date from #include 'my.h':  Mar 6, 2025
+Date from compiled library: Mar 6, 2025
+version from #include 'my.h.': 1.8.6
+version from compiled library: 1.8.6
 
 ------------------------------------------------------------
-MY: v1.8.4 (Feb 20, 2025)
-MY: v1.8.4 (in library)
-MY version code: 1008004
-MY date: Feb 20, 2025
+MY: v1.8.6 (Mar 6, 2025)
+MY: v1.8.6 (in library)
+MY version code: 1008006
+MY date: Mar 6, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.9.0 (Feb 20, 2025)
-SuiteSparse_config: v7.9.0 (in library)
-SuiteSparse_config version code: 7009000
+SuiteSparse_config: v7.10.1 (Mar 6, 2025)
+SuiteSparse_config: v7.10.1 (in library)
+SuiteSparse_config version code: 7010001
 
 ------------------------------------------------------------
 CXSparse: v4.4.1 (June 20, 2024)
@@ -72,9 +72,9 @@ CHOLMOD: v5.3.1 (in library)
 CHOLMOD version code: 5003001
 
 ------------------------------------------------------------
-GraphBLAS: v9.4.5 (Feb 20, 2025)
-GraphBLAS: v9.4.5 (in library)
-GraphBLAS version code: 9004005
+GraphBLAS: v10.0.1 (Mar 6, 2025)
+GraphBLAS: v10.0.1 (in library)
+GraphBLAS version code: 10000001
 
 ------------------------------------------------------------
 LAGraph: v1.1.5 (Feb 20, 2025)
@@ -140,11 +140,11 @@ UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 UMFPACK License: SPDX-License-Identifier: GPL-2.0+
    UMFPACK is available under alternate licenses,
    contact T. Davis for details.
-BLAS used: Apple Accelerate Framework BLAS (32-bit integers)
+BLAS used: Other BLAS (32-bit integers)
 BLAS integer size: 4 bytes
 x [0] = 36.4
 x [1] = -32.7
-error: 2.84217e-14
+error: 5.68434e-14
 
 UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 
@@ -160,7 +160,7 @@ UMFPACK V6.3.5 (Sept 23, 2024): OK
 UMFPACK V6.3.5 (Sept 23, 2024), Info:
     matrix entry defined as:          double
     Int (generic integer) defined as: int64_t
-    BLAS library used: Apple Accelerate Framework BLAS (32-bit integers).  size of BLAS integer: 4
+    BLAS library used: Other BLAS (32-bit integers).  size of BLAS integer: 4
     MATLAB: no.
     CPU timer: omp_get_wtime
     number of rows in matrix A:       2
@@ -243,7 +243,7 @@ UMFPACK V6.3.5 (Sept 23, 2024), Info:
     solve flops:                                   4.20000e+01
     iterative refinement steps taken:              0
     iterative refinement steps attempted:          0
-    sparse backward error omega1:                  0.00e+00
+    sparse backward error omega1:                  7.44e-17
     sparse backward error omega2:                  0.00e+00
     solve wall clock time (sec):                   0.00
 
