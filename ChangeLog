@@ -1,3 +1,32 @@
+Feb 20, 2025: version 7.9.0
+
+    * GraphBLAS v9.4.5: Added the GxB_IndexBinaryOp.  Added new JIT kernels.
+        Disabled more FactoryKernels to reduce compiled library size.
+        Added workaround for AppleClang compiler bug.
+    * LAGraph v1.1.5, SPEX v3.2.3, CHOLMOD 5.3.1: minor updates to github CI;
+        typos, reduce pedantic compiler warnings.
+    * Package versions in this release: (* denotes a new version)
+        SuiteSparse_config 7.9.0    *
+        AMD 3.3.3
+        BTF 2.3.2
+        CAMD 3.3.3
+        CCOLAMD 3.3.4
+        CHOLMOD 5.3.1               *
+        COLAMD 3.3.4
+        CSparse 4.3.2
+        CXSparse 4.4.1
+        Example 1.8.4               *
+        GraphBLAS 9.4.5             *
+        KLU 2.3.5
+        LDL 3.3.2
+        LAGraph 1.1.5               *
+        SuiteSparse_Mongoose 3.3.4
+        ParU 1.0.0
+        RBio 4.3.4
+        SPEX 3.2.3                  *
+        SPQR 4.3.4
+        UMFPACK 6.3.5
+
 Oct 10, 2024: version 7.8.3
 
     * ParU 1.0.0: first stable release. No change since last version

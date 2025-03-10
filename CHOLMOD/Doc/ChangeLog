@@ -1,3 +1,7 @@
+Feb 20, 2025: version 5.3.1
+
+    * minor changes: removing compiler warnings
+
 June 20, 2024: version 5.3.0
 
     * added cholmod_query: to deterimine at run time which modules

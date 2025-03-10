@@ -35,14 +35,12 @@ jobs:
       matrix:
         # For available CPU architectures, see:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
-        arch: [x86, aarch64, armv7, ppc64le, s390x, riscv64]
+        arch: [x86, armv7, ppc64le, s390x, riscv64]
         include:
           - arch: x86
             ccache-max: 64M
             extra-build-libs: ":GraphBLAS:LAGraph"
             extra-check-libs: ":GraphBLAS:LAGraph"
-          - arch: aarch64
-            ccache-max: 28M
           - arch: armv7
             ccache-max: 25M
           - arch: ppc64le
