@@ -127,7 +127,19 @@ endif ( )
 # find the BLAS
 #-------------------------------------------------------------------------------
 
-include ( SuiteSparseBLAS )
+option ( SUITESPARSE_REQUIRE_BLAS "Must not be set to OFF if any SuiteSparse project requires BLAS functions" ON )
+
+if ( SUITESPARSE_REQUIRE_BLAS )
+    include ( SuiteSparseBLAS )
+else ( )
+    # It doesn't actually matter which Fortran integer size is selected here.
+    # But we might as well respect any user flags.
+    if ( SUITESPARSE_USE_64BIT_BLAS )
+        include ( SuiteSparseBLAS64 )
+    else ( )
+        include ( SuiteSparseBLAS32 )
+    endif ( )
+endif ( )
 
 #-------------------------------------------------------------------------------
 # configure files

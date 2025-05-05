@@ -64,6 +64,7 @@ endforeach ( )
 
 # CHOLMOD options affecting dependencies
 option ( CHOLMOD_CAMD "ON (default): use CAMD/CCOLAMD.  OFF: do not use CAMD/CCOLAMD" ON )
+option ( CHOLMOD_SUPERNODAL "ON (default): use Supernodal Module.  OFF: do not use Supernodal Module" ON )
 
 # KLU options affecting dependencies
 option ( KLU_USE_CHOLMOD "ON (default): use CHOLMOD in KLU.  OFF: do not use CHOLMOD in KLU" ON )
@@ -265,6 +266,19 @@ if ( CMAKE_VERSION VERSION_LESS 3.24 )
     endif ( )
 endif ( )
 
+
+# BLAS is only required for some sub-projects
+option ( SUITESPARSE_REQUIRE_BLAS "Must not be set to OFF if any SuiteSparse project requires BLAS functions" ON )
+
+if ( ("cholmod" IN_LIST SUITESPARSE_ENABLE_PROJECTS AND CHOLMOD_SUPERNODAL)
+        OR "paru" IN_LIST SUITESPARSE_ENABLE_PROJECTS
+        OR "spqr" IN_LIST SUITESPARSE_ENABLE_PROJECTS
+        OR "umfpack" IN_LIST SUITESPARSE_ENABLE_PROJECTS )
+    if ( NOT SUITESPARSE_REQUIRE_BLAS )
+        message ( FATAL_ERROR "SUITESPARSE_REQUIRE_BLAS must not be set to OFF when building CHOLMOD with SUPERNODAL, ParU, SPQR, or UMFPACK." )
+    endif ( )
+
+endif ( )
 
 #-------------------------------------------------------------------------------
 # include selected projects
