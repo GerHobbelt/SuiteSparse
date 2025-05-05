@@ -1,19 +1,19 @@
 My demo
-Date from #include 'my.h':  Mar 6, 2025
-Date from compiled library: Mar 6, 2025
-version from #include 'my.h.': 1.8.6
-version from compiled library: 1.8.6
+Date from #include 'my.h':  Apr 10, 2025
+Date from compiled library: Apr 10, 2025
+version from #include 'my.h.': 1.8.7
+version from compiled library: 1.8.7
 
 ------------------------------------------------------------
-MY: v1.8.6 (Mar 6, 2025)
-MY: v1.8.6 (in library)
-MY version code: 1008006
-MY date: Mar 6, 2025
+MY: v1.8.7 (Apr 10, 2025)
+MY: v1.8.7 (in library)
+MY version code: 1008007
+MY date: Apr 10, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.10.1 (Mar 6, 2025)
-SuiteSparse_config: v7.10.1 (in library)
-SuiteSparse_config version code: 7010001
+SuiteSparse_config: v7.10.2 (Apr 10, 2025)
+SuiteSparse_config: v7.10.2 (in library)
+SuiteSparse_config version code: 7010002
 
 ------------------------------------------------------------
 CXSparse: v4.4.1 (June 20, 2024)
@@ -67,14 +67,14 @@ P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-CHOLMOD: v5.3.1 (Feb 20, 2025)
-CHOLMOD: v5.3.1 (in library)
-CHOLMOD version code: 5003001
+CHOLMOD: v5.3.2 (Apr 10, 2025)
+CHOLMOD: v5.3.2 (in library)
+CHOLMOD version code: 5003002
 
 ------------------------------------------------------------
-GraphBLAS: v10.0.1 (Mar 6, 2025)
-GraphBLAS: v10.0.1 (in library)
-GraphBLAS version code: 10000001
+GraphBLAS: v10.0.3 (Apr 10, 2025)
+GraphBLAS: v10.0.3 (in library)
+GraphBLAS version code: 10000003
 
 ------------------------------------------------------------
 LAGraph: v1.1.5 (Feb 20, 2025)
@@ -140,7 +140,7 @@ UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 UMFPACK License: SPDX-License-Identifier: GPL-2.0+
    UMFPACK is available under alternate licenses,
    contact T. Davis for details.
-BLAS used: Other BLAS (32-bit integers)
+BLAS used: Intel MKL 64lp BLAS (32-bit integers)
 BLAS integer size: 4 bytes
 x [0] = 36.4
 x [1] = -32.7
@@ -160,7 +160,7 @@ UMFPACK V6.3.5 (Sept 23, 2024): OK
 UMFPACK V6.3.5 (Sept 23, 2024), Info:
     matrix entry defined as:          double
     Int (generic integer) defined as: int64_t
-    BLAS library used: Other BLAS (32-bit integers).  size of BLAS integer: 4
+    BLAS library used: Intel MKL 64lp BLAS (32-bit integers).  size of BLAS integer: 4
     MATLAB: no.
     CPU timer: omp_get_wtime
     number of rows in matrix A:       2

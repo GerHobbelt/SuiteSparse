@@ -23,7 +23,7 @@ jobs:
     # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
     runs-on: windows-latest
 
-    name: msvc (${{ matrix.cc }} ${{ matrix.openmp }} OpenMP, ${{ matrix.link }})
+    name: msvc (${{ matrix.cc }} ${{ matrix.openmp }} OpenMP ${{ matrix.cuda }} CUDA, ${{ matrix.link }})
 
     defaults:
       run:
@@ -36,23 +36,38 @@ jobs:
 
       matrix:
         openmp: [with]
+        cuda: [without]
         link: [both]
         cc: [cl]
         cxx: [cl]
         include:
           - openmp: with
+            cuda: with
+            link: both
+            cc: cl
+            cxx: cl
+          - openmp: with
+            cuda: with
+            link: static
+            cc: cl
+            cxx: cl
+          - openmp: with
+            cuda: without
             link: both
             cc: cl
             cxx: cl
           - openmp: without
+            cuda: without
             link: both
             cc: cl
             cxx: cl
           - openmp: with
+            cuda: without
             link: both
             cc: clang-cl
             cxx: clang-cl
           - openmp: with
+            cuda: without
             link: both
             cc: clang
             cxx: clang++
