@@ -1,19 +1,19 @@
 My demo
-Date from #include 'my.h':  Apr 10, 2025
-Date from compiled library: Apr 10, 2025
-version from #include 'my.h.': 1.8.7
-version from compiled library: 1.8.7
+Date from #include 'my.h':  May 5, 2025
+Date from compiled library: May 5, 2025
+version from #include 'my.h.': 1.8.8
+version from compiled library: 1.8.8
 
 ------------------------------------------------------------
-MY: v1.8.7 (Apr 10, 2025)
-MY: v1.8.7 (in library)
-MY version code: 1008007
-MY date: Apr 10, 2025
+MY: v1.8.8 (May 5, 2025)
+MY: v1.8.8 (in library)
+MY version code: 1008008
+MY date: May 5, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.10.2 (Apr 10, 2025)
-SuiteSparse_config: v7.10.2 (in library)
-SuiteSparse_config version code: 7010002
+SuiteSparse_config: v7.10.3 (May 5, 2025)
+SuiteSparse_config: v7.10.3 (in library)
+SuiteSparse_config version code: 7010003
 
 ------------------------------------------------------------
 CXSparse: v4.4.1 (June 20, 2024)
@@ -46,9 +46,9 @@ Q [1] = 1
 nblocks 1
 
 ------------------------------------------------------------
-CAMD: v3.3.3 (June 20, 2024)
-CAMD: v3.3.3 (in library)
-CAMD version code: 3003003
+CAMD: v3.3.4 (May 5, 2025)
+CAMD: v3.3.4 (in library)
+CAMD version code: 3003004
 P [0] = 0
 P [1] = 1
 
@@ -67,14 +67,14 @@ P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-CHOLMOD: v5.3.2 (Apr 10, 2025)
-CHOLMOD: v5.3.2 (in library)
-CHOLMOD version code: 5003002
+CHOLMOD: v5.3.3 (May 5, 2025)
+CHOLMOD: v5.3.3 (in library)
+CHOLMOD version code: 5003003
 
 ------------------------------------------------------------
-GraphBLAS: v10.0.3 (Apr 10, 2025)
-GraphBLAS: v10.0.3 (in library)
-GraphBLAS version code: 10000003
+GraphBLAS: v10.0.5 (May 5, 2025)
+GraphBLAS: v10.0.5 (in library)
+GraphBLAS version code: 10000005
 
 ------------------------------------------------------------
 LAGraph: v1.1.5 (Feb 20, 2025)

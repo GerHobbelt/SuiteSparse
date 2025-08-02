@@ -1,3 +1,33 @@
+May 5, 2025: version 7.10.3
+
+    * SuiteSparse_config: do not print info about the BLAS if no BLAS used,
+        in the cmake build script.  Added /usr/local to the build and install
+        paths on the Mac.
+    * GraphBLAS: cmake revisions and 2 bug fixes
+    * revised CI rules on github
+    * CAMD: minor typo in Makefile, for demos
+    * Package versions in this release: (* denotes a new version)
+        SuiteSparse_config 7.10.3   *
+        AMD 3.3.3
+        BTF 2.3.2
+        CAMD 3.3.4                  *
+        CCOLAMD 3.3.4
+        CHOLMOD 5.3.2
+        COLAMD 3.3.4
+        CSparse 4.3.2
+        CXSparse 4.4.1
+        Example 1.8.8               *
+        GraphBLAS 10.0.5            *
+        KLU 2.3.5
+        LDL 3.3.2
+        LAGraph 1.1.5
+        SuiteSparse_Mongoose 3.3.4
+        ParU 1.0.0
+        RBio 4.3.4
+        SPEX 3.2.3
+        SPQR 4.3.4
+        UMFPACK 6.3.5
+
 Apr 10, 2025: version 7.10.2
 
     * GraphBLAS v10.0.3: performance of setElement.  Update to xxHash and

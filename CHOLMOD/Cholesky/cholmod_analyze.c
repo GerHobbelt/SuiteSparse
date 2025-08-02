@@ -548,6 +548,7 @@ cholmod_factor *CHOLMOD(analyze_p2)
     //--------------------------------------------------------------------------
 
     // turn off error handling [
+    int orig_try_catch = Common->try_catch;
     Common->try_catch = TRUE ;
 
     for (method = 0 ; method <= nmethods ; method++)
@@ -780,8 +781,8 @@ cholmod_factor *CHOLMOD(analyze_p2)
         }
     }
 
-    // turn error printing back on ]
-    Common->try_catch = FALSE ;
+    // turn error printing back to previous value ]
+    Common->try_catch = orig_try_catch ;
 
     //--------------------------------------------------------------------------
     // return if no ordering method succeeded

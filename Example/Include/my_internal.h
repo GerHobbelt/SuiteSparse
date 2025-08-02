@@ -29,8 +29,8 @@
 #endif
 
 #include "camd.h"
-#if !defined (CAMD__VERSION) || CAMD__VERSION < SUITESPARSE__VERCODE(3,3,3)
-#error "This library requires CAMD 3.3.3 or later"
+#if !defined (CAMD__VERSION) || CAMD__VERSION < SUITESPARSE__VERCODE(3,3,4)
+#error "This library requires CAMD 3.3.4 or later"
 #endif
 
 #include "ccolamd.h"
@@ -39,8 +39,8 @@
 #endif
 
 #include "cholmod.h"
-#if !defined (CHOLMOD__VERSION) || CHOLMOD__VERSION < SUITESPARSE__VERCODE(5,3,2)
-#error "This library requires CHOLMOD 5.3.2 or later"
+#if !defined (CHOLMOD__VERSION) || CHOLMOD__VERSION < SUITESPARSE__VERCODE(5,3,3)
+#error "This library requires CHOLMOD 5.3.3 or later"
 #endif
 
 #include "colamd.h"
@@ -56,8 +56,8 @@
 #if ! defined (NO_GRAPHBLAS)
     #include "GraphBLAS.h"
     #if !defined ( GxB_SUITESPARSE_GRAPHBLAS ) || \
-        GxB_IMPLEMENTATION < GxB_VERSION (10,0,3)
-    #error "This library requires SuiteSparse:GraphBLAS 10.0.3 or later"
+        GxB_IMPLEMENTATION < GxB_VERSION (10,0,5)
+    #error "This library requires SuiteSparse:GraphBLAS 10.0.5 or later"
     #endif
 #endif
 
