@@ -1,25 +1,25 @@
 My demo
-Date from #include 'my.h':  May 5, 2025
-Date from compiled library: May 5, 2025
-version from #include 'my.h.': 1.8.8
-version from compiled library: 1.8.8
+Date from #include 'my.h':  June 1, 2025
+Date from compiled library: June 1, 2025
+version from #include 'my.h.': 1.8.9
+version from compiled library: 1.8.9
 
 ------------------------------------------------------------
-MY: v1.8.8 (May 5, 2025)
-MY: v1.8.8 (in library)
-MY version code: 1008008
-MY date: May 5, 2025
+MY: v1.8.9 (June 1, 2025)
+MY: v1.8.9 (in library)
+MY version code: 1008009
+MY date: June 1, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.10.3 (May 5, 2025)
-SuiteSparse_config: v7.10.3 (in library)
-SuiteSparse_config version code: 7010003
+SuiteSparse_config: v7.11.0 (June 1, 2025)
+SuiteSparse_config: v7.11.0 (in library)
+SuiteSparse_config version code: 7011000
 
 ------------------------------------------------------------
-CXSparse: v4.4.1 (June 20, 2024)
-CXSparse: v4.4.1 (in library)
-CXSparse version code: 4004001
-CXSparse Version 4.4.1, June 20, 2024.  Copyright (c) Timothy A. Davis, 2006-2024
+CXSparse: v4.4.2 (June 1, 2025)
+CXSparse: v4.4.2 (in library)
+CXSparse version code: 4004002
+CXSparse Version 4.4.2, June 1, 2025.  Copyright (c) Timothy A. Davis, 2006-2024
 2-by-2, nzmax: 4 nnz: 4, 1-norm: 34
     col 0 : locations 0 to 1
       0 : 11
@@ -29,16 +29,16 @@ CXSparse Version 4.4.1, June 20, 2024.  Copyright (c) Timothy A. Davis, 2006-202
       1 : 22
 
 ------------------------------------------------------------
-AMD: v3.3.3 (June 20, 2024)
-AMD: v3.3.3 (in library)
-AMD version code: 3003003
+AMD: v3.3.4 (June 1, 2025)
+AMD: v3.3.4 (in library)
+AMD version code: 3003004
 P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-BTF: v2.3.2 (Mar 22, 2024)
-BTF: v2.3.2 (in library)
-BTF version code: 2003002
+BTF: v2.3.3 (June 1, 2025)
+BTF: v2.3.3 (in library)
+BTF version code: 2003003
 P [0] = 0
 P [1] = 1
 Q [0] = 0
@@ -46,61 +46,61 @@ Q [1] = 1
 nblocks 1
 
 ------------------------------------------------------------
-CAMD: v3.3.4 (May 5, 2025)
-CAMD: v3.3.4 (in library)
-CAMD version code: 3003004
+CAMD: v3.3.5 (June 1, 2025)
+CAMD: v3.3.5 (in library)
+CAMD version code: 3003005
 P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-CCOLAMD: v3.3.4 (June 20, 2024)
-CCOLAMD: v3.3.4 (in library)
-CCOLAMD version code: 3003004
+CCOLAMD: v3.3.5 (June 1, 2025)
+CCOLAMD: v3.3.5 (in library)
+CCOLAMD version code: 3003005
 P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-COLAMD: v3.3.4 (June 20, 2024)
-COLAMD: v3.3.4 (in library)
-COLAMD version code: 3003004
+COLAMD: v3.3.5 (June 1, 2025)
+COLAMD: v3.3.5 (in library)
+COLAMD version code: 3003005
 P [0] = 0
 P [1] = 1
 
 ------------------------------------------------------------
-CHOLMOD: v5.3.3 (May 5, 2025)
-CHOLMOD: v5.3.3 (in library)
-CHOLMOD version code: 5003003
+CHOLMOD: v5.3.4 (June 1, 2025)
+CHOLMOD: v5.3.4 (in library)
+CHOLMOD version code: 5003004
 
 ------------------------------------------------------------
-GraphBLAS: v10.0.5 (May 5, 2025)
-GraphBLAS: v10.0.5 (in library)
-GraphBLAS version code: 10000005
+GraphBLAS: v10.1.1 (June 2, 2025)
+GraphBLAS: v10.1.1 (in library)
+GraphBLAS version code: 10001001
 
 ------------------------------------------------------------
-LAGraph: v1.1.5 (Feb 20, 2025)
-LAGraph: v1.1.5 (in library)
-LAGraph version code: 1001005
+LAGraph: v1.2.0 (June 1, 2025)
+LAGraph: v1.2.0 (in library)
+LAGraph version code: 1002000
 
 ------------------------------------------------------------
-KLU: v2.3.5 (Oct 10, 2024)
-KLU: v2.3.5 (in library)
-KLU version code: 2003005
+KLU: v2.3.6 (June 1, 2025)
+KLU: v2.3.6 (in library)
+KLU version code: 2003006
 x [0] = 36.4
 x [1] = -32.7
 error: 7.10543e-14
 
 ------------------------------------------------------------
-LDL: v3.3.2 (Mar 22, 2024)
-LDL: v3.3.2 (in library)
-LDL version code: 3003002
+LDL: v3.3.3 (June 1, 2025)
+LDL: v3.3.3 (in library)
+LDL version code: 3003003
 x2 [0] = 36.4
 x2 [1] = -32.7
 error: 0
 
 ------------------------------------------------------------
-RBio: v4.3.4 (Oct 10, 2024)
-RBio: v4.3.4 (in library)
-RBio version code: 4003004
+RBio: v4.3.5 (June 1, 2025)
+RBio: v4.3.5 (in library)
+RBio version code: 4003005
 njumbled 0, nzeros 0
 result 0
 mtype: iua
@@ -113,14 +113,14 @@ iua                        2             2             4             0
  11 21 12 22
 
 ------------------------------------------------------------
-SPEX: v3.2.3 (Feb 20, 2025)
-SPEX: v3.2.3 (in library)
-SPEX version code: 3002003
+SPEX: v3.2.4 (June 1, 2025)
+SPEX: v3.2.4 (in library)
+SPEX version code: 3002004
 
 ------------------------------------------------------------
-SuiteSparseQR: v4.3.4 (June 20, 2024)
-SuiteSparseQR: v4.3.4 (in library)
-SuiteSparseQR version code: 4003004
+SuiteSparseQR: v4.3.5 (June 1, 2025)
+SuiteSparseQR: v4.3.5 (in library)
+SuiteSparseQR version code: 4003005
 
 CHOLMOD dense:   X from QR:  2-by-1, 
   leading dimension 2, nzmax 2, real, double
@@ -131,10 +131,10 @@ CHOLMOD dense:   X from QR:  2-by-1,
 
 
 ------------------------------------------------------------
-UMFPACK: v6.3.5 (Sept 23, 2024)
-UMFPACK: v6.3.5 (in library)
-UMFPACK version code: 6003005
-UMFPACK V6.3.5 (Sept 23, 2024)
+UMFPACK: v6.3.6 (June 1, 2025)
+UMFPACK: v6.3.6 (in library)
+UMFPACK version code: 6003006
+UMFPACK V6.3.6 (June 1, 2025)
 UMFPACK:  Copyright (c) 2005-2024 by Timothy A. Davis.  All Rights Reserved.
 
 UMFPACK License: SPDX-License-Identifier: GPL-2.0+
@@ -155,9 +155,9 @@ UMFPACK License: SPDX-License-Identifier: GPL-2.0+
 
 
 Availability: http://www.suitesparse.com
-UMFPACK V6.3.5 (Sept 23, 2024): OK
+UMFPACK V6.3.6 (June 1, 2025): OK
 
-UMFPACK V6.3.5 (Sept 23, 2024), Info:
+UMFPACK V6.3.6 (June 1, 2025), Info:
     matrix entry defined as:          double
     Int (generic integer) defined as: int64_t
     BLAS library used: Intel MKL 64lp BLAS (32-bit integers).  size of BLAS integer: 4

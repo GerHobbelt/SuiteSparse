@@ -37,7 +37,7 @@
 // See also the LAGraph_Version utility method, which returns these values.
 // These definitions are derived from LAGraph/CMakeLists.txt.
 
-#define LAGRAPH_DATE "June 1, 2025"
+#define LAGRAPH_DATE "July 25, 2025"
 #define LAGRAPH_VERSION_MAJOR  1
 #define LAGRAPH_VERSION_MINOR  2
 #define LAGRAPH_VERSION_UPDATE 0
@@ -1326,7 +1326,8 @@ double LAGraph_WallClockTime     // returns omp_get_wtime(), or other timer
  * Market "coordinate" and "array" format (http://www.nist.gov/MatrixMarket),
  * for sparse and dense matrices respectively.  The format is fully described
  * in <a href="https://github.com/GraphBLAS/LAGraph/blob/stable/papers/MatrixMarket.pdf">
- * LAGraph/Doc/MatrixMarket.pdf</a>, and summarized here (with extensions for LAGraph).
+ * LAGraph/papers/MatrixMarket.pdf</a>, and summarized here (with extensions
+ * for LAGraph).
  *
  * \rst_star{
  * First Line

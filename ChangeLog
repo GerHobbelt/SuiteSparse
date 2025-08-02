@@ -1,10 +1,9 @@
-June 1, 2025: version 7.11.0
+July 25, 2025: version 7.11.0
 
     * LAGraph v1.2: many new experimental algorithms, LAGraph_Random in src/
-    * GraphBLAS v10.1.0: risc-V vectorization, GRAPHBLAS_VANILLA (optional;
-        to disable GxB extensions), and cmake revisions to ensure gcc is not
-        used to compile GraphBLAS on the Power or s390 processors (as a
-        workaround around for a bug in the gcc compiler).
+    * GraphBLAS v10.1.1: risc-V vectorization, GRAPHBLAS_VANILLA (optional;
+        to disable GxB extensions), and workaround for gcc compiler bug on
+        Power and s390x processors.
     * nearly all packages: cmake updates, to move static targets into separate
         exports (needed for Fedora packaging)
     * Package versions in this release: (* denotes a new version)
@@ -18,7 +17,7 @@ June 1, 2025: version 7.11.0
         CSparse 4.3.2
         CXSparse 4.4.2              *
         Example 1.8.9               *
-        GraphBLAS 10.1.0            *
+        GraphBLAS 10.1.1            *
         KLU 2.3.6                   *
         LDL 3.3.3                   *
         LAGraph 1.2.0               *

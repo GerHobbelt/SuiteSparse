@@ -15,7 +15,7 @@
 cmake_minimum_required ( VERSION 3.22 )
 
 # version of both SuiteSparse and SuiteSparse_config
-set ( SUITESPARSE_DATE "June 1, 2025" )
+set ( SUITESPARSE_DATE "July 25, 2025" )
 set ( SUITESPARSE_VERSION_MAJOR 7 )
 set ( SUITESPARSE_VERSION_MINOR 11 )
 set ( SUITESPARSE_VERSION_SUB   0 )
@@ -395,3 +395,4 @@ endif ( )
 #-------------------------------------------------------------------------------
 
 include ( SuiteSparseReport )
+message ( STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}" )
