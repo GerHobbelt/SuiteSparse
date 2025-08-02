@@ -12,10 +12,10 @@
 # cmake 3.22 is required to find the BLAS/LAPACK
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( CHOLMOD_DATE "May 5, 2025" )
+set ( CHOLMOD_DATE "June 1, 2025" )
 set ( CHOLMOD_VERSION_MAJOR 5 CACHE STRING "" FORCE )
 set ( CHOLMOD_VERSION_MINOR 3 CACHE STRING "" FORCE )
-set ( CHOLMOD_VERSION_SUB   3 CACHE STRING "" FORCE )
+set ( CHOLMOD_VERSION_SUB   4 CACHE STRING "" FORCE )
 
 message ( STATUS "Building CHOLMOD version: v"
     ${CHOLMOD_VERSION_MAJOR}.
@@ -112,22 +112,22 @@ endif ( )
 #-------------------------------------------------------------------------------
 
 if ( NOT SUITESPARSE_ROOT_CMAKELISTS )
-    find_package ( SuiteSparse_config 7.8.0
+    find_package ( SuiteSparse_config 7.11.0
         PATHS ${CMAKE_SOURCE_DIR}/../SuiteSparse_config/build NO_DEFAULT_PATH )
     if ( NOT TARGET SuiteSparse::SuiteSparseConfig )
-        find_package ( SuiteSparse_config 7.8.0 REQUIRED )
+        find_package ( SuiteSparse_config 7.11.0 REQUIRED )
     endif ( )
 
-    find_package ( AMD 3.3.2
+    find_package ( AMD 3.3.4
         PATHS ${CMAKE_SOURCE_DIR}/../AMD/build NO_DEFAULT_PATH )
     if ( NOT TARGET SuiteSparse::AMD )
-        find_package ( AMD 3.3.2 REQUIRED )
+        find_package ( AMD 3.3.4 REQUIRED )
     endif ( )
 
-    find_package ( COLAMD 3.3.3
+    find_package ( COLAMD 3.3.5
         PATHS ${CMAKE_SOURCE_DIR}/../COLAMD/build NO_DEFAULT_PATH )
     if ( NOT TARGET SuiteSparse::COLAMD )
-        find_package ( COLAMD 3.3.3 REQUIRED )
+        find_package ( COLAMD 3.3.5 REQUIRED )
     endif ( )
 endif ( )
 
@@ -231,16 +231,16 @@ endif ( )
 
     if ( CHOLMOD_CAMD AND NOT SUITESPARSE_ROOT_CMAKELISTS )
         # find CAMD and CCOLAMD
-        find_package ( CAMD 3.3.2
+        find_package ( CAMD 3.3.5
             PATHS ${CMAKE_SOURCE_DIR}/../CAMD/build NO_DEFAULT_PATH )
         if ( NOT TARGET SuiteSparse::CAMD )
-            find_package ( CAMD 3.3.2 )
+            find_package ( CAMD 3.3.5 )
         endif ( )
 
-        find_package ( CCOLAMD 3.3.3
+        find_package ( CCOLAMD 3.3.5
             PATHS ${CMAKE_SOURCE_DIR}/../CCOLAMD/build NO_DEFAULT_PATH )
         if ( NOT TARGET SuiteSparse::CCOLAMD )
-            find_package ( CCOLAMD 3.3.3 )
+            find_package ( CCOLAMD 3.3.5 )
         endif ( )
 
         if ( NOT CAMD_FOUND OR NOT CCOLAMD_FOUND )
@@ -597,7 +597,7 @@ if ( CHOLMOD_HAS_CUDA )
     endif ( )
     if ( BUILD_STATIC_LIBS )
         target_link_libraries ( CHOLMOD_static PRIVATE CUDA::nvrtc CUDA::cudart_static )
-        # FIXME: Ok to hardcode CUDA library names like this?
+        # Fixme: Ok to hardcode CUDA library names like this?
         list ( APPEND CHOLMOD_STATIC_LIBS "-L${CUDAToolkit_LIBRARY_DIR};-lcuda;-lcudart_static" )
         if ( TARGET CUDA::cublas_static )
             target_link_libraries ( CHOLMOD_static PRIVATE CUDA::cublas_static )
@@ -651,23 +651,33 @@ if ( BUILD_SHARED_LIBS )
         ARCHIVE DESTINATION ${SUITESPARSE_LIBDIR}
         RUNTIME DESTINATION ${SUITESPARSE_BINDIR}
         PUBLIC_HEADER DESTINATION ${SUITESPARSE_INCLUDEDIR} )
+
+    # create (temporary) export target file during build
+    export ( EXPORT CHOLMODTargets
+        NAMESPACE SuiteSparse::
+        FILE ${CMAKE_CURRENT_BINARY_DIR}/CHOLMODTargets.cmake )
+
+    # install export target, config and version files for find_package
+    install ( EXPORT CHOLMODTargets
+        NAMESPACE SuiteSparse::
+        DESTINATION ${SUITESPARSE_PKGFILEDIR}/cmake/CHOLMOD )
 endif ( )
 if ( BUILD_STATIC_LIBS )
     install ( TARGETS CHOLMOD_static
-        EXPORT CHOLMODTargets
+        EXPORT CHOLMODTargets_static
         ARCHIVE DESTINATION ${SUITESPARSE_LIBDIR}
         PUBLIC_HEADER DESTINATION ${SUITESPARSE_INCLUDEDIR} )
+
+    # create (temporary) export target file during build
+    export ( EXPORT CHOLMODTargets_static
+        NAMESPACE SuiteSparse::
+        FILE ${CMAKE_CURRENT_BINARY_DIR}/CHOLMODTargets_static.cmake )
+
+    # install export target, config and version files for find_package
+    install ( EXPORT CHOLMODTargets_static
+        NAMESPACE SuiteSparse::
+        DESTINATION ${SUITESPARSE_PKGFILEDIR}/cmake/CHOLMOD )
 endif ( )
-
-# create (temporary) export target file during build
-export ( EXPORT CHOLMODTargets
-    NAMESPACE SuiteSparse::
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/CHOLMODTargets.cmake )
-
-# install export target, config and version files for find_package
-install ( EXPORT CHOLMODTargets
-    NAMESPACE SuiteSparse::
-    DESTINATION ${SUITESPARSE_PKGFILEDIR}/cmake/CHOLMOD )
 
 # generate config file to be used in common build tree
 set ( SUITESPARSE_IN_BUILD_TREE on )

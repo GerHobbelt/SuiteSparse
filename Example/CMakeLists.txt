@@ -53,10 +53,10 @@ message ( STATUS "MY prefix path:    ${CMAKE_PREFIX_PATH}" )
 #-------------------------------------------------------------------------------
 
 # cmake inserts the date and version number into Include/my.h:
-set ( MY_DATE "May 5, 2025" )
+set ( MY_DATE "June 1, 2025" )
 set ( MY_VERSION_MAJOR 1 )
 set ( MY_VERSION_MINOR 8 )
-set ( MY_VERSION_PATCH 8 )
+set ( MY_VERSION_PATCH 9 )
 
 message ( STATUS "Building MY library version: v"
     ${MY_VERSION_MAJOR}.
@@ -69,6 +69,7 @@ message ( STATUS "Building MY library version: v"
 
 if ( WIN32 )
     set ( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true )
+    add_compile_definitions ( _CRT_SECURE_NO_WARNINGS )
 endif ( )
 
 option ( BUILD_SHARED_LIBS "OFF: do not build shared libraries.  ON (default): build shared libraries" ON )
@@ -87,25 +88,25 @@ project ( my
 #-------------------------------------------------------------------------------
 
 # look for all SuiteSparse packages:
-find_package ( SuiteSparse_config 7.10.3 REQUIRED )
-find_package ( AMD 3.3.3 REQUIRED )
-find_package ( BTF 2.3.2 REQUIRED )
-find_package ( CAMD 3.3.4 REQUIRED )
-find_package ( CCOLAMD 3.3.4 REQUIRED )
-find_package ( CHOLMOD 5.3.3 REQUIRED )
-find_package ( COLAMD 3.3.4 REQUIRED )
-find_package ( CXSparse 4.4.1 REQUIRED )
-find_package ( GraphBLAS 10.0.5 )
-find_package ( KLU 2.3.5 REQUIRED )
-find_package ( KLU_CHOLMOD 2.3.5 REQUIRED )
-find_package ( LDL 3.3.2 REQUIRED )
-find_package ( LAGraph 1.1.5 )
-find_package ( SuiteSparse_Mongoose 3.3.4 REQUIRED )
-find_package ( ParU 1.0.0 REQUIRED )
-find_package ( RBio 4.3.4 REQUIRED )
-find_package ( SPEX 3.2.3 REQUIRED )    # requires GMP and MPFR
-find_package ( SPQR 4.3.4 REQUIRED )
-find_package ( UMFPACK 6.3.5 REQUIRED )
+find_package ( SuiteSparse_config 7.11.0 REQUIRED )
+find_package ( AMD 3.3.4 REQUIRED )
+find_package ( BTF 2.3.3 REQUIRED )
+find_package ( CAMD 3.3.5 REQUIRED )
+find_package ( CCOLAMD 3.3.5 REQUIRED )
+find_package ( CHOLMOD 5.3.4 REQUIRED )
+find_package ( COLAMD 3.3.5 REQUIRED )
+find_package ( CXSparse 4.4.2 REQUIRED )
+find_package ( GraphBLAS 10.1.0 )
+find_package ( KLU 2.3.6 REQUIRED )
+find_package ( KLU_CHOLMOD 2.3.6 REQUIRED )
+find_package ( LDL 3.3.3 REQUIRED )
+find_package ( LAGraph 1.2.0 )
+find_package ( SuiteSparse_Mongoose 3.3.5 REQUIRED )
+find_package ( ParU 1.0.1 REQUIRED )
+find_package ( RBio 4.3.5 REQUIRED )
+find_package ( SPEX 3.2.4 REQUIRED )    # requires GMP and MPFR
+find_package ( SPQR 4.3.5 REQUIRED )
+find_package ( UMFPACK 6.3.6 REQUIRED )
 
 #-------------------------------------------------------------------------------
 # configure files

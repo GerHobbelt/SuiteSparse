@@ -1,3 +1,34 @@
+June 1, 2025: version 7.11.0
+
+    * LAGraph v1.2: many new experimental algorithms, LAGraph_Random in src/
+    * GraphBLAS v10.1.0: risc-V vectorization, GRAPHBLAS_VANILLA (optional;
+        to disable GxB extensions), and cmake revisions to ensure gcc is not
+        used to compile GraphBLAS on the Power or s390 processors (as a
+        workaround around for a bug in the gcc compiler).
+    * nearly all packages: cmake updates, to move static targets into separate
+        exports (needed for Fedora packaging)
+    * Package versions in this release: (* denotes a new version)
+        SuiteSparse_config 7.11.0   *
+        AMD 3.3.4                   *
+        BTF 2.3.3                   *
+        CAMD 3.3.5                  *
+        CCOLAMD 3.3.5               *
+        CHOLMOD 5.3.4               *
+        COLAMD 3.3.5                *
+        CSparse 4.3.2
+        CXSparse 4.4.2              *
+        Example 1.8.9               *
+        GraphBLAS 10.1.0            *
+        KLU 2.3.6                   *
+        LDL 3.3.3                   *
+        LAGraph 1.2.0               *
+        SuiteSparse_Mongoose 3.3.5  *
+        ParU 1.0.1                  *
+        RBio 4.3.5                  *
+        SPEX 3.2.4                  *
+        SPQR 4.3.5                  *
+        UMFPACK 6.3.6               *
+
 May 5, 2025: version 7.10.3
 
     * SuiteSparse_config: do not print info about the BLAS if no BLAS used,
@@ -6,13 +37,14 @@ May 5, 2025: version 7.10.3
     * GraphBLAS: cmake revisions and 2 bug fixes
     * revised CI rules on github
     * CAMD: minor typo in Makefile, for demos
+    * CHOLMOD: restore try_catch after trying ordering methods
     * Package versions in this release: (* denotes a new version)
         SuiteSparse_config 7.10.3   *
         AMD 3.3.3
         BTF 2.3.2
         CAMD 3.3.4                  *
         CCOLAMD 3.3.4
-        CHOLMOD 5.3.2
+        CHOLMOD 5.3.3               *
         COLAMD 3.3.4
         CSparse 4.3.2
         CXSparse 4.4.1

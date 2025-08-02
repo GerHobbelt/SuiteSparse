@@ -1,3 +1,7 @@
+June 1, 2025: version 6.3.6
+
+    * minor updates to build system
+
 Sept 23, 2024: version 6.3.5
 
     * typos in comments and user guide for umfpack_get_determinant;

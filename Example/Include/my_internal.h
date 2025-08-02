@@ -14,8 +14,8 @@
 
 // SuiteSparse include files for C/C++:
 #include "SuiteSparse_config.h"
-#if !defined (SUITESPARSE__VERSION) || SUITESPARSE__VERSION < SUITESPARSE__VERCODE(7,10,2)
-#error "This library requires SuiteSparse_config 7.10.2 or later"
+#if !defined (SUITESPARSE__VERSION) || SUITESPARSE__VERSION < SUITESPARSE__VERCODE(7,10,4)
+#error "This library requires SuiteSparse_config 7.10.4 or later"
 #endif
 
 #include "amd.h"
@@ -56,15 +56,15 @@
 #if ! defined (NO_GRAPHBLAS)
     #include "GraphBLAS.h"
     #if !defined ( GxB_SUITESPARSE_GRAPHBLAS ) || \
-        GxB_IMPLEMENTATION < GxB_VERSION (10,0,5)
-    #error "This library requires SuiteSparse:GraphBLAS 10.0.5 or later"
+        GxB_IMPLEMENTATION < GxB_VERSION (10,1,0)
+    #error "This library requires SuiteSparse:GraphBLAS 10.1.0 or later"
     #endif
 #endif
 
 #if ! defined (NO_LAGRAPH)
     #include "LAGraph.h"
-    #if SUITESPARSE__VERCODE(LAGRAPH_VERSION_MAJOR,LAGRAPH_VERSION_MINOR,LAGRAPH_VERSION_UPDATE) < SUITESPARSE__VERCODE(1,1,5)
-    #error "This library requires LAGraph 1.1.5 or later"
+    #if SUITESPARSE__VERCODE(LAGRAPH_VERSION_MAJOR,LAGRAPH_VERSION_MINOR,LAGRAPH_VERSION_UPDATE) < SUITESPARSE__VERCODE(1,2,0)
+    #error "This library requires LAGraph 1.2.0 or later"
     #endif
 #endif
 

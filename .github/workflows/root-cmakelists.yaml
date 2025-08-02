@@ -84,6 +84,7 @@ jobs:
         id: ccache-prepare
         run: |
           echo "key=ccache:${{ matrix.os }}:root:${{ matrix.compiler }}:${{ matrix.cuda }}:${{ matrix.link }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
+        # "
 
       - name: restore ccache
         # setup the GitHub cache used to maintain the ccache from one job to the next
@@ -159,6 +160,7 @@ jobs:
                 ..
 
       - name: build libraries
+        id: build
         run: |
           cd ${GITHUB_WORKSPACE}/build
           cmake --build .
@@ -173,15 +175,17 @@ jobs:
           cd ${GITHUB_WORKSPACE}/build
           cmake --build .
           echo "::endgroup::"
-          # FIXME: How to run the demos without Makefile?
+          # Fixme: How to run the demos without Makefile?
 
       - name: ccache status
+        if: always() && (steps.build.outcome != 'skipped')
         continue-on-error: true
         run: ccache -s
 
       - name: save ccache
-        # Save the cache after we are done (successfully) building.
+        # Save the cache after we are done building
         # This helps to retain the ccache even if the subsequent steps are failing.
+        if: always() && (steps.build.outcome != 'skipped')
         uses: actions/cache/save@v4
         with:
           path: ~/.ccache

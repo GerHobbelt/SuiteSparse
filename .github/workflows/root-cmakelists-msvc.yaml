@@ -38,34 +38,34 @@ jobs:
         openmp: [with]
         cuda: [without]
         link: [both]
-        cc: [cl]
-        cxx: [cl]
+        cc: [clang-cl]
+        cxx: [clang-cl]
         include:
           - openmp: with
             cuda: with
             link: both
-            cc: cl
-            cxx: cl
+            cc: clang-cl
+            cxx: clang-cl
           - openmp: with
             cuda: with
             link: static
-            cc: cl
-            cxx: cl
-          - openmp: with
-            cuda: without
-            link: both
-            cc: cl
-            cxx: cl
+            cc: clang-cl
+            cxx: clang-cl
           - openmp: without
             cuda: without
             link: both
-            cc: cl
-            cxx: cl
+            cc: clang-cl
+            cxx: clang-cl
           - openmp: with
             cuda: without
             link: both
             cc: clang-cl
             cxx: clang-cl
+          - openmp: with
+            cuda: without
+            link: both
+            cc: cl
+            cxx: cl
           - openmp: with
             cuda: without
             link: both
@@ -234,6 +234,7 @@ jobs:
                 ..
 
       - name: build libraries
+        id: build
         run: |
           cd ${GITHUB_WORKSPACE}/build
           cmake --build . --config Release
@@ -248,15 +249,17 @@ jobs:
           cd ${GITHUB_WORKSPACE}/build
           cmake --build . --config Release
           echo "::endgroup::"
-          # FIXME: How to run the demos without Makefile?
+          # Fixme: How to run the demos without Makefile?
 
       - name: ccache status
+        if: always() && (steps.build.outcome != 'skipped')
         continue-on-error: true
         run: ${CCACHE} -s
 
       - name: save ccache
-        # Save the cache after we are done (successfully) building
+        # Save the cache after we are done building
         # This helps to retain the ccache even if the subsequent steps are failing.
+        if: always() && (steps.build.outcome != 'skipped')
         uses: actions/cache/save@v4
         with:
           path: ${{ steps.ccache-prepare.outputs.ccachedir }}
