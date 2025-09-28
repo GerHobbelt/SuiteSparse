@@ -301,13 +301,38 @@ endif ( )
 #-------------------------------------------------------------------------------
 
 include ( CheckLanguage )
-option ( SUITESPARSE_USE_FORTRAN "ON: use Fortran. OFF (default): do not use Fortran" OFF )
+option ( SUITESPARSE_USE_FORTRAN "ON (default): use Fortran. OFF: do not use Fortran" ON )
 if ( SUITESPARSE_USE_FORTRAN )
+    message ( STATUS "Checking if Fortran is available and compatible with C/C++" )
     check_language ( Fortran )
     if ( CMAKE_Fortran_COMPILER )
+        # Fortran is available; ensure that it is compatible with C/C++
+        enable_language ( CXX )
         enable_language ( Fortran )
-        message ( STATUS "Fortran:          ${CMAKE_Fortran_COMPILER}" )
         set ( SUITESPARSE_HAS_FORTRAN ON )
+        if ( NOT "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "${CMAKE_C_COMPILER_ID}" OR
+             NOT "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" )
+            message ( STATUS " " )
+            message ( STATUS "Incompatible Fortran/C/C++ compilers detected:" )
+            message ( STATUS "    Fortran:          ${CMAKE_Fortran_COMPILER}" )
+            message ( STATUS "    Fortran id:       ${CMAKE_Fortran_COMPILER_ID}" )
+            message ( STATUS "    C                 ${CMAKE_C_COMPILER}" )
+            message ( STATUS "    C       id:       ${CMAKE_C_COMPILER_ID}" )
+            message ( STATUS "    C++               ${CMAKE_CXX_COMPILER}" )
+            message ( STATUS "    C++     id:       ${CMAKE_CXX_COMPILER_ID}" )
+            if ( "${CMAKE_C_COMPILER_ID}" STREQUAL "IntelLLVM" )
+                # icx/icpx cannot be used with gfortran: this is a fatal error
+                message ( FATAL_ERROR "ERROR: Using Fortran with SuiteSparse requires that "
+                " it has the same compiler ID as the C/C++ compilers."
+                "  Use a compatible Fortran compiler, or set SUITESPARSE_USE_FORTRAN to OFF." )
+            else ( )
+                # for other case: just issue a warning and hope it works.
+                message ( WARNING "Warning: Using Fortran with SuiteSparse requires that "
+                " it has the same compiler ID as the C/C++ compilers."
+                "  Use a compatible Fortran compiler, or set SUITESPARSE_USE_FORTRAN to OFF." )
+            endif ( )
+        endif ( )
+        message ( STATUS "Fortran:          enabled" )
     else ( )
         # Fortran not available:
         set ( SUITESPARSE_HAS_FORTRAN OFF )

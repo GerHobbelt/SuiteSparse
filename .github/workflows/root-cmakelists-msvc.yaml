@@ -220,7 +220,6 @@ jobs:
                 -DSUITESPARSE_C_TO_FORTRAN="(name,NAME) name##_" \
                 -DPython_EXECUTABLE="C:/msys64/ucrt64/bin/python.exe" \
                 -DSUITESPARSE_DEMOS=OFF \
-                -DSUITESPARSE_USE_FORTRAN=ON \
                 -DBUILD_TESTING=OFF \
                 -DSUITESPARSE_USE_OPENMP=${{ matrix.openmp == 'without' && 'OFF' || 'ON' }} \
                 ${{ matrix.cuda == 'with'
@@ -287,7 +286,6 @@ jobs:
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
             -DCMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/lib/cmake;C:/Miniconda/envs/test/Library;${GITHUB_WORKSPACE}/dependencies" \
             -DBLA_VENDOR="All" \
-            -DSUITESPARSE_USE_FORTRAN=ON \
             -DSUITESPARSE_USE_OPENMP=${{ matrix.openmp == 'without' && 'OFF' || 'ON' }} \
             ..
           echo "::endgroup::"
