@@ -73,10 +73,17 @@ int main(int argc, char **argv)
     int mtype;
     cholmod_l_start(cc);
 
+    char *filename = NULL ;
     if (argc > 1)
     {
+        filename = argv [1] ;
         std::cout << "Matrix: " << argv [1] << std::endl ;
         fp = fopen (argv [1], "r") ;
+        // look for the last slash in filename:
+        for (char *p = filename ; *p != '\0' ; p++)
+        {
+            if (*p == '/') filename = p+1 ;
+        }
     }
     else
     {
@@ -167,14 +174,26 @@ int main(int argc, char **argv)
     x = (double *)malloc(n * sizeof(double));
     double rcond ;
 
-    #define NTRIALS 5
+    #define NTRIALS 3
     int middle = NTRIALS / 2 ;
 
+    //--------------------------------------------------------------------------
+    // to print one line with all timings, in ParU and UMFPACK
+    //--------------------------------------------------------------------------
+
+    double sym_time, num_times [20], sol_times [20] ;
+    for (int kk = 0 ; kk < 19 ; kk++)
+    {
+        num_times [kk] = -1 ;
+        sol_times [kk] = -1 ;
+    }
 
     //--------------------------------------------------------------------------
     // benchmark UMFPACK
     //--------------------------------------------------------------------------
 
+if (1)
+{
     double umf_time = 0;
     double status,           // Info [UMFPACK_STATUS]
         Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
@@ -192,12 +211,14 @@ int main(int argc, char **argv)
         int ordering = (ord == 0) ?  UMFPACK_ORDERING_AMD :
             UMFPACK_ORDERING_METIS_GUARD ;
         printf ("\n===== UMFPACK ordering: %d\n", ordering) ;
+        int kthread = 0 ;
+        sym_time = -1 ;
         for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
         {
             printf ("# threads: %d\n", nthreads) ;
             #ifdef _OPENMP
             omp_set_num_threads (nthreads) ;
-            // BLAS_set_num_threads (nthreads) ;
+            BLAS_set_num_threads (nthreads) ;
             #endif
 
             double UMF_sym_times [NTRIALS] ;
@@ -278,8 +299,39 @@ int main(int argc, char **argv)
                 << " total: " << UMF_sym_times [middle] +
                 UMF_num_times [middle] + UMF_sol_times [middle]
                 << std::endl << std::endl ;
+
+            if (nthreads == max_nthreads) sym_time = UMF_sym_times [middle] ;
+            num_times [kthread] = UMF_num_times [middle] ;
+            sol_times [kthread] = UMF_sol_times [middle] ;
+            kthread++ ;
         }
+
+        printf ("UMFPACK strategy used: %d\n", (int) Info [UMFPACK_STRATEGY_USED]) ;
+        printf ("UMFPACK ordering used: %d\n", (int) Info [UMFPACK_ORDERING_USED]) ;
+        printf ("TABLE,  UMF, %s, %d, %d, %d, sym_time:, %12.6e, num_times:, ",
+            (filename == NULL) ? " " : filename,
+            (int) Info [UMFPACK_STRATEGY_USED], (int) Info [UMFPACK_STRATEGY_USED],
+            (int) Info [UMFPACK_ORDERING_USED], sym_time) ;
+        for (int kk = 0 ; kk < 19 ; kk++)
+        {
+            if (num_times [kk] < 0) break ;
+            printf (" %12.6e, ", num_times [kk]) ;
+        }
+        printf (" sol_times:, ") ;
+        for (int kk = 0 ; kk < 19 ; kk++)
+        {
+            if (sol_times [kk] < 0) break ;
+            printf (" %12.6e, ", sol_times [kk]) ;
+        }
+        printf ("\n") ;
+
     }
+
+    #ifdef _OPENMP
+    omp_set_num_threads (max_nthreads) ;
+    BLAS_set_num_threads (max_nthreads) ;
+    #endif
+}
 
     //--------------------------------------------------------------------------
     // benchmark ParU
@@ -291,6 +343,9 @@ int main(int argc, char **argv)
             PARU_ORDERING_METIS_GUARD ;
         printf ("\n===== ParU ordering: %d\n", ordering) ;
         ParU_Set (PARU_CONTROL_ORDERING, ordering, Control) ;
+        int kthread = 0 ;
+        sym_time = -1 ;
+        int ordering_used, strategy_used, umf_strategy_used ;
         for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
         {
             printf ("# threads: %d\n", nthreads) ;
@@ -318,6 +373,9 @@ int main(int argc, char **argv)
                     std::cout << "ParU: analyze failed" << std::endl;
                     FREE_ALL_AND_RETURN (info) ;
                 }
+                ordering_used = Sym->ordering_used ;
+                strategy_used = Sym->strategy_used ;
+                umf_strategy_used = Sym->umfpack_strategy ;
 
                 info = ParU_Get (Sym, Num, PARU_GET_N, &n, Control) ;
                 if (info != PARU_SUCCESS)
@@ -388,6 +446,7 @@ int main(int argc, char **argv)
                 double rresid = (anorm == 0 || xnorm == 0 ) ? 0 :
                     (resid/(anorm*xnorm));
 
+                #if 0
                 for (int64_t i = 0; i < n; ++i)
                 {
                     for (int64_t j = 0; j < nrhs; ++j)
@@ -414,22 +473,28 @@ int main(int argc, char **argv)
                 }
                 double rresid2 = (anorm == 0 || xnorm == 0 ) ? 0 :
                     (resid/(anorm*xnorm));
+                #endif
 
                 if (trial == 0)
                 {
                     std::cout << std::scientific << std::setprecision(6)
                         << "Relative residual: " << rresid << " rcond: "
                         << rcond << std::endl;
+                    #if 0
                     std::cout << std::scientific << std::setprecision(6)
                         << "Multiple right hand side: relative residual is |"
                         << rresid2 << "|." << std::endl;
+                    #endif
                 }
 
                 std::cout << std::scientific << std::setprecision(6)
                     << "ParU: time: sym: " << my_time_analyze
                     << " num: " << my_time_fac
                     << " solve (1 rhs): " << my_solve_time
-                    << " solve (16 rhs): " << my_solve_time2 << std::endl ;
+                    #if 0
+                    << " solve (16 rhs): " << my_solve_time2
+                    #endif
+                    << std::endl ;
 
                 ParU_sym_times [trial] = my_time_analyze ;
                 ParU_num_times [trial] = my_time_fac ;
@@ -452,7 +517,31 @@ int main(int argc, char **argv)
                 << " total: " << ParU_sym_times [middle] +
                 ParU_num_times [middle] + ParU_sol_times [middle]
                 << std::endl << std::endl ;
+
+            if (nthreads == max_nthreads) sym_time = ParU_sym_times [middle] ;
+            num_times [kthread] = ParU_num_times [middle] ;
+            sol_times [kthread] = ParU_sol_times [middle] ;
+            kthread++ ;
         }
+
+        printf ("UMF  strategy used: %d\n", umf_strategy_used) ;
+        printf ("ParU strategy used: %d\n", strategy_used) ;
+        printf ("ParU ordering used: %d\n", ordering_used) ;
+        printf ("TABLE, ParU, %s, %d, %d, %d, sym_time:, %12.6e, num_times:, ",
+            (filename == NULL) ? " " : filename,
+            umf_strategy_used, strategy_used, ordering_used, sym_time) ;
+        for (int kk = 0 ; kk < 19 ; kk++)
+        {
+            if (num_times [kk] < 0) break ;
+            printf (" %12.6e, ", num_times [kk]) ;
+        }
+        printf (" sol_times:, ") ;
+        for (int kk = 0 ; kk < 19 ; kk++)
+        {
+            if (sol_times [kk] < 0) break ;
+            printf (" %12.6e, ", sol_times [kk]) ;
+        }
+        printf ("\n") ;
     }
 
     //--------------------------------------------------------------------------

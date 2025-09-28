@@ -222,6 +222,7 @@ jobs:
                   -DBLA_VENDOR="Generic" \
                   -DGRAPHBLAS_COMPACT=ON \
                   -DSUITESPARSE_DEMOS=OFF \
+                  -DSUITESPARSE_USE_FORTRAN=ON \
                   -DBUILD_TESTING=OFF \
                   ..
             echo "::endgroup::"

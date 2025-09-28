@@ -91,6 +91,7 @@ jobs:
                   -DCOMPACT=ON \
                   -DSUITESPARSE_USE_CUDA=ON \
                   -DCUDAToolkit_INCLUDE_DIRS="/usr/include" \
+                  -DSUITESPARSE_USE_FORTRAN=ON \
                   ..
             echo "::endgroup::"
             echo "::group::Build $lib"

@@ -137,7 +137,7 @@ bool paru_tasked_dgemm
         {
 
             //------------------------------------------------------------------
-            // tasked dgemm with the any BLAS
+            // tasked dgemm with any BLAS
             //------------------------------------------------------------------
 
             // This method works for any BLAS, but it is not as good as using

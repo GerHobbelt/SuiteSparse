@@ -147,6 +147,7 @@ jobs:
                 -DCMAKE_Fortran_COMPILER_LAUNCHER="ccache" \
                 -DBLA_VENDOR="OpenBLAS" \
                 -DSUITESPARSE_DEMOS=OFF \
+                -DSUITESPARSE_USE_FORTRAN=ON \
                 -DBUILD_TESTING=OFF \
                 ${{ matrix.cuda == 'with'
                   && '-DSUITESPARSE_USE_CUDA=ON \
@@ -208,6 +209,7 @@ jobs:
           printf "::group::\033[0;32m==>\033[0m Configuring example\n"
           cmake \
             -DCMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/lib/cmake" \
+            -DSUITESPARSE_USE_FORTRAN=ON \
             -DBLA_VENDOR="OpenBLAS" \
             ${{ matrix.cuda == 'with'
               && '-DSUITESPARSE_USE_CUDA=ON \

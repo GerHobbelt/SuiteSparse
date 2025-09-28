@@ -96,6 +96,7 @@ jobs:
                   -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
                   -DCMAKE_Fortran_COMPILER_LAUNCHER="ccache" \
                   -DBLA_VENDOR="Apple" \
+                  -DSUITESPARSE_USE_FORTRAN=ON \
                   -DCMAKE_PREFIX_PATH="${HOMEBREW_PREFIX}/opt/lapack;${HOMEBREW_PREFIX}/opt/openblas;${HOMEBREW_PREFIX}/opt/libomp" \
                   ..
             echo "::endgroup::"

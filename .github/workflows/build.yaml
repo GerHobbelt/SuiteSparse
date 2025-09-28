@@ -154,6 +154,7 @@ jobs:
                   -DCMAKE_Fortran_COMPILER_LAUNCHER="ccache" \
                   -DBLA_VENDOR="OpenBLAS" \
                   -DSUITESPARSE_DEMOS=OFF \
+                  -DSUITESPARSE_USE_FORTRAN=ON \
                   -DBUILD_TESTING=OFF \
                   ${{ matrix.cuda == 'with'
                     && '-DSUITESPARSE_USE_CUDA=ON \

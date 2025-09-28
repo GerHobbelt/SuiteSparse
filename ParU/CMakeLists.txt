@@ -65,7 +65,13 @@ if ( PARU_USE_OPENMP )
     endif ( )
     if ( OpenMP_CXX_FOUND AND OpenMP_C_FOUND )
         set ( PARU_HAS_OPENMP ON )
-        if (( OpenMP_CXX_VERSION VERSION_LESS 4.5 ) OR
+        if ( OpenMP_CXX_LIBRARIES MATCHES "libiomp" )
+            # cmake 3.22 has trouble determining the OpenMP versions for Intel;
+            # it does not set OpenMP_*_VERSION properly.  Just assume it is 4.5
+            # or later.  cmake 3.31.6 handles this OK, but this cmake script
+            # allows for cmake 3.22
+            message ( STATUS "Intel OpenMP: assume 4.5 or later" )
+        elseif (( OpenMP_CXX_VERSION VERSION_LESS 4.5 ) OR
             ( OpenMP_C_VERSION   VERSION_LESS 4.5 ) )
             message ( STATUS "ParU requires OpenMP 4.5 or later" )
             set ( PARU_HAS_OPENMP OFF )
@@ -483,3 +489,4 @@ endif ( )
 #-------------------------------------------------------------------------------
 
 include ( SuiteSparseReport )
+
