@@ -13,7 +13,7 @@
 
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( SPEX_DATE "June 1, 2025" )
+set ( SPEX_DATE "July 25, 2025" )
 set ( SPEX_VERSION_MAJOR 3 CACHE STRING "" FORCE )
 set ( SPEX_VERSION_MINOR 2 CACHE STRING "" FORCE )
 set ( SPEX_VERSION_SUB   4 CACHE STRING "" FORCE )

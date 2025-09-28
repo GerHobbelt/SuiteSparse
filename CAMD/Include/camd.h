@@ -392,7 +392,7 @@ void camd_version (int version [3]) ;
  *      #endif
  */
 
-#define CAMD_DATE "June 1, 2025"
+#define CAMD_DATE "July 25, 2025"
 #define CAMD_MAIN_VERSION   3
 #define CAMD_SUB_VERSION    3
 #define CAMD_SUBSUB_VERSION 5

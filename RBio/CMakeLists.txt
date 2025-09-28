@@ -11,7 +11,7 @@
 
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( RBIO_DATE "June 1, 2025" )
+set ( RBIO_DATE "July 25, 2025" )
 set ( RBIO_VERSION_MAJOR 4 CACHE STRING "" FORCE )
 set ( RBIO_VERSION_MINOR 3 CACHE STRING "" FORCE )
 set ( RBIO_VERSION_SUB   5 CACHE STRING "" FORCE )

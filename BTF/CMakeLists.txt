@@ -12,7 +12,7 @@
 
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( BTF_DATE "June 1, 2025" )
+set ( BTF_DATE "July 25, 2025" )
 set ( BTF_VERSION_MAJOR 2 CACHE STRING "" FORCE )
 set ( BTF_VERSION_MINOR 3 CACHE STRING "" FORCE )
 set ( BTF_VERSION_SUB   3 CACHE STRING "" FORCE )

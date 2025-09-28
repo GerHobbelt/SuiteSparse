@@ -1,5 +1,5 @@
 ( cd build && cmake  .. && cmake --build . --config Release -j8 )
--- Building SPQR version: v4.3.5 (June 1, 2025)
+-- Building SPQR version: v4.3.5 (July 25, 2025)
 -- Source:           /home/davis/dev2/SuiteSparse/SPQR 
 -- Build:            /home/davis/dev2/SuiteSparse/SPQR/build 
 -- Install lib:      /home/davis/dev2/SuiteSparse/lib
@@ -70,11 +70,11 @@ gmake[1]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[2]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target SPQR
 Consolidate compiler generated dependencies of target SPQR_static
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target SPQR
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-[ 42%] Built target SPQR_static
+[ 80%] Built target SPQR_static
 [ 85%] Built target SPQR
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
@@ -83,31 +83,31 @@ gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target qrdemoc
-Consolidate compiler generated dependencies of target qrsimplec_int32
-Consolidate compiler generated dependencies of target qrsimplec
-Consolidate compiler generated dependencies of target qrdemoc_int32
+Consolidate compiler generated dependencies of target qrsimple
 Consolidate compiler generated dependencies of target qrdemo
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target qrsimplec
+Consolidate compiler generated dependencies of target qrdemoc_int32
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target qrdemoc
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target qrsimplec_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target qrsimple
 Consolidate compiler generated dependencies of target qrdemo_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-[ 87%] Built target qrdemoc_int32
-[ 94%] Built target qrsimplec
-[ 94%] Built target qrdemo
+[ 88%] Built target qrdemo
+[ 89%] Built target qrsimple
+[ 91%] Built target qrsimplec
+[ 93%] Built target qrdemoc_int32
 [ 95%] Built target qrdemoc
-[ 95%] Built target qrsimplec_int32
-[ 97%] Built target qrsimple
-[100%] Built target qrdemo_int32
+[ 97%] Built target qrdemo_int32
+[100%] Built target qrsimplec_int32
 gmake[2]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[1]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 ( cd build && cmake  -DSUITESPARSE_DEMOS=1 .. && cmake --build . --config Release -j8 )
--- Building SPQR version: v4.3.5 (June 1, 2025)
+-- Building SPQR version: v4.3.5 (July 25, 2025)
 -- Source:           /home/davis/dev2/SuiteSparse/SPQR 
 -- Build:            /home/davis/dev2/SuiteSparse/SPQR/build 
 -- Install lib:      /home/davis/dev2/SuiteSparse/lib
@@ -182,7 +182,7 @@ Consolidate compiler generated dependencies of target SPQR
 Consolidate compiler generated dependencies of target SPQR_static
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-[ 56%] Built target SPQR_static
+[ 85%] Built target SPQR_static
 [ 85%] Built target SPQR
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
@@ -192,25 +192,25 @@ gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 Consolidate compiler generated dependencies of target qrsimplec
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target qrsimplec_int32
 Consolidate compiler generated dependencies of target qrdemoc
+Consolidate compiler generated dependencies of target qrsimplec_int32
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 Consolidate compiler generated dependencies of target qrdemoc_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target qrdemo
 Consolidate compiler generated dependencies of target qrsimple
+Consolidate compiler generated dependencies of target qrdemo
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 Consolidate compiler generated dependencies of target qrdemo_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-[ 88%] Built target qrsimplec_int32
-[ 89%] Built target qrsimplec
+[ 87%] Built target qrsimplec_int32
+[ 91%] Built target qrdemoc
+[ 91%] Built target qrsimplec
 [ 93%] Built target qrdemoc_int32
-[ 93%] Built target qrdemoc
-[ 95%] Built target qrdemo_int32
-[ 97%] Built target qrsimple
+[ 95%] Built target qrsimple
+[ 97%] Built target qrdemo_int32
 [100%] Built target qrdemo
 gmake[2]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[1]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
@@ -432,7 +432,7 @@ Matrix    841-by-841    nnz:   4089 residual:  1.8e-16 rank:    841
 ./build/qrdemoc < Matrix/lp_e226_transposed.mtx
 Matrix    472-by-223    nnz:   2768 residual:  9.2e+00 rank:    223
 ( cd build && cmake  -DSUITESPARSE_DEMOS=1 .. && cmake --build . --config Release -j8 )
--- Building SPQR version: v4.3.5 (June 1, 2025)
+-- Building SPQR version: v4.3.5 (July 25, 2025)
 -- Source:           /home/davis/dev2/SuiteSparse/SPQR 
 -- Build:            /home/davis/dev2/SuiteSparse/SPQR/build 
 -- Install lib:      /home/davis/dev2/SuiteSparse/lib
@@ -503,14 +503,14 @@ gmake[1]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[2]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target SPQR_static
 Consolidate compiler generated dependencies of target SPQR
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target SPQR_static
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-[ 42%] Built target SPQR
-gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+[ 69%] Built target SPQR
 [ 85%] Built target SPQR_static
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/SPQR/build'
@@ -520,23 +520,23 @@ Consolidate compiler generated dependencies of target qrsimplec_int32
 Consolidate compiler generated dependencies of target qrsimplec
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-Consolidate compiler generated dependencies of target qrdemoc
 Consolidate compiler generated dependencies of target qrsimple
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 Consolidate compiler generated dependencies of target qrdemo
-Consolidate compiler generated dependencies of target qrdemo_int32
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target qrdemoc
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 Consolidate compiler generated dependencies of target qrdemoc_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+Consolidate compiler generated dependencies of target qrdemo_int32
 gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
-gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
+[ 87%] Built target qrsimplec
 [ 89%] Built target qrsimplec_int32
-[ 89%] Built target qrsimplec
-[ 91%] Built target qrdemo_int32
-[ 93%] Built target qrdemo
-[ 97%] Built target qrsimple
-[ 97%] Built target qrdemoc
-[100%] Built target qrdemoc_int32
+[ 91%] Built target qrsimple
+[ 93%] Built target qrdemoc
+[ 95%] Built target qrdemo
+[ 97%] Built target qrdemoc_int32
+[100%] Built target qrdemo_int32
 gmake[2]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 gmake[1]: Leaving directory '/home/davis/dev2/SuiteSparse/SPQR/build'
 ./build/qrdemo_int32 < Matrix/a00.mtx

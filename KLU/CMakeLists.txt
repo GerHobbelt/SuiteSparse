@@ -12,7 +12,7 @@
 
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( KLU_DATE "June 1, 2025" )
+set ( KLU_DATE "July 25, 2025" )
 set ( KLU_VERSION_MAJOR 2 CACHE STRING "" FORCE )
 set ( KLU_VERSION_MINOR 3 CACHE STRING "" FORCE )
 set ( KLU_VERSION_SUB   6 CACHE STRING "" FORCE )

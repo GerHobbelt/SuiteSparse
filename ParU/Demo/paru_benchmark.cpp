@@ -18,7 +18,6 @@
 #include <cmath>
 
 #include "ParU.h"
-#include "paru_internal.hpp"
 #include <stdlib.h>
 #ifdef _OPENMP
 #include <omp.h>
@@ -192,8 +191,6 @@ int main(int argc, char **argv)
     // benchmark UMFPACK
     //--------------------------------------------------------------------------
 
-if (1)
-{
     double umf_time = 0;
     double status,           // Info [UMFPACK_STATUS]
         Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
@@ -218,7 +215,6 @@ if (1)
             printf ("# threads: %d\n", nthreads) ;
             #ifdef _OPENMP
             omp_set_num_threads (nthreads) ;
-            BLAS_set_num_threads (nthreads) ;
             #endif
 
             double UMF_sym_times [NTRIALS] ;
@@ -328,10 +324,9 @@ if (1)
     }
 
     #ifdef _OPENMP
+    // restore max threads to its default
     omp_set_num_threads (max_nthreads) ;
-    BLAS_set_num_threads (max_nthreads) ;
     #endif
-}
 
     //--------------------------------------------------------------------------
     // benchmark ParU
@@ -345,7 +340,7 @@ if (1)
         ParU_Set (PARU_CONTROL_ORDERING, ordering, Control) ;
         int kthread = 0 ;
         sym_time = -1 ;
-        int ordering_used, strategy_used, umf_strategy_used ;
+        int64_t ordering_used, strategy_used, umf_strategy_used ;
         for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
         {
             printf ("# threads: %d\n", nthreads) ;
@@ -373,17 +368,15 @@ if (1)
                     std::cout << "ParU: analyze failed" << std::endl;
                     FREE_ALL_AND_RETURN (info) ;
                 }
-                ordering_used = Sym->ordering_used ;
-                strategy_used = Sym->strategy_used ;
-                umf_strategy_used = Sym->umfpack_strategy ;
-
+                ParU_Get (Sym, Num, PARU_GET_ORDERING, &ordering_used, Control) ;
+                ParU_Get (Sym, Num, PARU_GET_STRATEGY, &strategy_used, Control) ;
+                ParU_Get (Sym, Num, PARU_GET_UMFPACK_STRATEGY, &umf_strategy_used, Control) ;
                 info = ParU_Get (Sym, Num, PARU_GET_N, &n, Control) ;
                 if (info != PARU_SUCCESS)
                 {
                     std::cout << "ParU: stats failed" << std::endl;
                     FREE_ALL_AND_RETURN (info) ;
                 }
-
                 info = ParU_Get (Sym, Num, PARU_GET_ANZ, &anz, Control) ;
                 if (info != PARU_SUCCESS)
                 {
@@ -524,12 +517,13 @@ if (1)
             kthread++ ;
         }
 
-        printf ("UMF  strategy used: %d\n", umf_strategy_used) ;
-        printf ("ParU strategy used: %d\n", strategy_used) ;
-        printf ("ParU ordering used: %d\n", ordering_used) ;
+        printf ("UMF  strategy used: %d\n", (int) umf_strategy_used) ;
+        printf ("ParU strategy used: %d\n", (int) strategy_used) ;
+        printf ("ParU ordering used: %d\n", (int) ordering_used) ;
         printf ("TABLE, ParU, %s, %d, %d, %d, sym_time:, %12.6e, num_times:, ",
             (filename == NULL) ? " " : filename,
-            umf_strategy_used, strategy_used, ordering_used, sym_time) ;
+            (int) umf_strategy_used, (int) strategy_used,
+            (int) ordering_used, sym_time) ;
         for (int kk = 0 ; kk < 19 ; kk++)
         {
             if (num_times [kk] < 0) break ;

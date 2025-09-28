@@ -82,7 +82,7 @@ jobs:
           Get-CIMInstance -Class Win32_Processor | Select-Object -Property Name
 
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
