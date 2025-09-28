@@ -1107,6 +1107,15 @@ build type).  The static libraries will not be built (since
   If `ON`, use the Fortran compiler to determine how C calls Fortan, and to
   build several optional Fortran routines. If `OFF`, use
   `SUITESPARSE_C_TO_FORTRAN` to define how C calls Fortran.
+  WARNING: mixing C/C++/Fortran compilers from different places is not
+  recommended.  Using the Intel C compiler (icx), GNU Fortran (gfortran or
+  f95), and the Intel MKL BLAS together will result in two OpenMP libraries
+  being linked (Intel's libiomp and the GNU libgomp).  This is a recipe for
+  disaster, and the cmake scripts check this and report fatal error if it's
+  attempted.  Other cases lead to a cmake warning.  If you get the warning,
+  check your built libraries and ensure that only one OpenMP library is in
+  use (GNU: libgomp, Intel: libiomp, Clang: libomp).  If you see this case,
+  use compatible compilers, or switch Fortran off.
   Default: `ON`.
 
 * `SUITESPARSE_C_TO_FORTRAN`

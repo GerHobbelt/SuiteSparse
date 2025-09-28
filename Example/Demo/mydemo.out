@@ -1,3 +1,141 @@
+( cd build && cmake  .. && cmake --build . --config Release -j8 )
+-- MY prefix path:    /home/davis/dev2/SuiteSparse/Example/..
+-- Building MY library version: v1.8.9 (June 1, 2025)
+-- Found OpenMP: TRUE (found version "4.5") found components: C 
+-- SuiteSparse_config version: 7.11.0
+-- SuiteSparse_config include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- SuiteSparse_config library: /home/davis/dev2/SuiteSparse/lib/libsuitesparseconfig.so.7.11.0
+-- SuiteSparse_config static:  /home/davis/dev2/SuiteSparse/lib/libsuitesparseconfig.a
+-- AMD version: 3.3.4
+-- AMD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- AMD library: /home/davis/dev2/SuiteSparse/lib/libamd.so.3.3.4
+-- AMD static:  /home/davis/dev2/SuiteSparse/lib/libamd.a
+-- BTF version: 2.3.3
+-- BTF include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- BTF library: /home/davis/dev2/SuiteSparse/lib/libbtf.so.2.3.3
+-- BTF static:  /home/davis/dev2/SuiteSparse/lib/libbtf.a
+-- CAMD version: 3.3.5
+-- CAMD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- CAMD library: /home/davis/dev2/SuiteSparse/lib/libcamd.so.3.3.5
+-- CAMD static:  /home/davis/dev2/SuiteSparse/lib/libcamd.a
+-- CCOLAMD version: 3.3.5
+-- CCOLAMD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- CCOLAMD library: /home/davis/dev2/SuiteSparse/lib/libccolamd.so.3.3.5
+-- CCOLAMD static:  /home/davis/dev2/SuiteSparse/lib/libccolamd.a
+-- COLAMD version: 3.3.5
+-- COLAMD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- COLAMD library: /home/davis/dev2/SuiteSparse/lib/libcolamd.so.3.3.5
+-- COLAMD static:  /home/davis/dev2/SuiteSparse/lib/libcolamd.a
+-- CHOLMOD version: 5.3.4
+-- CHOLMOD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- CHOLMOD library: /home/davis/dev2/SuiteSparse/lib/libcholmod.so.5.3.4
+-- CHOLMOD static:  /home/davis/dev2/SuiteSparse/lib/libcholmod.a
+-- COLAMD version: 3.3.5
+-- COLAMD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- COLAMD library: /home/davis/dev2/SuiteSparse/lib/libcolamd.so.3.3.5
+-- COLAMD static:  /home/davis/dev2/SuiteSparse/lib/libcolamd.a
+-- CXSparse version: 4.4.2
+-- CXSparse include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- CXSparse library: /home/davis/dev2/SuiteSparse/lib/libcxsparse.so.4.4.2
+-- CXSparse static:  /home/davis/dev2/SuiteSparse/lib/libcxsparse.a
+-- GraphBLAS version: 10.1.1
+-- GraphBLAS include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- GraphBLAS library: /home/davis/dev2/SuiteSparse/lib/libgraphblas.so.10.1.1
+-- GraphBLAS static:  
+-- KLU version: 2.3.6
+-- KLU include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- KLU library: /home/davis/dev2/SuiteSparse/lib/libklu.so.2.3.6
+-- KLU static:  /home/davis/dev2/SuiteSparse/lib/libklu.a
+-- KLU_CHOLMOD version: 2.3.6
+-- KLU_CHOLMOD include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- KLU_CHOLMOD library: /home/davis/dev2/SuiteSparse/lib/libklu_cholmod.so.2.3.6
+-- KLU_CHOLMOD static:  /home/davis/dev2/SuiteSparse/lib/libklu_cholmod.a
+-- LDL version: 3.3.3
+-- LDL include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- LDL library: /home/davis/dev2/SuiteSparse/lib/libldl.so.3.3.3
+-- LDL static:  /home/davis/dev2/SuiteSparse/lib/libldl.a
+-- GraphBLAS version: 10.1.1
+-- GraphBLAS include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- GraphBLAS library: /home/davis/dev2/SuiteSparse/lib/libgraphblas.so.10.1.1
+-- GraphBLAS static:  
+-- LAGraph version: 1.2.0
+-- LAGraph include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- LAGraph library: /home/davis/dev2/SuiteSparse/lib/liblagraph.so.1.2.0
+-- LAGraph static:  /home/davis/dev2/SuiteSparse/lib/liblagraph.a
+-- SuiteSparse_Mongoose version: 3.3.5
+-- SuiteSparse_Mongoose include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- SuiteSparse_Mongoose library: /home/davis/dev2/SuiteSparse/lib/libsuitesparse_mongoose.so.3
+-- SuiteSparse_Mongoose static:  /home/davis/dev2/SuiteSparse/lib/libsuitesparse_mongoose.a
+-- UMFPACK version: 6.3.6
+-- UMFPACK include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- UMFPACK library: /home/davis/dev2/SuiteSparse/lib/libumfpack.so.6.3.6
+-- UMFPACK static:  /home/davis/dev2/SuiteSparse/lib/libumfpack.a
+-- Found OpenMP: TRUE (found version "4.5") found components: CXX 
+-- ParU version: 1.0.1
+-- ParU include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- ParU library: /home/davis/dev2/SuiteSparse/lib/libparu.so.1.0.1
+-- ParU static:  /home/davis/dev2/SuiteSparse/lib/libparu.a
+-- RBio version: 4.3.5
+-- RBio include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- RBio library: /home/davis/dev2/SuiteSparse/lib/librbio.so.4.3.5
+-- RBio static:  /home/davis/dev2/SuiteSparse/lib/librbio.a
+-- SPEX version: 3.2.4
+-- SPEX include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- SPEX library: /home/davis/dev2/SuiteSparse/lib/libspex.so.3.2.4
+-- SPEX static:  /home/davis/dev2/SuiteSparse/lib/libspex.a
+-- SPQR version: 4.3.5
+-- SPQR include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- SPQR library: /home/davis/dev2/SuiteSparse/lib/libspqr.so.4.3.5
+-- SPQR static:  /home/davis/dev2/SuiteSparse/lib/libspqr.a
+-- UMFPACK version: 6.3.6
+-- UMFPACK include: /home/davis/dev2/SuiteSparse/include/suitesparse
+-- UMFPACK library: /home/davis/dev2/SuiteSparse/lib/libumfpack.so.6.3.6
+-- UMFPACK static:  /home/davis/dev2/SuiteSparse/lib/libumfpack.a
+-- MY source:         /home/davis/dev2/SuiteSparse/Example
+-- MY build:          /home/davis/dev2/SuiteSparse/Example/build
+-- MY install prefix: /usr/local
+-- MY install rpath:  
+-- MY build   rpath:  
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/davis/dev2/SuiteSparse/Example/build
+gmake[1]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[2]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_static
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_cxx_static
+Consolidate compiler generated dependencies of target my
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_cxx
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+[ 25%] Built target my
+[ 25%] Built target my_static
+[ 37%] Built target my_cxx_static
+[ 50%] Built target my_cxx
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[3]: Entering directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_demo
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_demo_static
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_cxx_demo
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+Consolidate compiler generated dependencies of target my_cxx_demo_static
+gmake[3]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+[ 62%] Built target my_demo
+[ 75%] Built target my_demo_static
+[ 87%] Built target my_cxx_demo_static
+[100%] Built target my_cxx_demo
+gmake[2]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+gmake[1]: Leaving directory '/home/davis/dev2/SuiteSparse/Example/build'
+( cd build && ./my_demo )
 My demo
 Date from #include 'my.h':  June 1, 2025
 Date from compiled library: June 1, 2025
@@ -11,7 +149,7 @@ MY version code: 1008009
 MY date: June 1, 2025
 
 ------------------------------------------------------------
-SuiteSparse_config: v7.11.0 (June 1, 2025)
+SuiteSparse_config: v7.11.0 (July 25, 2025)
 SuiteSparse_config: v7.11.0 (in library)
 SuiteSparse_config version code: 7011000
 
@@ -72,12 +210,12 @@ CHOLMOD: v5.3.4 (in library)
 CHOLMOD version code: 5003004
 
 ------------------------------------------------------------
-GraphBLAS: v10.1.1 (June 2, 2025)
+GraphBLAS: v10.1.1 (July 25, 2025)
 GraphBLAS: v10.1.1 (in library)
 GraphBLAS version code: 10001001
 
 ------------------------------------------------------------
-LAGraph: v1.2.0 (June 1, 2025)
+LAGraph: v1.2.0 (July 25, 2025)
 LAGraph: v1.2.0 (in library)
 LAGraph version code: 1002000
 

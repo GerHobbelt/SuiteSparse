@@ -70,22 +70,20 @@
 #                       This will require SUITESPARSE_C_TO_FORTRAN to be
 #                       defined explicitly, if the defaults are not appropriate
 #                       for your system.
-#                       Default: OFF
+#                       Default: ON
 #
-#       This setting was ON by default in SuiteSparse 7.10.0 and earlier.
-#       Note that Fortran is now disabled by default, with the default setting
-#       of SUITESPARSE_USE_FORTRAN changed from ON to OFF.  If the icx compiler
-#       and the Intel MKL BLAS are available but ifx is not, then loading the
-#       GNU Fortran compiler causes the cmake FindBLAS to link the Intel MKL
-#       against libgomp, but at the same time cmake links the application with
-#       libiomp.  Including two OpenMP libraries, libiomp and libgomp, in one
-#       application can cause serious performance issues.  To avoid this issue,
-#       SUITESPARSE_USE_FORTRAN has been set to OFF.  This has little impact on
-#       SuiteSparse (it disables the AMD Fortran routines, and removes the
-#       Fortran interface to UMFPACK).  If you wish to use those features,
-#       re-enable the SUITESPARSE_USE_FORTRAN, but be sure to use either gcc
-#       and gfortran together, or icx and ifx together.  Do not mix-and-match
-#       the compilers.
+#       *** WARNING:  Using the Intel icx compiler, the Intel MKL BLAS, and the
+#       GNU Fortran compiler together will result in two OpenMP libraries
+#       linked to the UMFPACK, CHOLMOD, ParU, and SPQR libraries.  This will
+#       cause serious performance issues.  This cmake file detects if icx and
+#       gfortran are in use, and issues a fatal error.  Otherwise, if the C,
+#       C++, and Fortran compilers have a different compiler ID, a warning is
+#       issued; this is NOT recommended, but it might be OK.  In that case,
+#       ensure that you are linking with just one OpenMP library.  If this
+#       occurs, disable the use of Fortran by setting SUITESPARSE_USE_FORTRAN
+#       to OFF, use a suite of C/C++/Fortran compilers with the same ID,
+#       or ensure that all your compiled libraries link against a single
+#       OpenMP library.
 #
 #   SUITESPARSE_PKGFILEDIR: Directory where CMake Config and pkg-config files
 #                       will be installed.  By default, CMake Config files will
@@ -326,7 +324,7 @@ if ( SUITESPARSE_USE_FORTRAN )
                 " it has the same compiler ID as the C/C++ compilers."
                 "  Use a compatible Fortran compiler, or set SUITESPARSE_USE_FORTRAN to OFF." )
             else ( )
-                # for other case: just issue a warning and hope it works.
+                # other cases: just issue a warning and hope it works.
                 message ( WARNING "Warning: Using Fortran with SuiteSparse requires that "
                 " it has the same compiler ID as the C/C++ compilers."
                 "  Use a compatible Fortran compiler, or set SUITESPARSE_USE_FORTRAN to OFF." )
