@@ -488,6 +488,10 @@ static int print_level = -1;
 
 #if ( defined ( BLAS_Intel10_64ilp ) || defined ( BLAS_Intel10_64lp ) )
 
+    #undef mkl_set_num_threads
+    #undef mkl_set_num_threads_local
+    #undef mkl_set_dynamic
+
     #ifdef MATLAB_MEX_FILE
 
         extern "C"
@@ -508,6 +512,7 @@ static int print_level = -1;
             void MKL_Set_Num_Threads_Local (int n) ;
             void MKL_Set_Dynamic (int flag);
         }
+
         #define mkl_set_num_threads         MKL_Set_Num_Threads
         #define mkl_set_num_threads_local   MKL_Set_Num_Threads_Local
         #define mkl_set_dynamic             MKL_Set_Dynamic

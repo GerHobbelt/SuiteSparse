@@ -18,6 +18,7 @@
 #include <cmath>
 
 #include "ParU.h"
+#include "paru_internal.hpp"
 #include <stdlib.h>
 #ifdef _OPENMP
 #include <omp.h>
@@ -63,7 +64,10 @@ int main(int argc, char **argv)
     void *Symbolic = NULL, *Numeric = NULL ;
     FILE *fp = stdin ;
 
-    //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
+    //--------------------------------------------------------------------------
+    // read the input matrix
+    //--------------------------------------------------------------------------
+
     // start CHOLMOD
     cc = &Common;
     int mtype;
@@ -99,7 +103,10 @@ int main(int argc, char **argv)
         FREE_ALL_AND_RETURN (PARU_INVALID) ;
     }
 
-    //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //--------------------------------------------------------------------------
+    // initializations
+    //--------------------------------------------------------------------------
+
     int ver[3];
     char date[128];
     ParU_Version(ver, date);
@@ -138,13 +145,16 @@ int main(int argc, char **argv)
     std::cout << "OpenMP in ParU: " << (using_openmp ? "yes" : "no" )
         << std::endl ;
 
-    int64_t max_nthreads ;
+    int64_t max_nthreads, max_levels ;
     #ifdef _OPENMP
     max_nthreads = omp_get_max_threads ( ) ;
+    max_levels   = omp_get_max_active_levels ( ) ;
     #else
     max_ntreads = 1 ;
+    max_levels  = 1 ;
     #endif
     std::cout << "max # threads: " << max_nthreads << std::endl ;
+    std::cout << "max # levels:  " << max_levels   << std::endl ;
 
     // allocate workspace
     int64_t n, anz ;
@@ -160,11 +170,126 @@ int main(int argc, char **argv)
     #define NTRIALS 5
     int middle = NTRIALS / 2 ;
 
+
+    //--------------------------------------------------------------------------
+    // benchmark UMFPACK
+    //--------------------------------------------------------------------------
+
+    double umf_time = 0;
+    double status,           // Info [UMFPACK_STATUS]
+        Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
+        umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
+    // is used in umfpack_dl_symbolic; if
+    // passed NULL it will use the defaults
+    umfpack_dl_defaults(umf_Control);
+
+    int64_t *Ap = (int64_t *)A->p;
+    int64_t *Ai = (int64_t *)A->i;
+    double *Ax = (double *)A->x;
+
+    for (int ord = 0 ; ord <= 1 ; ord++)
+    {
+        int ordering = (ord == 0) ?  UMFPACK_ORDERING_AMD :
+            UMFPACK_ORDERING_METIS_GUARD ;
+        printf ("\n===== UMFPACK ordering: %d\n", ordering) ;
+        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
+        {
+            printf ("# threads: %d\n", nthreads) ;
+            #ifdef _OPENMP
+            omp_set_num_threads (nthreads) ;
+            // BLAS_set_num_threads (nthreads) ;
+            #endif
+
+            double UMF_sym_times [NTRIALS] ;
+            double UMF_num_times [NTRIALS] ;
+            double UMF_sol_times [NTRIALS] ;
+            umf_Control[UMFPACK_ORDERING] = ordering ;
+            for (int trial = 0 ; trial < NTRIALS ; trial++)
+            {
+                printf ("Trial: %d\n", trial) ;
+
+                double umf_start_time = SUITESPARSE_TIME;
+                status = umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic,
+                    umf_Control, Info);
+                if (status < 0)
+                {
+                    umfpack_dl_report_info(umf_Control, Info);
+                    umfpack_dl_report_status(umf_Control, status);
+                    std::cout << "umfpack_dl_symbolic failed\n";
+                    FREE_ALL_AND_RETURN (PARU_INVALID) ;
+                }
+                double umf_symbolic = SUITESPARSE_TIME - umf_start_time;
+                double umf_fac_start = SUITESPARSE_TIME;
+                status = umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric,
+                    umf_Control, Info);
+                if (status < 0)
+                {
+                    umfpack_dl_report_info(umf_Control, Info);
+                    umfpack_dl_report_status(umf_Control, status);
+                    std::cout << "umfpack_dl_numeric failed\n";
+                    FREE_ALL_AND_RETURN (PARU_INVALID) ;
+                }
+
+                double umf_time_fac = SUITESPARSE_TIME - umf_fac_start;
+
+                for (int64_t i = 0; i < n; ++i) b[i] = i + 1;
+
+                double solve_start = SUITESPARSE_TIME;
+                status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b,
+                    Numeric, umf_Control, Info);
+                double umf_solve_time = SUITESPARSE_TIME - solve_start;
+                umf_time = SUITESPARSE_TIME - umf_start_time;
+
+                double umf_resid, umf_anorm, umf_xnorm;
+                info = ParU_Residual(A, x, b, umf_resid, umf_anorm, umf_xnorm,
+                    Control);
+                double umf_rresid = (umf_anorm == 0 || umf_xnorm == 0 )
+                    ? 0 : (umf_resid/(umf_anorm*umf_xnorm));
+                if (trial == 0)
+                {
+                    std::cout << std::scientific << std::setprecision(6)
+                        << "UMFPACK relative residual: " << umf_rresid
+                        << std::endl;
+                }
+
+                std::cout << std::scientific << std::setprecision(6)
+                    << "UMFPACK time: sym " << umf_symbolic
+                    << " num: " << umf_time_fac
+                    << " solve: " << umf_solve_time << std::endl ;
+
+                UMF_sym_times [trial] = umf_symbolic ;
+                UMF_num_times [trial] = umf_time_fac ;
+                UMF_sol_times [trial] = umf_solve_time ;
+
+                umfpack_dl_free_symbolic(&Symbolic);
+                umfpack_dl_free_numeric(&Numeric);
+            }
+
+            qsort (UMF_sym_times, NTRIALS, sizeof (double), compar) ;
+            qsort (UMF_num_times, NTRIALS, sizeof (double), compar) ;
+            qsort (UMF_sol_times, NTRIALS, sizeof (double), compar) ;
+
+            std::cout << std::scientific << std::setprecision(6)
+                << "\nUMF  ordering " << ordering
+                << " threads " << nthreads
+                << " median sym: " << UMF_sym_times [middle]
+                << " num: " << UMF_num_times [middle]
+                << " sol: " << UMF_sol_times [middle]
+                << " total: " << UMF_sym_times [middle] +
+                UMF_num_times [middle] + UMF_sol_times [middle]
+                << std::endl << std::endl ;
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // benchmark ParU
+    //--------------------------------------------------------------------------
+
     for (int ord = 0 ; ord <= 1 ; ord++)
     {
         int ordering = (ord == 0) ? PARU_ORDERING_AMD :
             PARU_ORDERING_METIS_GUARD ;
-        printf ("===== ParU ordering: %d\n", ordering) ;
+        printf ("\n===== ParU ordering: %d\n", ordering) ;
         ParU_Set (PARU_CONTROL_ORDERING, ordering, Control) ;
         for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
         {
@@ -330,115 +455,10 @@ int main(int argc, char **argv)
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //--------------------------------------------------------------------------
+    // free everything and return
+    //--------------------------------------------------------------------------
 
-    //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double umf_time = 0;
-    double status,           // Info [UMFPACK_STATUS]
-        Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
-        umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
-    // is used in umfpack_dl_symbolic; if
-    // passed NULL it will use the defaults
-    umfpack_dl_defaults(umf_Control);
-
-    int64_t *Ap = (int64_t *)A->p;
-    int64_t *Ai = (int64_t *)A->i;
-    double *Ax = (double *)A->x;
-
-    for (int ord = 0 ; ord <= 1 ; ord++)
-    {
-        int ordering = (ord == 0) ?  UMFPACK_ORDERING_AMD :
-            UMFPACK_ORDERING_METIS_GUARD ;
-        printf ("\n===== UMFPACK ordering: %d\n", ordering) ;
-        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
-        {
-            printf ("# threads: %d\n", nthreads) ;
-            #ifdef _OPENMP
-            omp_set_num_threads (nthreads) ;
-            #endif
-
-            double UMF_sym_times [NTRIALS] ;
-            double UMF_num_times [NTRIALS] ;
-            double UMF_sol_times [NTRIALS] ;
-            umf_Control[UMFPACK_ORDERING] = ordering ;
-            for (int trial = 0 ; trial < NTRIALS ; trial++)
-            {
-                printf ("Trial: %d\n", trial) ;
-
-                double umf_start_time = SUITESPARSE_TIME;
-                status = umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic,
-                    umf_Control, Info);
-                if (status < 0)
-                {
-                    umfpack_dl_report_info(umf_Control, Info);
-                    umfpack_dl_report_status(umf_Control, status);
-                    std::cout << "umfpack_dl_symbolic failed\n";
-                    FREE_ALL_AND_RETURN (PARU_INVALID) ;
-                }
-                double umf_symbolic = SUITESPARSE_TIME - umf_start_time;
-                double umf_fac_start = SUITESPARSE_TIME;
-                status = umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric,
-                    umf_Control, Info);
-                if (status < 0)
-                {
-                    umfpack_dl_report_info(umf_Control, Info);
-                    umfpack_dl_report_status(umf_Control, status);
-                    std::cout << "umfpack_dl_numeric failed\n";
-                    FREE_ALL_AND_RETURN (PARU_INVALID) ;
-                }
-
-                double umf_time_fac = SUITESPARSE_TIME - umf_fac_start;
-
-                for (int64_t i = 0; i < n; ++i) b[i] = i + 1;
-
-                double solve_start = SUITESPARSE_TIME;
-                status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b,
-                    Numeric, umf_Control, Info);
-                double umf_solve_time = SUITESPARSE_TIME - solve_start;
-                umf_time = SUITESPARSE_TIME - umf_start_time;
-
-                double umf_resid, umf_anorm, umf_xnorm;
-                info = ParU_Residual(A, x, b, umf_resid, umf_anorm, umf_xnorm,
-                    Control);
-                double umf_rresid = (umf_anorm == 0 || umf_xnorm == 0 )
-                    ? 0 : (umf_resid/(umf_anorm*umf_xnorm));
-                if (trial == 0)
-                {
-                    std::cout << std::scientific << std::setprecision(6)
-                        << "UMFPACK relative residual: " << umf_rresid
-                        << std::endl;
-                }
-
-                std::cout << std::scientific << std::setprecision(6)
-                    << "UMFPACK time: sym " << umf_symbolic
-                    << " num: " << umf_time_fac
-                    << " solve: " << umf_solve_time << std::endl ;
-
-                UMF_sym_times [trial] = umf_symbolic ;
-                UMF_num_times [trial] = umf_time_fac ;
-                UMF_sol_times [trial] = umf_solve_time ;
-
-                umfpack_dl_free_symbolic(&Symbolic);
-                umfpack_dl_free_numeric(&Numeric);
-            }
-
-            qsort (UMF_sym_times, NTRIALS, sizeof (double), compar) ;
-            qsort (UMF_num_times, NTRIALS, sizeof (double), compar) ;
-            qsort (UMF_sol_times, NTRIALS, sizeof (double), compar) ;
-
-            std::cout << std::scientific << std::setprecision(6)
-                << "\nUMF  ordering " << ordering
-                << " threads " << nthreads
-                << " median sym: " << UMF_sym_times [middle]
-                << " num: " << UMF_num_times [middle]
-                << " sol: " << UMF_sol_times [middle]
-                << " total: " << UMF_sym_times [middle] +
-                UMF_num_times [middle] + UMF_sol_times [middle]
-                << std::endl << std::endl ;
-        }
-    }
-
-    //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     FREE_ALL_AND_RETURN (PARU_SUCCESS) ;
 }
 

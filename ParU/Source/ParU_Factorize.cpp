@@ -214,6 +214,11 @@ ParU_Info ParU_Factorize
     // execute the task tree
     //--------------------------------------------------------------------------
 
+    #if ( defined ( BLAS_Intel10_64ilp ) || defined ( BLAS_Intel10_64lp ) )
+    int dynamic  = PARU_OPENMP_GET_DYNAMIC ;
+    #endif
+    int levels   = PARU_OPENMP_GET_MAX_ACTIVE_LEVELS ;
+
 #if ! defined ( PARU_1TASK )
     // The parallel factorization gets stuck intermittently on Windows or Mac
     // with gcc, so always use the sequential factorization in that case.
@@ -223,14 +228,16 @@ ParU_Info ParU_Factorize
         PRLEVEL(1, ("Parallel\n"));
         // checking user input
 
-#if ( defined ( BLAS_Intel10_64ilp ) || defined ( BLAS_Intel10_64lp ) )
+        // revise the MKL and OpenMP settings for the parallel task tree
+        #if ( defined ( BLAS_Intel10_64ilp ) || defined ( BLAS_Intel10_64lp ) )
         PARU_OPENMP_SET_DYNAMIC(0);
         mkl_set_dynamic((int)0);
         // mkl_set_threading_layer(MKL_THREADING_INTEL);
         // mkl_set_interface_layer(MKL_INTERFACE_ILP64);
-#endif
+        #endif
         BLAS_set_num_threads(1);
         PARU_OPENMP_SET_MAX_ACTIVE_LEVELS(4);
+
         const int64_t size = (int64_t)task_Q.size();
         const int64_t steps = size == 0 ? 1 : size;
         const int64_t stages = size / steps + 1;
@@ -295,7 +302,6 @@ ParU_Info ParU_Factorize
             }
             paru_free_work(Sym, Work);   // free the work DS
             ParU_FreeNumeric(Num_handle, Control);
-            return info;
         }
     }
     else
@@ -311,9 +317,22 @@ ParU_Info ParU_Factorize
                 PRLEVEL(1, ("%% A problem happend in " LD "\n", i));
                 paru_free_work(Sym, Work);   // free the work DS
                 ParU_FreeNumeric(Num_handle, Control);
-                return info;
+                break ;
             }
         }
+    }
+
+    // restore the MKL and OpenMP settings to their original values
+    #if ( defined ( BLAS_Intel10_64ilp ) || defined ( BLAS_Intel10_64lp ) )
+    PARU_OPENMP_SET_DYNAMIC (dynamic) ;
+    mkl_set_dynamic ((int) dynamic) ;
+    #endif
+    BLAS_set_num_threads (PARU_OPENMP_MAX_THREADS) ;
+    PARU_OPENMP_SET_MAX_ACTIVE_LEVELS (levels);
+
+    if (info != PARU_SUCCESS)
+    {
+        return (info) ;
     }
 
     //--------------------------------------------------------------------------

@@ -60,9 +60,6 @@ ParU_Info ParU_LSolve
         return (PARU_INVALID) ;
     }
 
-    // get Control
-    BLAS_set_num_threads (paru_nthreads (Control)) ;
-
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
     int64_t nf = Sym->nf;
@@ -127,6 +124,9 @@ ParU_Info ParU_LSolve
         PRLEVEL(1, ("ParU: out of memory lsolve\n"));
         return (PARU_OUT_OF_MEMORY) ;
     }
+
+    // get Control
+    BLAS_set_num_threads (paru_nthreads (Control)) ;
 
     const ParU_Factors *LUs = Num->partial_LUs;
     const int64_t *Super = Sym->Super;
@@ -211,6 +211,7 @@ ParU_Info ParU_LSolve
     PRLEVEL(1, (" \n"));
 #endif
     PARU_FREE(Num->max_row_count, double, work);
+    BLAS_set_num_threads (PARU_OPENMP_MAX_THREADS) ;
     return (blas_ok ? PARU_SUCCESS : PARU_TOO_LARGE);
 }
 
@@ -235,9 +236,6 @@ ParU_Info ParU_LSolve
     {
         return (PARU_INVALID) ;
     }
-
-    // get Control
-    BLAS_set_num_threads (paru_nthreads (Control)) ;
 
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -323,6 +321,9 @@ ParU_Info ParU_LSolve
         PRLEVEL(1, ("ParU: out of memory lsolve\n"));
         return (PARU_OUT_OF_MEMORY) ;
     }
+
+    // get Control
+    BLAS_set_num_threads (paru_nthreads (Control)) ;
 
     const ParU_Factors *LUs = Num->partial_LUs;
     const int64_t *Super = Sym->Super;
@@ -418,5 +419,6 @@ ParU_Info ParU_LSolve
     PRLEVEL(1, (" \n"));
 #endif
     PARU_FREE(Num->max_row_count * nrhs, double, work);
+    BLAS_set_num_threads (PARU_OPENMP_MAX_THREADS) ;
     return (blas_ok ? PARU_SUCCESS : PARU_TOO_LARGE);
 }
