@@ -191,6 +191,8 @@ int main(int argc, char **argv)
     // benchmark UMFPACK
     //--------------------------------------------------------------------------
 
+#if 0
+
     double umf_time = 0;
     double status,           // Info [UMFPACK_STATUS]
         Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
@@ -327,6 +329,8 @@ int main(int argc, char **argv)
     // restore max threads to its default
     omp_set_num_threads (max_nthreads) ;
     #endif
+
+#endif
 
     //--------------------------------------------------------------------------
     // benchmark ParU
