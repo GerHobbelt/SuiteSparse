@@ -413,8 +413,6 @@ Packages in SuiteSparse, and files in this directory:
 
   a parallel unsymmetric pattern multifrontal method.
 
-  Currently a pre-release.
-
   authors: Mohsen Aznaveh and Tim Davis
 
 * `RBio`

@@ -80,10 +80,10 @@ SuiteSparse packages:
   KLU      sparse LU factorization, BLAS-free
   BTF      permutation to block triangular form
   LDL      concise sparse LDL'
-  LPDASA   LP Dual Active Set Algorithm
   RBio     read/write files in Rutherford/Boeing format
   SPQR     sparse QR factorization (full name: SuiteSparseQR)
   SPEX     sparse left-looking integer-preserving LU factorization
+  ParU     parallel unsymmetric-pattern multifrontal method
 
 SuiteSparse_config is not required by these packages:
 

@@ -1,4 +1,4 @@
-// SuiteSparse:GraphBLAS 10.2.0
+// SuiteSparse:GraphBLAS 10.3.1
 //------------------------------------------------------------------------------
 // GraphBLAS.h: definitions for the GraphBLAS package
 //------------------------------------------------------------------------------
@@ -286,10 +286,10 @@
 
 // The version of this implementation, and the GraphBLAS API version:
 #define GxB_IMPLEMENTATION_NAME "SuiteSparse:GraphBLAS"
-#define GxB_IMPLEMENTATION_DATE "Nov 1, 2025"
+#define GxB_IMPLEMENTATION_DATE "Jan 21, 2026"
 #define GxB_IMPLEMENTATION_MAJOR 10
-#define GxB_IMPLEMENTATION_MINOR 2
-#define GxB_IMPLEMENTATION_SUB   0
+#define GxB_IMPLEMENTATION_MINOR 3
+#define GxB_IMPLEMENTATION_SUB   1
 #define GxB_SPEC_DATE "Dec 22, 2023"
 #define GxB_SPEC_MAJOR 2
 #define GxB_SPEC_MINOR 1
@@ -6605,7 +6605,7 @@ GrB_Info prefix ## Matrix_import ## suffix                                  \
     GrB_Index nrows,        /* number of rows of the matrix */              \
     GrB_Index ncols,        /* number of columns of the matrix */           \
     const GrB_Index *Ap,    /* pointers for CSR,CSC; row indices for COO   */\
-    const GrB_Index *Ai,    /* row indices for CSR; col indices for COO,CSR*/\
+    const GrB_Index *Ai,    /* row indices for CSC; col indices for COO,CSR*/\
     const ctype *Ax,        /* values */                                    \
     GrB_Index Ap_len,       /* number of entries in Ap (not # of bytes) */  \
     GrB_Index Ai_len,       /* number of entries in Ai (not # of bytes) */  \

@@ -10,7 +10,7 @@
 SuiteSparse:  A Suite of Sparse matrix packages at http://suitesparse.com
 -----------------------------------------------------------------------------
 
-Nov 1, 2025, SuiteSparse VERSION 7.12.0
+Feb 5, 2026, SuiteSparse VERSION 7.12.2
 
 SuiteSparse is a set of sparse-matrix-related packages written or co-authored
 by Tim Davis, available at https://github.com/DrTimothyAldenDavis/SuiteSparse .
@@ -412,8 +412,6 @@ Packages in SuiteSparse, and files in this directory:
 * `ParU`
 
   a parallel unsymmetric pattern multifrontal method.
-
-  Currently a pre-release.
 
   authors: Mohsen Aznaveh and Tim Davis
 
