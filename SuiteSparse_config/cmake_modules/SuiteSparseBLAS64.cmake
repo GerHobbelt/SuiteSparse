@@ -15,7 +15,13 @@ if ( SUITESPARSE_REQUIRE_BLAS )
 endif ( )
 add_compile_definitions ( BLAS_${BLA_VENDOR} )
 add_compile_definitions ( BLAS64 )
+if ( BLA_VENDOR MATCHES "Intel10" )
+    add_compile_definitions ( BLAS_Intel10 )
+endif ( )
 set ( SuiteSparse_BLAS_integer "int64_t" )
+
+# determine the BLAS properties (single/multi-thread and set local threads)
+include ( SuiteSparse__blas_threading )
 
 #-------------------------------------------------------------------------------
 # Examine the suffix appended to the Fortran 64-bit BLAS+LAPACK functions

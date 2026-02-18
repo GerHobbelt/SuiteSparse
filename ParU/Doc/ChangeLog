@@ -1,3 +1,7 @@
+TODO, 2025: version 1.1.0
+
+    * performance: better detection and control of threading in the BLAS
+
 July 25, 2025: version 1.0.1
 
     * minor updates to build system

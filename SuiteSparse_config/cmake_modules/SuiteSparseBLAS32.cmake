@@ -14,5 +14,11 @@ if ( SUITESPARSE_REQUIRE_BLAS )
     message ( STATUS "Found ${BLA_VENDOR} 32-bit BLAS" )
 endif ( )
 add_compile_definitions ( BLAS_${BLA_VENDOR} )
+if ( BLA_VENDOR MATCHES "Intel10" )
+    add_compile_definitions ( BLAS_Intel10 )
+endif ( )
 set ( SuiteSparse_BLAS_integer "int32_t" )
+
+# determine the BLAS properties (single/multi-thread and set local threads)
+include ( SuiteSparse__blas_threading )
 

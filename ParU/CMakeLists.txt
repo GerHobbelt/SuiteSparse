@@ -2,7 +2,7 @@
 # SuiteSparse/ParU/CMakeLists.txt:  cmake for ParU
 #-------------------------------------------------------------------------------
 
-# ParU, Copyright (c) 2022-2024, Mohsen Aznaveh and Timothy A. Davis,
+# ParU, Copyright (c) 2022-2025, Mohsen Aznaveh and Timothy A. Davis,
 # All Rights Reserved.
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,10 +13,10 @@
 # cmake 3.22 is required to find the BLAS in SuiteSparse_config
 cmake_minimum_required ( VERSION 3.22 )
 
-set ( PARU_DATE "July 25, 2025" )
+set ( PARU_DATE "Nov 1, 2025" )
 set ( PARU_VERSION_MAJOR  1 CACHE STRING "" FORCE )
-set ( PARU_VERSION_MINOR  0 CACHE STRING "" FORCE )
-set ( PARU_VERSION_UPDATE 1 CACHE STRING "" FORCE )
+set ( PARU_VERSION_MINOR  1 CACHE STRING "" FORCE )
+set ( PARU_VERSION_UPDATE 0 CACHE STRING "" FORCE )
 
 message ( STATUS "Building PARU version: v"
     ${PARU_VERSION_MAJOR}.
@@ -103,10 +103,10 @@ endif ( )
 #-------------------------------------------------------------------------------
 
 if ( NOT SUITESPARSE_ROOT_CMAKELISTS )
-    find_package ( SuiteSparse_config 7.11.0
+    find_package ( SuiteSparse_config 7.12.0
         PATHS ${CMAKE_SOURCE_DIR}/../SuiteSparse_config/build NO_DEFAULT_PATH )
     if ( NOT TARGET SuiteSparse::SuiteSparseConfig )
-        find_package ( SuiteSparse_config 7.11.0 REQUIRED )
+        find_package ( SuiteSparse_config 7.12.0 REQUIRED )
     endif ( )
 
     find_package ( CHOLMOD 5.3.4
@@ -115,10 +115,10 @@ if ( NOT SUITESPARSE_ROOT_CMAKELISTS )
         find_package ( CHOLMOD 5.3.4 REQUIRED )
     endif ( )
 
-    find_package ( UMFPACK 6.3.6
+    find_package ( UMFPACK 6.3.7
         PATHS ${CMAKE_SOURCE_DIR}/../UMFPACK/build NO_DEFAULT_PATH )
     if ( NOT UMFPACK_FOUND )
-        find_package ( UMFPACK 6.3.6 REQUIRED )
+        find_package ( UMFPACK 6.3.7 REQUIRED )
     endif ( )
 endif ( )
 

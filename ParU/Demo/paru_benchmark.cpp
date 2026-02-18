@@ -2,7 +2,7 @@
 // =======================  paru_benchmark.cpp ==============================  /
 // ==========================================================================  /
 
-// ParU, Copyright (c) 2022-2024, Mohsen Aznaveh and Timothy A. Davis,
+// ParU, Copyright (c) 2022-2025, Mohsen Aznaveh and Timothy A. Davis,
 // All Rights Reserved.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -16,7 +16,6 @@
 #include <iomanip>
 #include <ios>
 #include <cmath>
-
 #include "ParU.h"
 #include <stdlib.h>
 #ifdef _OPENMP
@@ -49,6 +48,22 @@ static int compar (const void *p1, const void *p2)
     double x1 = *((double *) p1) ;
     double x2 = *((double *) p2) ;
     return (x1 < x2 ? -1 : ((x1 > x2) ? 1 : 0)) ;
+}
+
+static int next_threads (int current_threads)
+{
+    if (current_threads == 32)
+    {
+        return (24) ;
+    }
+    else if (current_threads == 24)
+    {
+        return (16) ;
+    }
+    else
+    {
+        return (current_threads/2) ;
+    }
 }
 
 int main(int argc, char **argv)
@@ -191,7 +206,7 @@ int main(int argc, char **argv)
     // benchmark UMFPACK
     //--------------------------------------------------------------------------
 
-#if 0
+#if 1
 
     double umf_time = 0;
     double status,           // Info [UMFPACK_STATUS]
@@ -212,7 +227,7 @@ int main(int argc, char **argv)
         printf ("\n===== UMFPACK ordering: %d\n", ordering) ;
         int kthread = 0 ;
         sym_time = -1 ;
-        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
+        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = next_threads (nthreads))
         {
             printf ("# threads: %d\n", nthreads) ;
             #ifdef _OPENMP
@@ -345,7 +360,7 @@ int main(int argc, char **argv)
         int kthread = 0 ;
         sym_time = -1 ;
         int64_t ordering_used, strategy_used, umf_strategy_used ;
-        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = nthreads/2)
+        for (int nthreads = max_nthreads ; nthreads > 0 ; nthreads = next_threads (nthreads))
         {
             printf ("# threads: %d\n", nthreads) ;
             ParU_Set (PARU_CONTROL_MAX_THREADS, (int64_t) nthreads, Control) ;
