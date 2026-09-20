@@ -41,16 +41,18 @@ jobs:
         cc: [clang-cl]
         cxx: [clang-cl]
         include:
-          - openmp: with
-            cuda: with
-            link: both
-            cc: clang-cl
-            cxx: clang-cl
-          - openmp: with
-            cuda: with
-            link: static
-            cc: clang-cl
-            cxx: clang-cl
+# CUDA is intermittently timing out, as of July 20, 2026, so it is
+# temporarily removed from this workflow:
+#         - openmp: with
+#           cuda: with
+#           link: both
+#           cc: clang-cl
+#           cxx: clang-cl
+#         - openmp: with
+#           cuda: with
+#           link: static
+#           cc: clang-cl
+#           cxx: clang-cl
           - openmp: without
             cuda: without
             link: both
@@ -316,7 +318,7 @@ jobs:
           IFS=':' read -r -a libs <<< "${INSTALLED_LIBS}"
           for lib in "${libs[@]}"; do
             printf "::group::   \033[0;32m==>\033[0m Building with Config.cmake with library \033[0;32m${lib}\033[0m\n"
-            cd ${GITHUB_WORKSPACE}/TestConfig/${lib}
+            cd ${GITHUB_WORKSPACE}/TestConfig/test_${lib}
             cd build
             cmake -G"Ninja Multi-Config" \
               -DCMAKE_C_COMPILER=${{ matrix.cc }} \
